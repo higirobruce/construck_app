@@ -25,8 +25,10 @@ export default function Login() {
   const [viewPort, setViewPort] = useState('login')
   const [accountType, setAccountType] = useState('')
   const [country, setCountry] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   function login() {
+    setSubmitting(true)
     try {
       fetch(`https://construck-backend.herokuapp.com/users/login`, {
         method: 'POST',
@@ -56,9 +58,12 @@ export default function Login() {
               progress: undefined,
             })
           }
+
+          setSubmitting(false)
         })
         .catch((err) => {
           toast.error(`${messages[`${language}`].checkDataService}`)
+          setSubmitting(false)
         })
     } catch (err) {
       toast.error(JSON.stringify(err), {
@@ -70,6 +75,8 @@ export default function Login() {
         draggable: true,
         progress: undefined,
       })
+
+      setSubmitting(false)
     }
   }
 
@@ -206,6 +213,7 @@ export default function Login() {
                 />
               </div>
               <button
+                disabled={submitting}
                 onClick={() => {
                   if (email.length < 1 || password.length < 1) {
                     toast.error(`${messages[`${language}`]?.checkInputs}`, {
@@ -223,9 +231,11 @@ export default function Login() {
                 }}
                 className="mt-5 flex w-full cursor-pointer items-center justify-center space-x-2 rounded-md bg-zinc-800 p-3 shadow-md transition duration-75 ease-out hover:shadow-sm active:scale-95 active:shadow-sm"
               >
-                <div className="text-white">{`${
-                  labels[`${language}`]?.submit
-                }`}</div>
+                {
+                  <div className="text-white">{`${
+                    labels[`${language}`]?.submit
+                  }`}</div>
+                }
               </button>
             </form>
           </div>
