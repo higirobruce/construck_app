@@ -162,7 +162,7 @@ export default function Projects() {
       </div>
       {viewPort === 'list' && (
         <>
-          {!loading && (
+          {!loading && projects.length > 0 && (
             <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-4 md:gap-y-6">
               {projects.map((e) => {
                 return (
@@ -179,7 +179,7 @@ export default function Projects() {
             </div>
           )}
 
-          {loading && (
+          {(loading || projects.length === 0) && (
             <div className="h-fu mx-auto">
               <Loader active />
             </div>

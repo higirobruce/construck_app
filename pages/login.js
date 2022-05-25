@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import TextInput from '../components/common/TextIput'
 import { UserContext } from '../contexts/UserContext'
 import { toast, ToastContainer } from 'react-toastify'
-import { Dropdown } from 'semantic-ui-react'
+import { Dropdown, Loader } from 'semantic-ui-react'
 import 'react-toastify/dist/ReactToastify.css'
 import 'semantic-ui-css/semantic.min.css'
 import MTextView from '../components/common/mTextView'
@@ -212,31 +212,37 @@ export default function Login() {
                   setValue={_setPassword}
                 />
               </div>
-              <button
-                disabled={submitting}
-                onClick={() => {
-                  if (email.length < 1 || password.length < 1) {
-                    toast.error(`${messages[`${language}`]?.checkInputs}`, {
-                      position: 'top-center',
-                      autoClose: 3000,
-                      hideProgressBar: true,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                    })
-                  } else {
-                    login()
+              {!submitting && (
+                <button
+                  onClick={() => {
+                    if (email.length < 1 || password.length < 1) {
+                      toast.error(`${messages[`${language}`]?.checkInputs}`, {
+                        position: 'top-center',
+                        autoClose: 3000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      })
+                    } else {
+                      login()
+                    }
+                  }}
+                  className="mt-5 flex w-full cursor-pointer items-center justify-center space-x-2 rounded-md bg-zinc-800 p-3 shadow-md transition duration-75 ease-out hover:shadow-sm active:scale-95 active:shadow-sm"
+                >
+                  {
+                    <div className="text-white">{`${
+                      labels[`${language}`]?.submit
+                    }`}</div>
                   }
-                }}
-                className="mt-5 flex w-full cursor-pointer items-center justify-center space-x-2 rounded-md bg-zinc-800 p-3 shadow-md transition duration-75 ease-out hover:shadow-sm active:scale-95 active:shadow-sm"
-              >
-                {
-                  <div className="text-white">{`${
-                    labels[`${language}`]?.submit
-                  }`}</div>
-                }
-              </button>
+                </button>
+              )}
+              {submitting && (
+                <div className="mt-5 flex w-full cursor-not-allowed items-center justify-center space-x-2 rounded-md bg-zinc-100 p-3 shadow-md transition duration-75 ease-out">
+                  <Loader active inline size="small" />
+                </div>
+              )}
             </form>
           </div>
 

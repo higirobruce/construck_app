@@ -9,7 +9,7 @@ import 'antd/dist/antd.css'
 
 import { DatePicker, Space } from 'antd'
 import TextInputV from '../common/TextIputV'
-import { Dropdown } from 'semantic-ui-react'
+import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
 import { MapIcon } from '@heroicons/react/solid'
 const { RangePicker } = DatePicker
@@ -26,6 +26,10 @@ export default function Dashboard() {
   let [provisionalRevenues, setProvisionalRevenues] = useState(0)
   let [totalDays, setTotalDays] = useState(0)
 
+  let [loadingFinalRev, setLoadingFinalRev] = useState(true)
+  let [loadingProvisionalRev, setLoadingProvisionalRev] = useState(true)
+  let [loadingTotalDays, setLoadingTotalDays] = useState(true)
+
   useEffect(() => {
     fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
       method: 'POST',
@@ -45,7 +49,9 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         setFinalRevenues(res.totalRevenue)
+        setLoadingFinalRev(false)
         setTotalDays(res.totalDays)
+        setLoadingTotalDays(false)
       })
       .catch((err) => {})
 
@@ -67,12 +73,16 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         setProvisionalRevenues(res.totalRevenue)
-        setTotalDays(res.totalDays)
+        setLoadingProvisionalRev(false)
       })
       .catch((err) => {})
   }, [])
 
   useEffect(() => {
+    setLoadingFinalRev(true)
+    setLoadingProvisionalRev(true)
+    setLoadingTotalDays(true)
+
     fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
       method: 'POST',
       headers: {
@@ -91,7 +101,9 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         setFinalRevenues(res.totalRevenue)
+        setLoadingFinalRev(false)
         setTotalDays(res.totalDays)
+        setLoadingTotalDays(false)
       })
       .catch((err) => {})
 
@@ -113,6 +125,7 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         setProvisionalRevenues(res.totalRevenue)
+        setLoadingProvisionalRev(false)
         setTotalDays(res.totalDays)
       })
       .catch((err) => {})
@@ -216,21 +229,33 @@ export default function Dashboard() {
           <StatisticCard
             data={{
               title: 'Provisional Revenues',
-              content: provisionalRevenues?.toLocaleString() + ' RWF',
+              content: loadingProvisionalRev ? (
+                <Loader active size="mini" inline />
+              ) : (
+                provisionalRevenues?.toLocaleString() + ' RWF'
+              ),
             }}
             icon={<CashIcon className="h-5 w-5 text-yellow-600" />}
           />
           <StatisticCard
             data={{
               title: 'Final Revenues',
-              content: finalRevenues?.toLocaleString() + ' RWF',
+              content: loadingFinalRev ? (
+                <Loader active size="mini" inline />
+              ) : (
+                finalRevenues?.toLocaleString() + ' RWF'
+              ),
             }}
             icon={<CashIcon className="h-5 w-5 text-blue-600" />}
           />
           <StatisticCard
             data={{
               title: 'Billable Days',
-              content: totalDays,
+              content: loadingTotalDays ? (
+                <Loader active inline size="mini" />
+              ) : (
+                totalDays
+              ),
             }}
             icon={<ClockIcon className="h-5 w-5 text-green-600" />}
           />

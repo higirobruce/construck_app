@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
 import React, { useEffect, useState } from 'react'
+import { Loader } from 'semantic-ui-react'
 import CustomerCard from '../common/customerCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
@@ -10,18 +11,21 @@ export default function Customers() {
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
 
+  let [loadingCustomers, setLoadingCustomers] = useState(true)
+
   useEffect(() => {
     fetch('https://construck-backend.herokuapp.com/customers/')
       .then((res) => res.json())
       .then((resp) => {
         setCustomers(resp)
         setOgCustomerList(resp)
-        console.log(resp)
+        setLoadingCustomers(false)
       })
   }, [])
 
   useEffect(() => {
     if (search.length >= 3) {
+      setLoadingCustomers(true)
       let _customerList = ogCustomerList.filter((w) => {
         let _search = search?.toLocaleLowerCase()
         let custName = w?.name?.toLocaleLowerCase()
@@ -29,10 +33,12 @@ export default function Customers() {
         return custName.includes(_search)
       })
       setCustomers(_customerList)
+      setLoadingCustomers(false)
     }
 
     if (search.length < 3) {
       setCustomers(ogCustomerList)
+      setLoadingCustomers(false)
     }
   }, [search])
 
@@ -77,23 +83,28 @@ export default function Customers() {
           />
         )}
       </div>
-      {viewPort === 'list' && (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-6">
-          {customers.map((c) => {
-            return (
-              <CustomerCard
-                data={{
-                  name: c.name,
-                  email: c.email,
-                  phone: c.phone,
-                  tinNumber: c.tinNumber,
-                  nProjects: c.projects?.length,
-                }}
-              />
-            )
-          })}
-        </div>
-      )}
+      {viewPort === 'list' &&
+        (!loadingCustomers && customers.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-6">
+            {customers.map((c) => {
+              return (
+                <CustomerCard
+                  data={{
+                    name: c.name,
+                    email: c.email,
+                    phone: c.phone,
+                    tinNumber: c.tinNumber,
+                    nProjects: c.projects?.length,
+                  }}
+                />
+              )
+            })}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-6">
+            <Loader active />
+          </div>
+        ))}
     </div>
   )
 }

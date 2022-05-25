@@ -30,22 +30,7 @@ export default function Equipments() {
   let [filterBy, setFilterBy] = useState('')
 
   useEffect(() => {
-    setLoading(true)
-    fetch('https://construck-backend.herokuapp.com/equipments/')
-      .then((res) => res.json())
-      .then((res) => {
-        setEquipments(res)
-
-        let availableEq = res.filter((e) => e.eqStatus === 'available')
-        let assignedEq = res.filter((e) => e.eqStatus === 'assigned to job')
-        let dispatchedEq = res.filter((e) => e.eqStatus === 'dispatched')
-
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setOgEquipmentList(res)
-        setLoading(false)
-      })
+    refresh()
   }, [])
 
   useEffect(() => {
@@ -286,11 +271,7 @@ export default function Equipments() {
       </div>
       {viewPort === 'list' && (
         <>
-          {loading && (
-            <div className="h-fu mx-auto">
-              <Loader active />
-            </div>
-          )}
+          {loading || (equipments.length === 0 && <Loader active />)}
           {!loading && (
             <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
               {equipments.map((e) => {
