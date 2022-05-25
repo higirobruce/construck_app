@@ -63,7 +63,7 @@ export default function Workdata() {
   let [row, setRow] = useState()
   let [rowIndex, setRowIndex] = useState()
 
-  let [submitting, setSubmitting] = useState(true)
+  let [submitting, setSubmitting] = useState(false)
   let [loadingData, setLoadingData] = useState(true)
 
   useEffect(() => {
@@ -91,12 +91,12 @@ export default function Workdata() {
         setProjects(list)
       })
 
-    fetch('https://construck-backend.herokuapp.com/users/')
+    fetch('https://construck-backend.herokuapp.com/employees/')
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
         let userOptions = list
-          .filter((l) => l.userType === 'driver')
+          .filter((l) => l.type === 'driver' || l.type === 'operator')
           .map((l) => {
             return {
               key: l._id,
@@ -135,12 +135,12 @@ export default function Workdata() {
         setProjects(list)
       })
 
-    fetch('https://construck-backend.herokuapp.com/users/')
+    fetch('https://construck-backend.herokuapp.com/employees/')
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
         let userOptions = list
-          .filter((l) => l.userType === 'driver')
+          .filter((l) => l.type === 'driver' || l.type === 'operator')
           .map((l) => {
             return {
               key: l._id,
