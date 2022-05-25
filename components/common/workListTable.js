@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import {
   CashIcon,
+  DotsHorizontalIcon,
   PrinterIcon,
   ReceiptRefundIcon,
 } from '@heroicons/react/solid'
@@ -97,7 +98,7 @@ const MStatusIndicator = ({ status }) => {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
-          <PauseIcon className="h-5 w-5 text-gray-500" />
+          <DotsHorizontalIcon className="h-5 w-5 text-gray-200" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
@@ -238,7 +239,7 @@ export default function WorkListTable({
             </Table.Header>
 
             <Table.Body>
-              {pData.map((row) => {
+              {pData.map((row, index) => {
                 return (
                   <Table.Row key={row._id}>
                     <Table.Cell>
@@ -348,13 +349,13 @@ export default function WorkListTable({
                           row.status === 'stopped' && (
                             <>
                               <div
-                                onClick={() => handelApprove(row)}
+                                onClick={() => handelApprove(row, index)}
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <CheckIcon className="h-5 w-5 text-green-400" />
                               </div>
                               <div
-                                onClick={() => handelReject(row)}
+                                onClick={() => handelReject(row, index)}
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <XIcon className="h-5 w-5 text-red-400" />
@@ -400,7 +401,7 @@ export default function WorkListTable({
                         {user.userType === 'admin' && row.status === 'created' && (
                           <>
                             <div
-                              onClick={() => handelRecall(row)}
+                              onClick={() => handelRecall(row, index)}
                               className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <ReceiptRefundIcon className="h-5 w-5 text-zinc-700" />
