@@ -271,7 +271,7 @@ export default function Equipments() {
       </div>
       {viewPort === 'list' && (
         <>
-          {(loading || equipments.length === 0) && <Loader active />}
+          {loading && <Loader active />}
           {!loading && (
             <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
               {equipments.map((e) => {
