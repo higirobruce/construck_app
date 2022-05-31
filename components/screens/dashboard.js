@@ -2,6 +2,8 @@ import {
   CashIcon,
   ClockIcon,
   SwitchVerticalIcon,
+  TrendingUpIcon,
+  TruckIcon,
 } from '@heroicons/react/outline'
 import React, { useEffect, useState } from 'react'
 import StatisticCard from '../common/statisticCard'
@@ -228,7 +230,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
           <StatisticCard
             data={{
-              title: 'Provisional Revenues',
+              title: 'Projected Revenues',
               content: loadingProvisionalRev ? (
                 <Loader active size="mini" inline />
               ) : (
@@ -239,7 +241,7 @@ export default function Dashboard() {
           />
           <StatisticCard
             data={{
-              title: 'Final Revenues',
+              title: 'Actual Revenues',
               content: loadingFinalRev ? (
                 <Loader active size="mini" inline />
               ) : (
@@ -250,21 +252,26 @@ export default function Dashboard() {
           />
           <StatisticCard
             data={{
-              title: 'Billable Days',
+              title: 'Asset utilization',
               content: loadingTotalDays ? (
                 <Loader active inline size="mini" />
               ) : (
-                totalDays
+                totalDays + '%'
               ),
             }}
-            icon={<ClockIcon className="h-5 w-5 text-green-600" />}
+            icon={<TrendingUpIcon className="h-5 w-5 text-green-600" />}
           />
+          {/* TODO */}
           <StatisticCard
             data={{
-              title: 'Dispatched Days',
-              content: '334',
+              title: 'Asset availability',
+              content: loadingTotalDays ? (
+                <Loader active inline size="mini" />
+              ) : (
+                totalDays + '%'
+              ),
             }}
-            icon={<SwitchVerticalIcon className="h-5 w-5 text-orange-500" />}
+            icon={<TruckIcon className="h-5 w-5 text-orange-500" />}
           />
         </div>
       </div>
