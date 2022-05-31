@@ -145,7 +145,7 @@ export default function WorkListTable({
   handleSelect,
   handleDeselect,
 }) {
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
   const { user, setUser } = useContext(UserContext)
 
