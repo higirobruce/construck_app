@@ -230,7 +230,7 @@ export default function Workdata() {
 
   useEffect(() => {
     let _jobDesc = jobTypeList.filter((j) => (j._id = jobType))[0]?.text
-    setDispatchDescription(`${eqType}s for ${_jobDesc}`)
+    setDispatchDescription(`${eqType}s for ${_jobDesc ? _jobDesc : ''}`)
   }, [project, dispatchDate, jobType, eqType])
 
   function refresh() {

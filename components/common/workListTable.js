@@ -255,7 +255,7 @@ export default function WorkListTable({
                       <MTextView content={row.equipment?.plateNumber} />
                     </Table.Cell>
                     <Table.Cell>
-                      <MTextView content={row.equipment?.eqtype} />
+                      <MTextView content={row.equipment?.eqDescription} />
                     </Table.Cell>
                     <Table.Cell>
                       <div className="w-20 truncate">
