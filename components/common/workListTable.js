@@ -274,7 +274,7 @@ export default function WorkListTable({
                               ? msToTime(
                                   getDuration(row?.startTime, row?.duration)
                                 )
-                              : row?.duration + 'days'
+                              : Math.round(row?.duration * 100) / 100 + 'days'
                             : '...'
                         }
                       />
