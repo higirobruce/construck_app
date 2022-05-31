@@ -244,7 +244,9 @@ export default function WorkListTable({
                   <Table.Row key={row._id}>
                     <Table.Cell>
                       <MTextView
-                        content={new Date(row.createdOn).toLocaleDateString()}
+                        content={new Date(
+                          row?.dispatch?.date
+                        ).toLocaleDateString()}
                       />
                     </Table.Cell>
                     <Table.Cell>
