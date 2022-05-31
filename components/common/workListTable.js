@@ -130,6 +130,12 @@ function msToTime(duration) {
   else return days + hours + minutes
 }
 
+const getShiftLabel = (shift) => {
+  if (shift === 'dayShift') return 'D'
+  else if (shift === 'nightShift') return 'N'
+  else return ''
+}
+
 export default function WorkListTable({
   data,
   handelApprove,
@@ -199,7 +205,7 @@ export default function WorkListTable({
                   <div className="w-20 truncate">Work done</div>
                 </Table.HeaderCell>
                 <Table.HeaderCell>Duration</Table.HeaderCell>
-                <Table.HeaderCell>Rate</Table.HeaderCell>
+                {/* <Table.HeaderCell>Rate</Table.HeaderCell> */}
                 <Table.HeaderCell>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
@@ -242,11 +248,13 @@ export default function WorkListTable({
               {pData.map((row, index) => {
                 return (
                   <Table.Row key={row._id}>
-                    <Table.Cell>
+                    <Table.Cell singleLine>
                       <MTextView
-                        content={new Date(
-                          row?.dispatch?.date
-                        ).toLocaleDateString()}
+                        content={
+                          new Date(row?.dispatch?.date).toLocaleDateString() +
+                          '-' +
+                          getShiftLabel(row?.dispatch?.shift)
+                        }
                       />
                     </Table.Cell>
                     <Table.Cell>
@@ -254,7 +262,18 @@ export default function WorkListTable({
                     </Table.Cell>
 
                     <Table.Cell>
-                      <MTextView content={row.equipment?.plateNumber} />
+                      <Tooltip
+                        title={
+                          'RWF ' +
+                          row.equipment?.rate?.toLocaleString() +
+                          ' per ' +
+                          row?.equipment?.uom
+                        }
+                      >
+                        <div>
+                          <MTextView content={row.equipment?.plateNumber} />
+                        </div>
+                      </Tooltip>
                     </Table.Cell>
                     <Table.Cell>
                       <MTextView content={row.equipment?.eqDescription} />
@@ -281,7 +300,7 @@ export default function WorkListTable({
                         }
                       />
                     </Table.Cell>
-                    <Table.Cell>
+                    {/* <Table.Cell>
                       <MTextView
                         content={
                           row.status === 'created' ||
@@ -297,14 +316,12 @@ export default function WorkListTable({
                               row?.uom
                         }
                       />
-                    </Table.Cell>
+                    </Table.Cell> */}
                     <Table.Cell>
                       <MTextView
                         selected={row?.selected}
                         content={
-                          row.status === 'stopped' ||
-                          row.status === 'approved' ||
-                          row.status === 'rejected'
+                          row.totalRevenue
                             ? 'RWF ' +
                               _.round(row?.totalRevenue, 2).toLocaleString()
                             : '...'
@@ -315,11 +332,15 @@ export default function WorkListTable({
                       <MStatusIndicator status={row.status} />
                     </Table.Cell>
                     <Table.Cell>
-                      <MTextView
-                        content={
-                          row.driver?.firstName + ' ' + row.driver?.lastName
-                        }
-                      />
+                      <Tooltip title={row.driver?.phone}>
+                        <div>
+                          <MTextView
+                            content={
+                              row.driver?.firstName + ' ' + row.driver?.lastName
+                            }
+                          />
+                        </div>
+                      </Tooltip>
                     </Table.Cell>
                     <Table.Cell>
                       <MTextView
