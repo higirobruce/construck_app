@@ -240,9 +240,11 @@ export default function Workdata() {
       .then((resp) => {
         setWorkList(resp)
         setEquipments([])
+        setEquipmentList([])
         setDrivers([])
         setNJobs(1)
         setTargetTrips(0)
+        setEqType('')
         setLoadingData(false)
       })
   }
