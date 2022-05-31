@@ -366,7 +366,7 @@ export default function Workdata() {
     if (param === 'byDate') {
       let ordered = _.orderBy(
         workList,
-        ['createdOn'],
+        ['dispatch.date'],
         [orderAsc ? 'asc' : 'desc']
       )
       setWorkList(ordered)
