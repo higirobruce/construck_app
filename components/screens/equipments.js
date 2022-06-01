@@ -2,6 +2,7 @@ import {
   AdjustmentsIcon,
   ArrowLeftIcon,
   CheckIcon,
+  CogIcon,
   DocumentDuplicateIcon,
   DownloadIcon,
   PlusIcon,
@@ -21,6 +22,7 @@ export default function Equipments() {
   let [equipments, setEquipments] = useState([])
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
+  let [nInWorkshop, setNInWorkshop] = useState(0)
   let [nDispatched, setNDispatched] = useState(0)
   let [ogEquipmentList, setOgEquipmentList] = useState([])
   let [viewPort, setViewPort] = useState('list')
@@ -61,10 +63,12 @@ export default function Equipments() {
         let availableEq = res.filter((e) => e.eqStatus === 'available')
         let assignedEq = res.filter((e) => e.eqStatus === 'assigned to job')
         let dispatchedEq = res.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = res.filter((e) => e.eqStatus === 'workshop')
 
         setNAssigned(assignedEq.length)
         setNAvailable(availableEq.length)
         setNDispatched(dispatchedEq.length)
+        setNInWorkshop(inWorkshopEq.length)
         setOgEquipmentList(res)
         setLoading(false)
       })
@@ -133,6 +137,100 @@ export default function Equipments() {
     } else setStatusFilter(filterBy)
   }, [filterBy])
 
+  useEffect(() => {
+    let availableEq = ogEquipmentList.filter((e) => e.eqStatus === 'available')
+    let assignedEq = ogEquipmentList.filter(
+      (e) => e.eqStatus === 'assigned to job'
+    )
+    let dispatchedEq = ogEquipmentList.filter(
+      (e) => e.eqStatus === 'dispatched'
+    )
+    let inWorkshopEq = ogEquipmentList.filter((e) => e.eqStatus === 'workshop')
+
+    setNAssigned(assignedEq.length)
+    setNAvailable(availableEq.length)
+    setNDispatched(dispatchedEq.length)
+    setNInWorkshop(inWorkshopEq.length)
+  }, [equipments])
+
+  function sendToWorkShop(id) {
+    let _eqs = [...equipments]
+    let indexToUpdate = 0
+    let eqToUpdate = _eqs.find((e, index) => {
+      indexToUpdate = index
+      return e._id == id
+    })
+    eqToUpdate.eqStatus = 'updating'
+    _eqs[indexToUpdate] = eqToUpdate
+    setEquipments(_eqs)
+
+    fetch(
+      `https://construck-backend.herokuapp.com/equipments/sendToWorkshop/${id}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        let _eqs = [...equipments]
+        let indexToUpdate = 0
+        let eqToUpdate = _eqs.find((e, index) => {
+          indexToUpdate = index
+          return e._id == id
+        })
+        eqToUpdate.eqStatus = 'workshop'
+        _eqs[indexToUpdate] = eqToUpdate
+        setEquipments(_eqs)
+        // setOgEquipmentList(_eqs)
+
+        let availableEq = equipments.filter((e) => e.eqStatus === 'available')
+        let assignedEq = equipments.filter(
+          (e) => e.eqStatus === 'assigned to job'
+        )
+        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+
+        setNAssigned(assignedEq.length)
+        setNAvailable(availableEq.length)
+        setNDispatched(dispatchedEq.length)
+        setNInWorkshop(inWorkshopEq.length)
+      })
+  }
+
+  function makeAvailable(id) {
+    let _eqs = [...equipments]
+    let indexToUpdate = 0
+    let eqToUpdate = _eqs.find((e, index) => {
+      indexToUpdate = index
+      return e._id == id
+    })
+    eqToUpdate.eqStatus = 'updating'
+    _eqs[indexToUpdate] = eqToUpdate
+    setEquipments(_eqs)
+
+    fetch(
+      `https://construck-backend.herokuapp.com/equipments/makeAvailable/${id}`,
+      {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        let _eqs = [...equipments]
+        let indexToUpdate = 0
+        let eqToUpdate = _eqs.find((e, index) => {
+          indexToUpdate = index
+          return e._id == id
+        })
+        eqToUpdate.eqStatus = 'available'
+        _eqs[indexToUpdate] = eqToUpdate
+        setEquipments(_eqs)
+        // setOgEquipmentList(_eqs)
+      })
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Equipments</div>
@@ -191,6 +289,7 @@ export default function Equipments() {
                 </div>
               </Tooltip>
             </div>
+
             <div
               className={
                 filterBy === 'dispatched'
@@ -233,8 +332,8 @@ export default function Equipments() {
                 <div
                   className={
                     filterBy !== 'assigned to job'
-                      ? 'flex flex-row items-center rounded-lg p-1 text-red-300 shadow-md ring-1 ring-red-100'
-                      : 'flex flex-row items-center rounded-lg bg-red-50 p-1 text-red-400 ring-1 ring-red-300'
+                      ? 'flex flex-row items-center rounded-lg p-1 text-orange-300 shadow-md ring-1 ring-orange-100'
+                      : 'flex flex-row items-center rounded-lg bg-red-50 p-1 text-orange-400 ring-1 ring-orange-300'
                   }
                 >
                   <LockClosedIcon className="h-5 w-5" />
@@ -242,7 +341,35 @@ export default function Equipments() {
                 </div>
               </Tooltip>
             </div>
+
+            <div
+              className={
+                filterBy === 'workshop'
+                  ? 'cursor-pointer rounded-lg p-1 font-normal'
+                  : 'cursor-pointer rounded-lg p-1 font-normal'
+              }
+              onClick={() =>
+                filterBy === 'workshop'
+                  ? setFilterBy('all')
+                  : setFilterBy('workshop')
+              }
+            >
+              <Tooltip title="In workshop">
+                <div
+                  className={
+                    filterBy !== 'workshop'
+                      ? 'flex flex-row items-center rounded-lg p-1 text-red-300 shadow-md ring-1 ring-red-100'
+                      : 'flex flex-row items-center rounded-lg bg-red-50 p-1 text-red-400 ring-1 ring-red-300'
+                  }
+                >
+                  <CogIcon className="h-5 w-5" />
+                  <div>({nInWorkshop})</div>
+                </div>
+              </Tooltip>
+            </div>
+
             <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
+
             <div>
               <label>
                 <span className="mt-2 cursor-pointer text-base leading-normal">
@@ -283,8 +410,11 @@ export default function Equipments() {
                       eqType: e.eqtype,
                       eqStatus: e.eqStatus,
                       description: e.eqDescription,
+                      id: e._id,
                     }}
                     intent={e.eqStatus}
+                    handleSendToWorkshop={sendToWorkShop}
+                    handleMakeAvailable={makeAvailable}
                   />
                 )
               })}

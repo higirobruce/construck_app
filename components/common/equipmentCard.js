@@ -8,11 +8,13 @@ import {
   StopIcon,
   CogIcon,
   BanIcon,
+  DotsHorizontalIcon,
 } from '@heroicons/react/outline'
 import {
   FolderOpenIcon,
   ExclamationIcon,
   LockClosedIcon,
+  SwitchHorizontalIcon,
 } from '@heroicons/react/solid'
 import React from 'react'
 import MTextView from './mTextView'
@@ -39,17 +41,17 @@ const MStatusIndicator = ({ status }) => {
         {/* <MTextView content={status} /> */}
       </div>
     )
-  } else if (status === 'under maintenance') {
+  } else if (status === 'workshop') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <CogIcon className="h-5 w-5 text-blue-500" />
+        <BanIcon className="h-4 w-4 text-red-300" />
         {/* <MTextView content={status} /> */}
       </div>
     )
-  } else if (status === 'created') {
+  } else if (status === 'updating') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <PlayIcon className="h-5 w-5 text-teal-500" />
+        <DotsHorizontalIcon className="h-5 w-5 text-gray-500" />
         {/* <MTextView content={status} /> */}
       </div>
     )
@@ -76,7 +78,13 @@ const MStatusIndicator = ({ status }) => {
     )
   }
 }
-export default function EquipmentType({ intent, data, icon }) {
+export default function EquipmentType({
+  intent,
+  data,
+  icon,
+  handleSendToWorkshop,
+  handleMakeAvailable,
+}) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
@@ -84,10 +92,10 @@ export default function EquipmentType({ intent, data, icon }) {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-100 ring-1 ring-zinc-200 w-full'
     } else if (intent == 'assigned to job') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-50  w-full ring-1 ring-red-200'
-    } else if (intent == 'danger') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-400  w-full'
-    } else if (intent == 'normal') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-green-200  w-full'
+    } else if (intent == 'workshop') {
+      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-50  w-full ring-1 ring-red-200'
+    } else if (intent == 'updating') {
+      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-white w-full ring-1 ring-zinc-200'
     } else {
       return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
     }
@@ -125,6 +133,33 @@ export default function EquipmentType({ intent, data, icon }) {
                 : 'h-5 w-5 text-zinc-300'
             }
           />
+          {data.eqStatus !== 'workshop' && (
+            <CogIcon
+              onClick={() => {
+                handleSendToWorkshop(data.id)
+                console.log(data.id)
+              }}
+              className={
+                intent === 'available'
+                  ? 'h-5 w-5 cursor-pointer text-red-400'
+                  : 'h-5 w-5 text-red-300'
+              }
+            />
+          )}
+
+          {data.eqStatus === 'workshop' && (
+            <SwitchHorizontalIcon
+              onClick={() => {
+                handleMakeAvailable(data.id)
+                console.log(data.id)
+              }}
+              className={
+                intent === 'workshop'
+                  ? 'h-5 w-5 cursor-pointer text-teal-400'
+                  : 'h-5 w-5 text-teal-300'
+              }
+            />
+          )}
         </div>
       </div>
     </div>
