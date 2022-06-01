@@ -206,12 +206,23 @@ export default function WorkListTable({
                 </Table.HeaderCell>
                 <Table.HeaderCell>Duration</Table.HeaderCell>
                 {/* <Table.HeaderCell>Rate</Table.HeaderCell> */}
+
+                <Table.HeaderCell>
+                  <div
+                    className="flex cursor-pointer flex-row items-center space-x-1"
+                    onClick={() => handleOrder('byProjectedAmount')}
+                  >
+                    <div>Projected Revenue</div>
+                    <SwitchVerticalIcon className="h-4 w-4" />
+                  </div>
+                </Table.HeaderCell>
+
                 <Table.HeaderCell>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
                     onClick={() => handleOrder('byTotalAmount')}
                   >
-                    <div>Total Amount</div>
+                    <div>Actual revenue</div>
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
@@ -317,6 +328,17 @@ export default function WorkListTable({
                         }
                       />
                     </Table.Cell> */}
+                    <Table.Cell>
+                      <MTextView
+                        selected={row?.selected}
+                        content={
+                          row.projectedRevenue
+                            ? 'RWF ' +
+                              _.round(row?.projectedRevenue, 2).toLocaleString()
+                            : '...'
+                        }
+                      />
+                    </Table.Cell>
                     <Table.Cell>
                       <MTextView
                         selected={row?.selected}

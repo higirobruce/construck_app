@@ -41,7 +41,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         startDate: startDate,
         endDate: endDate,
-        status: 'approved',
+        status: 'final',
         customer,
         project,
         equipment,
@@ -65,7 +65,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         startDate: startDate,
         endDate: endDate,
-        status: 'stopped',
+        status: 'projected',
         customer,
         project,
         equipment,
@@ -74,7 +74,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setProvisionalRevenues(res.totalRevenue)
+        setProvisionalRevenues(res.projectedRevenue)
         setLoadingProvisionalRev(false)
       })
       .catch((err) => {})
@@ -93,7 +93,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         startDate: startDate,
         endDate: endDate,
-        status: 'approved',
+        status: 'final',
         customer,
         project,
         equipment,
@@ -117,7 +117,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         startDate: startDate,
         endDate: endDate,
-        status: 'stopped',
+        status: 'projected',
         customer,
         project,
         equipment,
@@ -126,7 +126,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setProvisionalRevenues(res.totalRevenue)
+        setProvisionalRevenues(res.projectedRevenue)
         setLoadingProvisionalRev(false)
         setTotalDays(res.totalDays)
       })
@@ -142,7 +142,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         startDate: startDate,
         endDate: endDate,
-        status: 'approved',
+        status: 'final',
         customer,
         project,
         equipment,
@@ -164,7 +164,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         startDate: startDate,
         endDate: endDate,
-        status: 'stopped',
+        status: 'projected',
         customer,
         project,
         equipment,
@@ -173,7 +173,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setProvisionalRevenues(res.totalRevenue)
+        setProvisionalRevenues(res.projectedRevenue)
         setTotalDays(res.totalDays)
       })
       .catch((err) => {})
