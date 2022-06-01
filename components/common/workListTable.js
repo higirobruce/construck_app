@@ -198,16 +198,14 @@ export default function WorkListTable({
                 <Table.HeaderCell>
                   <div className="w-30 truncate">Plate number</div>
                 </Table.HeaderCell>
-                <Table.HeaderCell>
-                  <div className="w-20 truncate">Equipment type</div>
+                <Table.HeaderCell singleLine>
+                  <div className="">Equipment type</div>
                 </Table.HeaderCell>
-                <Table.HeaderCell>
-                  <div className="w-20 truncate">Work done</div>
-                </Table.HeaderCell>
+
                 <Table.HeaderCell>Duration</Table.HeaderCell>
                 {/* <Table.HeaderCell>Rate</Table.HeaderCell> */}
 
-                <Table.HeaderCell>
+                {/* <Table.HeaderCell singleLine>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
                     onClick={() => handleOrder('byProjectedAmount')}
@@ -215,9 +213,9 @@ export default function WorkListTable({
                     <div>Projected Revenue</div>
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
-                </Table.HeaderCell>
+                </Table.HeaderCell> */}
 
-                <Table.HeaderCell>
+                <Table.HeaderCell singleLine>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
                     onClick={() => handleOrder('byTotalAmount')}
@@ -236,8 +234,8 @@ export default function WorkListTable({
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
-                <Table.HeaderCell>Target Trips</Table.HeaderCell>
-                <Table.HeaderCell>
+                <Table.HeaderCell singleLine>Target Trips</Table.HeaderCell>
+                <Table.HeaderCell singleLine>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
                     onClick={() => handleOrder('byTripsDone')}
@@ -289,11 +287,6 @@ export default function WorkListTable({
                     <Table.Cell>
                       <MTextView content={row.equipment?.eqDescription} />
                     </Table.Cell>
-                    <Table.Cell>
-                      <div className="w-20 truncate">
-                        <MTextView content={row?.workDone?.jobDescription} />
-                      </div>
-                    </Table.Cell>
 
                     <Table.Cell>
                       <MTextView
@@ -328,7 +321,7 @@ export default function WorkListTable({
                         }
                       />
                     </Table.Cell> */}
-                    <Table.Cell>
+                    {/* <Table.Cell>
                       <MTextView
                         selected={row?.selected}
                         content={
@@ -338,17 +331,26 @@ export default function WorkListTable({
                             : '...'
                         }
                       />
-                    </Table.Cell>
+                    </Table.Cell> */}
                     <Table.Cell>
-                      <MTextView
-                        selected={row?.selected}
-                        content={
-                          row.totalRevenue
-                            ? 'RWF ' +
-                              _.round(row?.totalRevenue, 2).toLocaleString()
-                            : '...'
+                      <Tooltip
+                        title={
+                          'Projected Revenue: RWF ' +
+                          row.projectedRevenue.toLocaleString()
                         }
-                      />
+                      >
+                        <div>
+                          <MTextView
+                            selected={row?.selected}
+                            content={
+                              row.totalRevenue
+                                ? 'RWF ' +
+                                  _.round(row?.totalRevenue, 2).toLocaleString()
+                                : '...'
+                            }
+                          />
+                        </div>
+                      </Tooltip>
                     </Table.Cell>
                     <Table.Cell>
                       <MStatusIndicator status={row.status} />
