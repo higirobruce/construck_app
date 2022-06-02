@@ -133,7 +133,7 @@ export default function EquipmentType({
                 : 'h-5 w-5 text-zinc-300'
             }
           />
-          {data.eqStatus !== 'workshop' && (
+          {data.eqStatus !== 'workshop' && data.eqStatus !== 'assigned to job' && (
             <CogIcon
               onClick={() => {
                 handleSendToWorkshop(data.id)

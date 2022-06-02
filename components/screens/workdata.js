@@ -19,8 +19,13 @@ import { toast, ToastContainer } from 'react-toastify'
 import _ from 'lodash'
 import { DocumentDuplicateIcon } from '@heroicons/react/solid'
 import { UserContext } from '../../contexts/UserContext'
-import { DatePicker } from 'antd'
+import { DatePicker, Descriptions } from 'antd'
 import Modal from '../common/modal'
+// import XlsExport from 'xlsexport'
+import { saveAs } from 'file-saver'
+import DownloadForms from '../common/downloadForms'
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
 
 export default function Workdata() {
   let { user, setUser } = useContext(UserContext)
@@ -454,6 +459,33 @@ export default function Workdata() {
     }
   }
 
+  function download() {
+    let _workList = workList.map((w) => {
+      return {
+        'Project Description': w.project.prjDescription,
+        'Equipment-PlateNumber': w.equipment.plateNumber,
+        'Equipment Type': w.equipment.eqDescription,
+        'Duration (HRS)': w.duration,
+        'Projected Revenue': w.projectedRevenue,
+        'Actual Revenue': w.totalRevenue,
+      }
+    })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    exportToCSV(_workList, `Dispatch report ${Date.now()}`)
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Forms</div>
@@ -496,8 +528,12 @@ export default function Workdata() {
               </div>
             )}
             <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
-            <DownloadIcon className="h-5 w-5 cursor-pointer" />
+            <DownloadIcon
+              className="h-5 w-5 cursor-pointer"
+              onClick={() => download()}
+            />
             <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
+
             <MSubmitButton
               submit={refresh}
               intent="neutral"
