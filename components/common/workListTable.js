@@ -234,7 +234,8 @@ export default function WorkListTable({
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
-                <Table.HeaderCell singleLine>Target Trips</Table.HeaderCell>
+                <Table.HeaderCell>Driver's contact</Table.HeaderCell>
+
                 <Table.HeaderCell singleLine>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
@@ -356,34 +357,35 @@ export default function WorkListTable({
                       <MStatusIndicator status={row.status} />
                     </Table.Cell>
                     <Table.Cell>
-                      <Tooltip title={row.driver?.phone}>
-                        <div>
-                          <MTextView
-                            content={
-                              row.driver?.firstName + ' ' + row.driver?.lastName
-                            }
-                          />
-                        </div>
-                      </Tooltip>
-                    </Table.Cell>
-                    <Table.Cell>
                       <MTextView
                         content={
-                          row.equipment.eqtype === 'Truck'
-                            ? row?.dispatch?.targetTrips
-                            : 'NA'
+                          row.driver?.firstName + ' ' + row.driver?.lastName
                         }
                       />
                     </Table.Cell>
 
                     <Table.Cell>
-                      <MTextView
-                        content={
+                      <MTextView content={row.driver?.phone} />
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <Tooltip
+                        title={
                           row.equipment.eqtype === 'Truck'
-                            ? row?.tripsDone
+                            ? 'Target trips: ' + row?.dispatch?.targetTrips
                             : 'NA'
                         }
-                      />
+                      >
+                        <div>
+                          <MTextView
+                            content={
+                              row.equipment.eqtype === 'Truck'
+                                ? row?.tripsDone
+                                : 'NA'
+                            }
+                          />
+                        </div>
+                      </Tooltip>
                     </Table.Cell>
 
                     <Table.Cell>
