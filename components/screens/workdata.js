@@ -773,13 +773,13 @@ export default function Workdata() {
               </div>
             </div>
 
-            <div className="mt-5 flex w-1/3 flex-col space-y-5">
+            <div className="mt-5 flex w-2/5 flex-col space-y-5">
               <MTitle content="Equipment & Driver data" />
 
               {[...Array(nJobs)].map((e, i) => (
                 <div className="mb-5 flex flex-row space-x-7">
                   <div className="flex w-1/2 flex-row items-center space-x-5">
-                    <div className="items-cente flex flex-1 flex-row">
+                    <div className="items-cente flex flex-row">
                       <MTextView content="Equipment" />
                       {<div className="text-sm text-red-600">*</div>}
                     </div>
@@ -810,7 +810,7 @@ export default function Workdata() {
                       }}
                     />
                   </div>
-                  <div className="flex flex-row items-center space-x-5">
+                  <div className="flex w-1/2 flex-row items-center space-x-5">
                     <div className="items-cente flex flex-1 flex-row">
                       <MTextView content="Driver" />
                       {<div className="text-sm text-red-600">*</div>}
