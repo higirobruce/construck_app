@@ -217,10 +217,14 @@ export default function Workdata() {
         let desc = w?.project?.prjDescription?.toLocaleLowerCase()
         let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
         let customer = w?.project?.customer?.toLocaleLowerCase()
+        let driver =
+          w?.driver?.firstName?.toLocaleLowerCase() +
+          w?.driver?.lastName?.toLocaleLowerCase()
         return (
           desc.includes(_search) ||
           plateNumber.includes(_search) ||
-          customer.includes(_search)
+          customer.includes(_search) ||
+          driver.includes(_search)
         )
       })
       setWorkList(_workList)
