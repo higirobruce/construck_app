@@ -506,13 +506,32 @@ export default function Workdata() {
     }
   }
 
+  function msToTime(duration) {
+    var milliseconds = Math.floor((duration % 1000) / 100),
+      seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
+      days = Math.floor(duration / (1000 * 60 * 60 * 24))
+
+    // days = days >= 1 ? days + 'days ' : ''
+    // hours = hours >= 1 ? +hours + 'hrs ' : ''
+    // minutes = minutes >= 1 ? minutes + 'min ' : ''
+    // seconds = seconds >= 1 ? seconds + 'sec.' : ''
+
+    // if (duration === 0 || (!days && !hours && !minutes)) return '...'
+    // else return days + hours + minutes
+    return hours
+  }
+
   function download() {
     let _workList = workList.map((w) => {
       return {
+        'Dispatch date': Date.parse(w.dispatch.date).toString('d-MMM-yyyy'),
         'Project Description': w.project.prjDescription,
         'Equipment-PlateNumber': w.equipment.plateNumber,
         'Equipment Type': w.equipment.eqDescription,
-        'Duration (HRS)': w.duration,
+        'Duration (HRS)': w.equipment.uom === 'hour' ? msToTime(w.duration) : 0,
+        'Duration (DAYS)': w.equipment.uom === 'day' ? w.duration : 0,
         'Projected Revenue': w.projectedRevenue,
         'Actual Revenue': w.totalRevenue,
       }
