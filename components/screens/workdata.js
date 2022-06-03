@@ -243,6 +243,7 @@ export default function Workdata() {
         )
       })
       setWorkList(_workList)
+      setLoadingData(false)
     }
 
     if (searchDriver.length >= 3) {
