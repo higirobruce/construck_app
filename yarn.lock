@@ -316,6 +316,11 @@
   dependencies:
     mini-svg-data-uri "^1.2.3"
 
+"@types/datejs@0.0.32":
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/@types/datejs/-/datejs-0.0.32.tgz#f7949a127de6806a6e3abeb5ccb82262c603fb83"
+  integrity sha512-jbrpIgak0486vlFjMq1RDEW1m4/xJ8lypSo9V9L4HQfK2oqoXfDeQcjz71wv0xhdvhp9SK0dGpJYQyiHtaT2Jg==
+
 "@types/node@17.0.4":
   version "17.0.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.4.tgz#fec0ce0526abb6062fd206d72a642811b887a111"
@@ -705,6 +710,11 @@ date-fns@2.x:
   version "2.28.0"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.28.0.tgz#9570d656f5fc13143e50c975a3b6bbeb46cd08b2"
   integrity sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==
+
+datejs@^1.0.0-rc3:
+  version "1.0.0-rc3"
+  resolved "https://registry.yarnpkg.com/datejs/-/datejs-1.0.0-rc3.tgz#bffa1efedefeb41fdd8a242af55afa01fb58de57"
+  integrity sha512-c6kzWmGUKLrdT+8LjUvtAObOgsecqnkpOYOuSDzYdNhdCk3+WALxtBuSMRJDmOfS6JVs/+N2yTGHb0D8oNqB/Q==
 
 dayjs@1.x:
   version "1.11.1"

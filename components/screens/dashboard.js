@@ -14,11 +14,17 @@ import TextInputV from '../common/TextIputV'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
 import { MapIcon } from '@heroicons/react/solid'
+import 'datejs'
+
 const { RangePicker } = DatePicker
 
 export default function Dashboard() {
-  let [startDate, setStartDate] = useState('2000-01-01')
-  let [endDate, setEndDate] = useState('9999-01-01')
+  let [startDate, setStartDate] = useState(
+    Date.today().clearTime().moveToFirstDayOfMonth()
+  )
+  let [endDate, setEndDate] = useState(
+    Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
+  )
   let [customer, setCustomer] = useState()
   let [project, setProject] = useState()
   let [equipment, setEquipment] = useState()
@@ -91,8 +97,12 @@ export default function Dashboard() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        startDate: startDate,
-        endDate: endDate,
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today().clearTime().moveToLastDayOfMonth(),
         status: 'final',
         customer,
         project,
@@ -115,8 +125,12 @@ export default function Dashboard() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        startDate: startDate,
-        endDate: endDate,
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today().clearTime().moveToLastDayOfMonth(),
         status: 'projected',
         customer,
         project,
