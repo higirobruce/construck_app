@@ -226,6 +226,7 @@ export default function Workdata() {
 
   useEffect(() => {
     if (search.length >= 3) {
+      console.log(search)
       setLoadingData(true)
       let _workList = ogWorkList.filter((w) => {
         let _search = search?.toLocaleLowerCase()
@@ -257,11 +258,29 @@ export default function Workdata() {
       setWorkList(_workList)
       setLoadingData(false)
     }
+
     if (search.length < 3 && searchDriver.length < 3) {
       setWorkList(ogWorkList)
       setLoadingData(false)
     }
-  }, [search, startDate, endDate, owner, searchDriver])
+  }, [search, owner, searchDriver])
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      let _workList = workList.filter((w) => {
+        return (
+          Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+          Date.parse(endDate).addHours(23).addMinutes(59) >=
+            Date.parse(w?.dispatch?.date)
+        )
+      })
+      console.log(_workList)
+      setWorkList(_workList)
+      setLoadingData(false)
+    } else {
+      setWorkList(ogWorkList)
+    }
+  }, [startDate, endDate])
 
   function refresh() {
     setLoadingData(true)
@@ -565,8 +584,8 @@ export default function Workdata() {
             <div className="w-3/5">
               <RangePicker
                 onChange={(values, dateStrings) => {
-                  setStartDate(Date(dateStrings[0]))
-                  setEndDate(Date(dateStrings[1]))
+                  setStartDate(dateStrings[0])
+                  setEndDate(dateStrings[1])
                 }}
               />
             </div>
