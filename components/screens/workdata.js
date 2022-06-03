@@ -45,7 +45,6 @@ export default function Workdata() {
 
   let [projects, setProjects] = useState([])
 
-  let [dispatchDescription, setDispatchDescription] = useState('')
   let [project, setProject] = useState('')
   let [fromSite, setFromSite] = useState('')
   let [toSite, setToSite] = useState('')
@@ -233,17 +232,15 @@ export default function Workdata() {
     }
   }, [search])
 
-  useEffect(() => {
-    let _jobDesc = jobTypeList.filter((j) => (j._id = jobType))[0]?.text
-    setDispatchDescription(`${eqType}s for ${_jobDesc ? _jobDesc : ''}`)
-  }, [project, dispatchDate, jobType, eqType])
-
   function refresh() {
     setLoadingData(true)
+    setSearch('')
     fetch('https://construck-backend.herokuapp.com/works/')
       .then((resp) => resp.json())
       .then((resp) => {
         setWorkList(resp)
+        setOgWorkList(resp)
+
         setEquipments([])
         setEquipmentList([])
         setDrivers([])
@@ -430,7 +427,7 @@ export default function Workdata() {
               status: 'created',
               createdOn: Date.now(),
               dispatch: {
-                dispatchDescription,
+                // dispatchDescription,
                 project,
                 fromSite,
                 toSite,
@@ -695,7 +692,7 @@ export default function Workdata() {
 
               <div className="mt-5 flex flex-row items-center justify-between">
                 <div className="flex flex-row items-center">
-                  <MTextView content="Equipments Needed" />
+                  <MTextView content="Equipment Type" />
                   {<div className="text-sm text-red-600">*</div>}
                 </div>
                 <div className="w-4/5">
@@ -738,14 +735,6 @@ export default function Workdata() {
                 </div>
               </div>
 
-              <TextInput
-                isRequired={true}
-                label="Dispatch desc."
-                placeholder="Trucks for Stone base..."
-                setValue={setDispatchDescription}
-                type="text"
-                value={dispatchDescription}
-              />
               <TextInput
                 label="Site origin"
                 placeholder="From which site?"
