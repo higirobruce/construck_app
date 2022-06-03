@@ -26,6 +26,10 @@ import { saveAs } from 'file-saver'
 import DownloadForms from '../common/downloadForms'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
+import TextInputV from '../common/TextIputV'
+import 'datejs'
+
+const { RangePicker } = DatePicker
 
 export default function Workdata() {
   let { user, setUser } = useContext(UserContext)
@@ -70,7 +74,19 @@ export default function Workdata() {
   let [submitting, setSubmitting] = useState(false)
   let [loadingData, setLoadingData] = useState(true)
 
+  let [startDate, setStartDate] = useState(
+    Date.today().clearTime().moveToFirstDayOfMonth()
+  )
+  let [endDate, setEndDate] = useState(
+    Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
+  )
+  let [customer, setCustomer] = useState()
+  let [searchProject, setSearchProject] = useState('')
+  let [searchDriver, setSearchDriver] = useState('')
+  let [owner, setOwner] = useState('')
+
   useEffect(() => {
+    setLoadingData(true)
     fetch('https://construck-backend.herokuapp.com/works/')
       .then((resp) => resp.json())
       .then((resp) => {
@@ -120,7 +136,6 @@ export default function Workdata() {
         setWorkList(resp)
         setOgWorkList(resp)
         setLoadingData(false)
-        console.log(resp)
       })
 
     fetch('https://construck-backend.herokuapp.com/projects/v2')
@@ -228,13 +243,24 @@ export default function Workdata() {
         )
       })
       setWorkList(_workList)
-      setLoadingData(false)
     }
 
-    if (search.length < 3) {
-      setWorkList(ogWorkList)
+    if (searchDriver.length >= 3) {
+      let _searchDriver = searchDriver?.toLocaleLowerCase()
+      let _workList = workList.filter((w) => {
+        let driver =
+          w?.driver?.firstName?.toLocaleLowerCase() +
+          w?.driver?.lastName?.toLocaleLowerCase()
+        return driver.includes(_searchDriver)
+      })
+      setWorkList(_workList)
+      setLoadingData(false)
     }
-  }, [search])
+    if (search.length < 3 && searchDriver.length < 3) {
+      setWorkList(ogWorkList)
+      setLoadingData(false)
+    }
+  }, [search, startDate, endDate, owner, searchDriver])
 
   function refresh() {
     setLoadingData(true)
@@ -501,8 +527,48 @@ export default function Workdata() {
         )}
 
         {viewPort === 'list' && (
-          <div className="mx-auto flex flex-grow flex-col">
+          <div className="flex flex-1 flex-row items-center space-x-5 py-5">
             <TextInput placeholder="Search..." setValue={setSearch} />
+            {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} />
+            <TextInputV placeholder="Project" setValue={setSearchProject} />*/}
+
+            <div className="w-4/5">
+              <Dropdown
+                options={[
+                  {
+                    key: '0',
+                    value: 'All',
+                    text: 'All equipment',
+                  },
+                  {
+                    key: '1',
+                    value: 'Hired',
+                    text: 'Hired equipment',
+                  },
+                  {
+                    key: '2',
+                    value: 'Construck',
+                    text: 'Construck equipment',
+                  },
+                ]}
+                placeholder="Select equipment owner"
+                fluid
+                search
+                selection
+                onChange={(e, data) => {
+                  setOwner(data.value)
+                }}
+              />
+            </div>
+            <TextInputV placeholder="Driver" setValue={setSearchDriver} />
+            <div className="w-3/5">
+              <RangePicker
+                onChange={(values, dateStrings) => {
+                  setStartDate(Date(dateStrings[0]))
+                  setEndDate(Date(dateStrings[1]))
+                }}
+              />
+            </div>
           </div>
         )}
 
@@ -599,6 +665,12 @@ export default function Workdata() {
           )}
 
           {loadingData && <Loader active />}
+
+          {!loadingData && workList.length === 0 && (
+            <div className="my-2 flex w-full flex-row items-center justify-center">
+              No data found!
+            </div>
+          )}
         </>
       )}
 
