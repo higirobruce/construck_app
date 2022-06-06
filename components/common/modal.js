@@ -106,7 +106,7 @@ export default function Modal({
                   setIsShown(false)
                 }}
                 type="button"
-                className="transform rounded-md bg-zinc-500 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-zinc-600 focus:bg-zinc-500 focus:outline-none focus:ring focus:ring-sky-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
+                className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
               >
                 Ok
               </button>
