@@ -144,6 +144,7 @@ export default function WorkListTable({
   handleOrder,
   handleSelect,
   handleDeselect,
+  loading,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
@@ -476,11 +477,11 @@ export default function WorkListTable({
         </>
       )}
 
-      {/* {pData.length === 0 && (
+      {pData.length === 0 && !loading && (
         <div className="my-2 flex w-full flex-row items-center justify-center">
           No data found!
         </div>
-      )} */}
+      )}
     </div>
   )
 }
