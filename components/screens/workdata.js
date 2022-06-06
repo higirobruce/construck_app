@@ -510,7 +510,7 @@ export default function Workdata() {
     var milliseconds = Math.floor((duration % 1000) / 100),
       seconds = Math.floor((duration / 1000) % 60),
       minutes = Math.floor((duration / (1000 * 60)) % 60),
-      hours = Math.floor((duration / (1000 * 60 * 60)) % 24),
+      hours = Math.round((duration / (1000 * 60 * 60)) * 100) / 100,
       days = Math.floor(duration / (1000 * 60 * 60 * 24))
 
     // days = days >= 1 ? days + 'days ' : ''
@@ -527,13 +527,24 @@ export default function Workdata() {
     let _workList = workList.map((w) => {
       return {
         'Dispatch date': Date.parse(w.dispatch.date).toString('d-MMM-yyyy'),
+        'Dispatch Shift': w.dispatch.shift,
         'Project Description': w.project.prjDescription,
         'Equipment-PlateNumber': w.equipment.plateNumber,
         'Equipment Type': w.equipment.eqDescription,
+        Rate: w.equipment.rate,
+        'Unit of measurement': w.equipment.uom,
         'Duration (HRS)': w.equipment.uom === 'hour' ? msToTime(w.duration) : 0,
-        'Duration (DAYS)': w.equipment.uom === 'day' ? w.duration : 0,
+        'Duration (DAYS)':
+          w.equipment.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
         'Projected Revenue': w.projectedRevenue,
         'Actual Revenue': w.totalRevenue,
+        'Driver Names': w.driver.firstName + ' ' + w.driver.lastName,
+        'Driver contacts': w.driver.phone,
+        'Target trips': w.dispatch.targetTrips,
+        'Trips done': w.tripsDone,
+        "Driver's/Operator's Comment": w.comment,
+        Customer: w.project.customer,
+        Status: w.status,
       }
     })
 
@@ -700,16 +711,11 @@ export default function Workdata() {
               handleOrder={order}
               handleSelect={select}
               handleDeselect={deselect}
+              loading
             />
           )}
 
           {loadingData && <Loader active />}
-
-          {!loadingData && workList.length === 0 && (
-            <div className="my-2 flex w-full flex-row items-center justify-center">
-              No data found!
-            </div>
-          )}
         </>
       )}
 
