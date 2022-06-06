@@ -425,7 +425,7 @@ export default function Equipments() {
       </div>
       {viewPort === 'list' && (
         <>
-          {loading && nRecords !== -1 ? (
+          {loading || equipments.length < 200 ? (
             <Loader active />
           ) : (
             <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">

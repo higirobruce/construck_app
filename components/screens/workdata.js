@@ -585,6 +585,7 @@ export default function Workdata() {
             {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} />
             <TextInputV placeholder="Project" setValue={setSearchProject} />*/}
 
+            <TextInputV placeholder="Driver" setValue={setSearchDriver} />
             <div className="w-4/5">
               <Dropdown
                 options={[
@@ -613,7 +614,7 @@ export default function Workdata() {
                 }}
               />
             </div>
-            <TextInputV placeholder="Driver" setValue={setSearchDriver} />
+
             <div className="w-3/5">
               <RangePicker
                 onChange={(values, dateStrings) => {
