@@ -702,7 +702,7 @@ export default function Workdata() {
       )}
       {viewPort === 'list' && (
         <>
-          {!loadingData && (
+          {!loadingData && workList.length > 0 ? (
             <WorkListTable
               data={workList}
               handelApprove={_setApproveRow}
@@ -713,9 +713,9 @@ export default function Workdata() {
               handleDeselect={deselect}
               loading
             />
+          ) : (
+            <Loader active />
           )}
-
-          {loadingData && <Loader active />}
         </>
       )}
 
