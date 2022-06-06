@@ -17,6 +17,7 @@ import readXlsxFile from 'read-excel-file'
 import { Loader } from 'semantic-ui-react'
 import { Tooltip } from 'antd'
 import { ExclamationIcon, LockClosedIcon } from '@heroicons/react/solid'
+import Modal from '../common/modal'
 
 export default function Equipments() {
   let [equipments, setEquipments] = useState([])
@@ -27,11 +28,20 @@ export default function Equipments() {
   let [ogEquipmentList, setOgEquipmentList] = useState([])
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
-  let [loading, setLoading] = useState(true)
+  let [loading, setLoading] = useState(false)
   let [statusFilter, setStatusFilter] = useState('')
   let [filterBy, setFilterBy] = useState('')
+  let [dataFound, setDataFound] = useState(false)
+  let [nRecords, setNRecords] = useState(-1)
+
+  let [rowId, setRowId] = useState()
+  let [sendToWorkshopModalIsShown, setSendToWorkshopModalIsShown] =
+    useState(false)
+  let [makeAvailableModalIsShown, setMakeAvailableModalIsShown] =
+    useState(false)
 
   useEffect(() => {
+    setLoading(true)
     refresh()
   }, [])
 
@@ -59,17 +69,21 @@ export default function Equipments() {
     fetch('https://construck-backend.herokuapp.com/equipments/')
       .then((res) => res.json())
       .then((res) => {
-        setEquipments(res)
-        let availableEq = res.filter((e) => e.eqStatus === 'available')
-        let assignedEq = res.filter((e) => e.eqStatus === 'assigned to job')
-        let dispatchedEq = res.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = res.filter((e) => e.eqStatus === 'workshop')
+        let eqs = res?.equipments
+        let nEqs = res.nrecords
+        setNRecords(nEqs)
+        setEquipments(eqs)
+        let availableEq = eqs.filter((e) => e.eqStatus === 'available')
+        let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
+        let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = eqs.filter((e) => e.eqStatus === 'workshop')
 
         setNAssigned(assignedEq.length)
         setNAvailable(availableEq.length)
         setNDispatched(dispatchedEq.length)
         setNInWorkshop(inWorkshopEq.length)
-        setOgEquipmentList(res)
+        setOgEquipmentList(eqs)
+
         setLoading(false)
       })
   }
@@ -137,35 +151,19 @@ export default function Equipments() {
     } else setStatusFilter(filterBy)
   }, [filterBy])
 
-  useEffect(() => {
-    let availableEq = ogEquipmentList.filter((e) => e.eqStatus === 'available')
-    let assignedEq = ogEquipmentList.filter(
-      (e) => e.eqStatus === 'assigned to job'
-    )
-    let dispatchedEq = ogEquipmentList.filter(
-      (e) => e.eqStatus === 'dispatched'
-    )
-    let inWorkshopEq = ogEquipmentList.filter((e) => e.eqStatus === 'workshop')
-
-    setNAssigned(assignedEq.length)
-    setNAvailable(availableEq.length)
-    setNDispatched(dispatchedEq.length)
-    setNInWorkshop(inWorkshopEq.length)
-  }, [equipments])
-
-  function sendToWorkShop(id) {
+  function sendToWorkShop() {
     let _eqs = [...equipments]
     let indexToUpdate = 0
     let eqToUpdate = _eqs.find((e, index) => {
       indexToUpdate = index
-      return e._id == id
+      return e._id == rowId
     })
     eqToUpdate.eqStatus = 'updating'
     _eqs[indexToUpdate] = eqToUpdate
     setEquipments(_eqs)
 
     fetch(
-      `https://construck-backend.herokuapp.com/equipments/sendToWorkshop/${id}`,
+      `https://construck-backend.herokuapp.com/equipments/sendToWorkshop/${rowId}`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -177,7 +175,7 @@ export default function Equipments() {
         let indexToUpdate = 0
         let eqToUpdate = _eqs.find((e, index) => {
           indexToUpdate = index
-          return e._id == id
+          return e._id == rowId
         })
         eqToUpdate.eqStatus = 'workshop'
         _eqs[indexToUpdate] = eqToUpdate
@@ -198,19 +196,19 @@ export default function Equipments() {
       })
   }
 
-  function makeAvailable(id) {
+  function makeAvailable() {
     let _eqs = [...equipments]
     let indexToUpdate = 0
     let eqToUpdate = _eqs.find((e, index) => {
       indexToUpdate = index
-      return e._id == id
+      return e._id == rowId
     })
     eqToUpdate.eqStatus = 'updating'
     _eqs[indexToUpdate] = eqToUpdate
     setEquipments(_eqs)
 
     fetch(
-      `https://construck-backend.herokuapp.com/equipments/makeAvailable/${id}`,
+      `https://construck-backend.herokuapp.com/equipments/makeAvailable/${rowId}`,
       {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -222,7 +220,7 @@ export default function Equipments() {
         let indexToUpdate = 0
         let eqToUpdate = _eqs.find((e, index) => {
           indexToUpdate = index
-          return e._id == id
+          return e._id == rowId
         })
         eqToUpdate.eqStatus = 'available'
         _eqs[indexToUpdate] = eqToUpdate
@@ -231,8 +229,37 @@ export default function Equipments() {
       })
   }
 
+  function _setToWorkshopRow(id) {
+    setRowId(id)
+    setSendToWorkshopModalIsShown(true)
+  }
+
+  function _setMakeAvailableRow(id) {
+    setRowId(id)
+    setMakeAvailableModalIsShown(true)
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
+      {sendToWorkshopModalIsShown && (
+        <Modal
+          title="Send to Workshop"
+          body="Are you sure you want to send this asset to workshop?"
+          isShown={sendToWorkshopModalIsShown}
+          setIsShown={setSendToWorkshopModalIsShown}
+          handleConfirm={sendToWorkShop}
+        />
+      )}
+
+      {makeAvailableModalIsShown && (
+        <Modal
+          title="Make asset available"
+          body="Are you sure you want to move this asset from the workshop?"
+          isShown={makeAvailableModalIsShown}
+          setIsShown={setMakeAvailableModalIsShown}
+          handleConfirm={makeAvailable}
+        />
+      )}
       <div className="text-2xl font-semibold">Equipments</div>
       <div className="flex w-full flex-row items-center justify-between space-x-4">
         {viewPort === 'list' && (
@@ -398,8 +425,9 @@ export default function Equipments() {
       </div>
       {viewPort === 'list' && (
         <>
-          {loading && <Loader active />}
-          {!loading && (
+          {loading && nRecords !== -1 ? (
+            <Loader active />
+          ) : (
             <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
               {equipments.map((e) => {
                 return (
@@ -413,8 +441,8 @@ export default function Equipments() {
                       id: e._id,
                     }}
                     intent={e.eqStatus}
-                    handleSendToWorkshop={sendToWorkShop}
-                    handleMakeAvailable={makeAvailable}
+                    handleSendToWorkshop={_setToWorkshopRow}
+                    handleMakeAvailable={_setMakeAvailableRow}
                   />
                 )
               })}
