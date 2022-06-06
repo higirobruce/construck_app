@@ -53,6 +53,7 @@ export default function Workdata() {
   let [fromSite, setFromSite] = useState('')
   let [toSite, setToSite] = useState('')
   let [jobType, setJobType] = useState('')
+  let [otherJobType, setOtherJobType] = useState('')
   let [targetTrips, setTargetTrips] = useState(0)
   let [equipments, setEquipments] = useState([])
   let [equipmentsOg, setEquipmentsOg] = useState([])
@@ -477,7 +478,7 @@ export default function Workdata() {
               status: 'created',
               createdOn: Date.now(),
               dispatch: {
-                // dispatchDescription,
+                otherJobType: otherJobType ? otherJobType : '',
                 project,
                 fromSite,
                 toSite,
@@ -536,6 +537,8 @@ export default function Workdata() {
         'Duration (HRS)': w.equipment.uom === 'hour' ? msToTime(w.duration) : 0,
         'Duration (DAYS)':
           w.equipment.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
+        'Work done': w.workDone.jobDescription,
+        'Other work description': w.dispatch.otherJobType,
         'Projected Revenue': w.projectedRevenue,
         'Actual Revenue': w.totalRevenue,
         'Driver Names': w.driver.firstName + ' ' + w.driver.lastName,
@@ -855,6 +858,17 @@ export default function Workdata() {
                   />
                 </div>
               </div>
+
+              {(jobType === '62690bbacf45ad62aa6144e6' ||
+                jobType === '62690b67cf45ad62aa6144d8') && (
+                <TextInput
+                  label="Specify Job Type"
+                  placeholder="Job type..."
+                  setValue={setOtherJobType}
+                  type="text"
+                  isRequired
+                />
+              )}
 
               <TextInput
                 label="Site origin"
