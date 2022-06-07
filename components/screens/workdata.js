@@ -58,6 +58,7 @@ export default function Workdata() {
   let [otherJobType, setOtherJobType] = useState('')
   let [targetTrips, setTargetTrips] = useState(0)
   let [equipments, setEquipments] = useState([])
+  let [selEquipments, setSelEquipments] = useState([])
   let [equipmentsOg, setEquipmentsOg] = useState([])
   let [drivers, setDrivers] = useState([])
   let [astDrivers, setAstDrivers] = useState([])
@@ -535,17 +536,17 @@ export default function Workdata() {
     if (eqType === 'Truck' && (targetTrips == 0 || !targetTrips)) {
       toast.error('Target trips are mandatory for this entry!')
     } else {
-      if (equipments.length === drivers.length) {
+      if (selEquipments.length === drivers.length) {
         let posted = 0
         let promises = []
-        for (let i = 0; i < equipments.length; i++) {
+        for (let i = 0; i < selEquipments.length; i++) {
           setSubmitting(true)
           await fetch('https://construck-backend.herokuapp.com/works', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               project,
-              equipment: equipments[i],
+              equipment: selEquipments[i],
               workDone: jobType,
               driver: drivers[i],
               startTime: Date.now(),
@@ -557,7 +558,7 @@ export default function Workdata() {
                 fromSite,
                 toSite,
                 targetTrips,
-                equipments: equipments,
+                equipments: selEquipments,
                 drivers,
                 astDrivers,
                 jobType,
@@ -568,7 +569,7 @@ export default function Workdata() {
             }),
           }).then((res) => {
             setSubmitting(false)
-            if (i == equipments.length - 1) {
+            if (i == selEquipments.length - 1) {
               setViewPort('list')
               refresh()
             }
@@ -577,7 +578,7 @@ export default function Workdata() {
       } else {
         setSubmitting(false)
         console.table(drivers)
-        console.log(equipments)
+        console.log(selEquipments)
       }
     }
   }
@@ -1028,12 +1029,12 @@ export default function Workdata() {
                           return e._id === data.value
                         })
                         if (!selecteObj) {
-                          let _eq = [...equipments]
+                          let _eq = [...selEquipments]
                           _eq[i] = equipmentsOg.filter(
                             (e) => e._id === data.value
                           )[0]
 
-                          setEquipments(_eq)
+                          setSelEquipments(_eq)
                         } else {
                           toast.error('Already selected!')
                           if (nJobs === 1) {
@@ -1068,9 +1069,9 @@ export default function Workdata() {
                           toast.error('Already selected!')
                           if (nJobs === 1) {
                           } else {
-                            let _e = [...equipments]
+                            let _e = [...selEquipments]
                             _e.pop()
-                            setEquipments(_e)
+                            setSelEquipments(_e)
                             setNJobs(nJobs - 1)
                           }
                         }
@@ -1155,7 +1156,7 @@ export default function Workdata() {
             project &&
             eqType &&
             jobType &&
-            equipments.length > 0 &&
+            selEquipments.length > 0 &&
             drivers.length > 0 && (
               <div className="mt-5 w-24">
                 <MSubmitButton
