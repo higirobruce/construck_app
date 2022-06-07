@@ -23,7 +23,7 @@ export default function Modal({
   showReasonField,
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
-  let uom = rowData.equipment?.uom
+  let uom = rowData?.equipment?.uom
 
   return (
     <div>

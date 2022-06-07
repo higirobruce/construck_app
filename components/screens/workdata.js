@@ -44,10 +44,10 @@ export default function Workdata() {
   let [nJobs, setNJobs] = useState(1)
   let [nAstDrivers, setNAstDrivers] = useState(1)
   let [jobList, setJobList] = useState([])
-  let [eqType, setEqType] = useState('')
+  let [eqType, setEqType] = useState('Truck')
   let [dayShift, setDayShift] = useState(true)
   let [search, setSearch] = useState('')
-  let [dispatchDate, setDispatchDate] = useState(null)
+  let [dispatchDate, setDispatchDate] = useState(Date.now())
 
   let [projects, setProjects] = useState([])
 
@@ -107,7 +107,10 @@ export default function Workdata() {
         setOgWorkList(resp)
         setLoadingData(false)
       })
-
+      .catch((err) => {
+        setLoadingData(false)
+        toast.error('Connection issue!!!')
+      })
     fetch('https://construck-backend.herokuapp.com/projects/v2')
       .then((resp) => resp.json())
       .then((resp) => {
@@ -123,6 +126,7 @@ export default function Workdata() {
         setProjectList(projectOptions)
         setProjects(list)
       })
+      .catch((err) => {})
 
     fetch('https://construck-backend.herokuapp.com/reasons')
       .then((resp) => resp.json())
@@ -137,6 +141,7 @@ export default function Workdata() {
         })
         setReasonList(reasonOptions)
       })
+      .catch((err) => {})
 
     fetch('https://construck-backend.herokuapp.com/employees/')
       .then((resp) => resp.json())
@@ -153,6 +158,7 @@ export default function Workdata() {
           })
         setDriverList(userOptions)
       })
+      .catch((err) => {})
   }, [])
 
   useEffect(() => {
@@ -230,6 +236,7 @@ export default function Workdata() {
           setEquipmentList([])
         }
       })
+      .catch((err) => {})
 
     fetch('https://construck-backend.herokuapp.com/jobtypes/eqType/' + eqType)
       .then((resp) => resp.json())
@@ -248,6 +255,7 @@ export default function Workdata() {
           }
         }
       })
+      .catch((err) => {})
   }, [eqType, dispatchDate, dayShift])
 
   useEffect(() => {
@@ -792,7 +800,7 @@ export default function Workdata() {
       )}
       {viewPort === 'list' && (
         <>
-          {!loadingData && workList.length > 0 ? (
+          {!loadingData ? (
             <WorkListTable
               data={workList}
               handelApprove={_setApproveRow}

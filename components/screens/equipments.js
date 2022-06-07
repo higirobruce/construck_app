@@ -87,6 +87,9 @@ export default function Equipments() {
 
         setLoading(false)
       })
+      .catch((err) => {
+        setLoading(false)
+      })
   }
 
   async function readFromFile(file) {
