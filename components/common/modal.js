@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import TextInput from './TextIput'
+import TextInputLogin from './TextIputLogin'
+import TextInputV from './TextIputV'
 
 export default function Modal({
   isShown,
@@ -8,7 +11,12 @@ export default function Modal({
   handleConfirm,
   type,
   handleReasonChange,
+  handleSetEndIndex,
+  handleSetDuration,
+  handleSetTripsDone,
+  handleSetComment,
 }) {
+  let [lEndIndex, setLEndIndex] = useState(0)
   return (
     <div>
       <div
@@ -86,6 +94,40 @@ export default function Modal({
                   rows="3"
                   placeholder="Your message"
                 ></textarea>
+              </div>
+            )}
+
+            {type === 'stop' && (
+              <div className="mb-3 flex flex-col space-y-4">
+                <TextInputLogin
+                  label="End Index"
+                  placeholder="0"
+                  setValue={handleSetEndIndex}
+                  type="number"
+                  isRequired
+                />
+
+                <TextInputLogin
+                  label="Duration (Hrs)"
+                  placeholder="0"
+                  setValue={handleSetDuration}
+                  type="number"
+                  isRequired
+                />
+
+                <TextInputLogin
+                  label="Trips done"
+                  placeholder="0"
+                  setValue={handleSetTripsDone}
+                  type="number"
+                />
+
+                <TextInputLogin
+                  label="Comment"
+                  placeholder="0"
+                  setValue={handleSetComment}
+                  type="text"
+                />
               </div>
             )}
 
