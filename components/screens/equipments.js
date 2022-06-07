@@ -72,7 +72,7 @@ export default function Equipments() {
         let eqs = res?.equipments
         let nEqs = res.nrecords
         setNRecords(nEqs)
-        setEquipments(eqs)
+
         let availableEq = eqs.filter((e) => e.eqStatus === 'available')
         let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
         let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
@@ -83,6 +83,7 @@ export default function Equipments() {
         setNDispatched(dispatchedEq.length)
         setNInWorkshop(inWorkshopEq.length)
         setOgEquipmentList(eqs)
+        setEquipments(eqs)
 
         setLoading(false)
       })
@@ -425,7 +426,7 @@ export default function Equipments() {
       </div>
       {viewPort === 'list' && (
         <>
-          {loading || equipments.length < 200 ? (
+          {loading || nRecords < 0 ? (
             <Loader active />
           ) : (
             <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
