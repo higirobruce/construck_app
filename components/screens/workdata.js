@@ -334,7 +334,7 @@ export default function Workdata() {
         setWorkList(resp)
         setOgWorkList(resp)
 
-        setEquipments([])
+        setEquipments(resp)
         setEquipmentList([])
         setDrivers([])
         setNJobs(1)
