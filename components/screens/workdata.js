@@ -44,7 +44,7 @@ export default function Workdata() {
   let [nJobs, setNJobs] = useState(1)
   let [nAstDrivers, setNAstDrivers] = useState(1)
   let [jobList, setJobList] = useState([])
-  let [eqType, setEqType] = useState('Truck')
+  let [eqType, setEqType] = useState('')
   let [dayShift, setDayShift] = useState(true)
   let [search, setSearch] = useState('')
   let [dispatchDate, setDispatchDate] = useState(Date.now())
