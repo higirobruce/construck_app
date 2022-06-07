@@ -4,6 +4,7 @@ import {
   DotsHorizontalIcon,
   PrinterIcon,
   ReceiptRefundIcon,
+  StopIcon,
 } from '@heroicons/react/solid'
 import {
   CheckIcon,
@@ -11,6 +12,7 @@ import {
   ExclamationCircleIcon,
   XIcon,
   PauseIcon,
+  PlayIcon,
 } from '@heroicons/react/solid'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
@@ -23,8 +25,6 @@ import _ from 'lodash'
 import {
   ClipboardCheckIcon,
   ClipboardIcon,
-  PlayIcon,
-  StopIcon,
   SwitchVerticalIcon,
 } from '@heroicons/react/outline'
 import { ResponsiveWrapper } from '@nivo/core'
@@ -145,6 +145,7 @@ export default function WorkListTable({
   handleSelect,
   handleDeselect,
   loading,
+  handelStop,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
@@ -444,6 +445,17 @@ export default function WorkListTable({
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <PrinterIcon className="h-5 w-5 text-blue-400" />
+                              </div>
+                            </>
+                          )}
+                        {user.userType === 'admin' &&
+                          row.status === 'in progress' && (
+                            <>
+                              <div
+                                onClick={() => handelStop(row, index)}
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                              >
+                                <StopIcon className="h-5 w-5 text-red-500" />
                               </div>
                             </>
                           )}
