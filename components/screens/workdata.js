@@ -39,6 +39,7 @@ export default function Workdata() {
   let [equipmentList, setEquipmentList] = useState([])
   let [jobTypeList, setJobTypeList] = useState([])
   let [driverList, setDriverList] = useState([])
+  let [reasonList, setReasonList] = useState([])
   let [viewPort, setViewPort] = useState('list')
   let [nJobs, setNJobs] = useState(1)
   let [nAstDrivers, setNAstDrivers] = useState(1)
@@ -71,6 +72,7 @@ export default function Workdata() {
   let [approveModalIsShown, setApproveModalIsShown] = useState(false)
   let [rejectModalIsShown, setRejectModalIsShown] = useState(false)
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
+  let [showReasonField, setShowReasonField] = useState(false)
 
   let [row, setRow] = useState()
   let [rowIndex, setRowIndex] = useState()
@@ -122,6 +124,20 @@ export default function Workdata() {
         setProjects(list)
       })
 
+    fetch('https://construck-backend.herokuapp.com/reasons')
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let list = resp
+        let reasonOptions = list.map((p) => {
+          return {
+            key: p._id,
+            value: p.descriptionRw,
+            text: p.description,
+          }
+        })
+        setReasonList(reasonOptions)
+      })
+
     fetch('https://construck-backend.herokuapp.com/employees/')
       .then((resp) => resp.json())
       .then((resp) => {
@@ -138,6 +154,14 @@ export default function Workdata() {
         setDriverList(userOptions)
       })
   }, [])
+
+  useEffect(() => {
+    console.log(workList[rowIndex])
+    let targetTrips = parseInt(workList[rowIndex]?.dispatch?.targetTrips)
+
+    if (targetTrips > tripsDone) setShowReasonField(true)
+    else setShowReasonField(false)
+  }, [tripsDone])
 
   useEffect(() => {
     setLoadingData(true)
@@ -452,8 +476,9 @@ export default function Workdata() {
     setWorkList(_workList)
   }
 
-  function _setEndIndex(value) {
-    setEndIndex(value)
+  function _setReason(value) {
+    console.log(value)
+    setComment(value)
   }
 
   function order(param) {
@@ -728,6 +753,10 @@ export default function Workdata() {
           handleSetDuration={setDuration}
           handleSetTripsDone={setTripsDone}
           handleSetComment={setComment}
+          handleSetReason={_setReason}
+          reasons={reasonList}
+          rowData={workList[rowIndex]}
+          showReasonField={showReasonField}
           type="stop"
         />
       )}
@@ -1043,8 +1072,8 @@ export default function Workdata() {
                 </div>
               ))}
 
-              <div className="pt-4">
-                <MTitle content="Assistant Drivers" />
+              <div className="rounded bg-slate-200 p-5">
+                <MTitle content="Assistant Drivers / Turn boys" />
                 <div className="flex w-full flex-row justify-between">
                   <div className="flex w-1/2 flex-col space-y-5">
                     {[...Array(nAstDrivers)].map((e, i) => (
@@ -1079,7 +1108,7 @@ export default function Workdata() {
                     ))}
                   </div>
 
-                  <div className="flex flex-row space-x-10">
+                  <div className="mt-3 flex flex-row space-x-10">
                     <PlusIcon
                       className="h-5 w-5 cursor-pointer text-teal-600"
                       onClick={() => setNAstDrivers(nAstDrivers + 1)}
@@ -1097,6 +1126,7 @@ export default function Workdata() {
                 </div>
               </div>
             </div>
+
             <div className="flex flex-row space-x-10">
               <PlusIcon
                 className="mt-5 h-5 w-5 cursor-pointer text-teal-600"

@@ -373,18 +373,14 @@ export default function WorkListTable({
                     <Table.Cell>
                       <Tooltip
                         title={
-                          row.equipment.eqtype === 'Truck'
+                          row?.dispatch?.targetTrips
                             ? 'Target trips: ' + row?.dispatch?.targetTrips
                             : 'NA'
                         }
                       >
                         <div>
                           <MTextView
-                            content={
-                              row.equipment.eqtype === 'Truck'
-                                ? row?.tripsDone
-                                : 'NA'
-                            }
+                            content={row?.tripsDone ? row?.tripsDone : 0}
                           />
                         </div>
                       </Tooltip>

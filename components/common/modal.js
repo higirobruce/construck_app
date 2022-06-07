@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { Dropdown } from 'semantic-ui-react'
+import MTextView from './mTextView'
 import TextInput from './TextIput'
 import TextInputLogin from './TextIputLogin'
 import TextInputV from './TextIputV'
@@ -15,13 +17,19 @@ export default function Modal({
   handleSetDuration,
   handleSetTripsDone,
   handleSetComment,
+  handleSetReason,
+  reasons,
+  rowData,
+  showReasonField,
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
+  let uom = rowData.equipment?.uom
+
   return (
     <div>
       <div
         x-show={isShown}
-        className="fixed inset-0 mx-auto overflow-y-auto"
+        className="fixed inset-0 mx-auto h-screen overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -50,7 +58,7 @@ export default function Modal({
             x-transitionLeave="transition ease-in duration-200 transform"
             x-transitionLeave-start="opacity-100 translate-y-0 sm:scale-100"
             x-transitionLeave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            className="my-20 inline-block w-full max-w-xl transform overflow-hidden rounded-lg bg-white p-8 text-left shadow-xl transition-all 2xl:max-w-2xl"
+            className="my-20 inline-block w-full max-w-xl transform overflow-auto rounded-lg bg-white p-8 text-left shadow-xl transition-all 2xl:max-w-2xl"
           >
             <div className="flex items-center justify-between space-x-4">
               <div className="text-2xl font-semibold">{title}</div>
@@ -98,36 +106,60 @@ export default function Modal({
             )}
 
             {type === 'stop' && (
-              <div className="mb-3 flex flex-col space-y-4">
-                <TextInputLogin
-                  label="End Index"
-                  placeholder="0"
-                  setValue={handleSetEndIndex}
-                  type="number"
-                  isRequired
-                />
+              <div className="grid grid-cols-2 gap-x-2">
+                <div className="mb-3 flex flex-col space-y-4">
+                  <TextInputLogin
+                    label={`End Index [from ${rowData.startIndex}]`}
+                    placeholder="0"
+                    setValue={handleSetEndIndex}
+                    type="number"
+                    isRequired
+                  />
 
-                <TextInputLogin
-                  label="Duration (Hrs)"
-                  placeholder="0"
-                  setValue={handleSetDuration}
-                  type="number"
-                  isRequired
-                />
+                  <TextInputLogin
+                    label="Duration (Hrs)"
+                    placeholder="0"
+                    setValue={handleSetDuration}
+                    type="number"
+                    isRequired
+                  />
 
-                <TextInputLogin
-                  label="Trips done"
-                  placeholder="0"
-                  setValue={handleSetTripsDone}
-                  type="number"
-                />
+                  {parseInt(rowData.dispatch?.targetTrips) > 0 && (
+                    <TextInputLogin
+                      label={
+                        `Trips done out of ` + rowData.dispatch?.targetTrips
+                      }
+                      placeholder="0"
+                      setValue={handleSetTripsDone}
+                      type="number"
+                    />
+                  )}
 
-                <TextInputLogin
+                  {/* <TextInputLogin
                   label="Comment"
                   placeholder="0"
                   setValue={handleSetComment}
                   type="text"
-                />
+                /> */}
+                </div>
+
+                {showReasonField && (
+                  <div className="flex flex-col">
+                    <div className="mb-1 flex flex-row items-center">
+                      <MTextView content="Reason" />
+                    </div>
+                    <Dropdown
+                      options={reasons}
+                      placeholder="Select reason"
+                      search
+                      compact
+                      selection
+                      onChange={(e, data) => {
+                        handleSetReason(data.value)
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
