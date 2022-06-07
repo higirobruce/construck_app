@@ -41,6 +41,7 @@ export default function Workdata() {
   let [driverList, setDriverList] = useState([])
   let [viewPort, setViewPort] = useState('list')
   let [nJobs, setNJobs] = useState(1)
+  let [nAstDrivers, setNAstDrivers] = useState(1)
   let [jobList, setJobList] = useState([])
   let [eqType, setEqType] = useState('')
   let [dayShift, setDayShift] = useState(true)
@@ -58,6 +59,7 @@ export default function Workdata() {
   let [equipments, setEquipments] = useState([])
   let [equipmentsOg, setEquipmentsOg] = useState([])
   let [drivers, setDrivers] = useState([])
+  let [astDrivers, setAstDrivers] = useState([])
   let [reasonForRejection, setReasonForRejection] = useState('')
 
   let [selectedWorks, setSelectedWorks] = useState([])
@@ -65,6 +67,7 @@ export default function Workdata() {
   let [orderAsc, setOrderAsc] = useState(true)
 
   let [recallModalIsShown, setRecallModalIsShown] = useState(false)
+  let [stopModalIsShown, setStopModalIsShown] = useState(false)
   let [approveModalIsShown, setApproveModalIsShown] = useState(false)
   let [rejectModalIsShown, setRejectModalIsShown] = useState(false)
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
@@ -85,6 +88,13 @@ export default function Workdata() {
   let [searchProject, setSearchProject] = useState('')
   let [searchDriver, setSearchDriver] = useState('')
   let [owner, setOwner] = useState('')
+
+  // duration, endIndex, tripsDone, comment
+
+  let [duration, setDuration] = useState(0)
+  let [endIndex, setEndIndex] = useState(0)
+  let [tripsDone, setTripsDone] = useState(0)
+  let [comment, setComment] = useState(0)
 
   useEffect(() => {
     setLoadingData(true)
@@ -340,6 +350,11 @@ export default function Workdata() {
     setRowIndex(index)
     setRecallModalIsShown(true)
   }
+  function _setStopRow(row, index) {
+    setRow(row)
+    setRowIndex(index)
+    setStopModalIsShown(true)
+  }
 
   function _setApproveRow(row, index) {
     setRow(row)
@@ -364,6 +379,28 @@ export default function Workdata() {
     setWorkList(_workList)
     fetch(`https://construck-backend.herokuapp.com/works/recall/${row._id}`, {
       method: 'PUT',
+    })
+      .then((resp) => resp.json())
+      .then((resp) => {
+        refresh()
+      })
+  }
+
+  function stop() {
+    let _workList = [...workList]
+    _workList[rowIndex].status = 'updating'
+    setWorkList(_workList)
+
+    // duration, endIndex, tripsDone, comment
+    fetch(`https://construck-backend.herokuapp.com/works/stop/${row._id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        duration,
+        endIndex,
+        tripsDone,
+        comment,
+      }),
     })
       .then((resp) => resp.json())
       .then((resp) => {
@@ -413,6 +450,10 @@ export default function Workdata() {
     setSelectedWorks(_newSelected)
 
     setWorkList(_workList)
+  }
+
+  function _setEndIndex(value) {
+    setEndIndex(value)
   }
 
   function order(param) {
@@ -485,6 +526,7 @@ export default function Workdata() {
                 targetTrips,
                 equipments: equipments,
                 drivers,
+                astDrivers,
                 jobType,
                 shift: dayShift ? 'dayShift' : 'nightShift',
                 createdOn: new Date().toISOString(),
@@ -568,7 +610,7 @@ export default function Workdata() {
 
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
-      <div className="text-2xl font-semibold">Forms</div>
+      <div className="text-2xl font-semibold">Forms ({workList.length})</div>
       <div className="flex w-full flex-row items-center justify-between space-x-10">
         {viewPort === 'list' && user.userType === 'admin' && (
           <MSubmitButton
@@ -675,6 +717,21 @@ export default function Workdata() {
         />
       )}
 
+      {stopModalIsShown && (
+        <Modal
+          title="End job"
+          body="Are you sure you want to end this job?"
+          isShown={stopModalIsShown}
+          setIsShown={setStopModalIsShown}
+          handleConfirm={stop}
+          handleSetEndIndex={setEndIndex}
+          handleSetDuration={setDuration}
+          handleSetTripsDone={setTripsDone}
+          handleSetComment={setComment}
+          type="stop"
+        />
+      )}
+
       {approveModalIsShown && (
         <Modal
           title="Approval of a job"
@@ -712,6 +769,7 @@ export default function Workdata() {
               handelApprove={_setApproveRow}
               handelReject={_setRejectRow}
               handelRecall={_setRecallRow}
+              handelStop={_setStopRow}
               handleOrder={order}
               handleSelect={select}
               handleDeselect={deselect}
@@ -871,18 +929,22 @@ export default function Workdata() {
                 />
               )}
 
-              <TextInput
-                label="Site origin"
-                placeholder="From which site?"
-                setValue={setFromSite}
-                type="text"
-              />
-              <TextInput
-                label="Site Destination"
-                placeholder="To which site?"
-                setValue={setToSite}
-                type="text"
-              />
+              {eqType === 'Truck' && (
+                <>
+                  <TextInput
+                    label="Site origin"
+                    placeholder="From which site?"
+                    setValue={setFromSite}
+                    type="text"
+                  />
+                  <TextInput
+                    label="Site Destination"
+                    placeholder="To which site?"
+                    setValue={setToSite}
+                    type="text"
+                  />
+                </>
+              )}
 
               {/* <TextInput isRequired={true} label="Date" placeholder="Day" /> */}
 
@@ -911,7 +973,6 @@ export default function Workdata() {
 
             <div className="mt-5 flex w-2/5 flex-col space-y-5">
               <MTitle content="Equipment & Driver data" />
-
               {[...Array(nJobs)].map((e, i) => (
                 <div className="mb-5 flex flex-row space-x-7">
                   <div className="flex w-1/2 flex-row items-center space-x-5">
@@ -981,8 +1042,61 @@ export default function Workdata() {
                   </div>
                 </div>
               ))}
-            </div>
 
+              <div className="pt-4">
+                <MTitle content="Assistant Drivers" />
+                <div className="flex w-full flex-row justify-between">
+                  <div className="flex w-1/2 flex-col space-y-5">
+                    {[...Array(nAstDrivers)].map((e, i) => (
+                      <div className="flex flex-row items-center space-x-5">
+                        <Dropdown
+                          options={driverList}
+                          placeholder="Select Driver"
+                          fluid
+                          search
+                          selection
+                          onChange={(e, data) => {
+                            let selectedDr = _.find(astDrivers, (d) => {
+                              return d === data.value
+                            })
+
+                            if (!selectedDr) {
+                              let _dr = [...astDrivers]
+                              _dr[i] = data.value
+                              setAstDrivers(_dr)
+                            } else {
+                              toast.error('Already selected!')
+                              if (nAstDrivers === 1) {
+                              } else {
+                                let _astDrivers = [...astDrivers]
+                                _astDrivers.pop()
+                                setNAstDrivers(nAstDrivers - 1)
+                              }
+                            }
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-row space-x-10">
+                    <PlusIcon
+                      className="h-5 w-5 cursor-pointer text-teal-600"
+                      onClick={() => setNAstDrivers(nAstDrivers + 1)}
+                    />
+                    <TrashIcon
+                      className="h-5 w-5 cursor-pointer text-red-500"
+                      onClick={() => {
+                        if (nAstDrivers === 1) {
+                        } else {
+                          setNAstDrivers(nAstDrivers - 1)
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="flex flex-row space-x-10">
               <PlusIcon
                 className="mt-5 h-5 w-5 cursor-pointer text-teal-600"
