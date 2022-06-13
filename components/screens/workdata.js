@@ -1088,6 +1088,16 @@ export default function Workdata() {
                 name="check"
                 id="checkLowbed"
                 onChange={() => {
+                  setSelEquipments([])
+                  setSelJobTypes([])
+                  setAstDrivers([])
+                  setDispatchDates(null)
+                  setFromProjects([])
+                  settoProjects([])
+                  setDrivers(null)
+                  setNJobs(1)
+                  setNAstDrivers(1)
+                  setSelectedWorks(null)
                   setLowbedWork(!lowbedWork)
                 }}
               />
@@ -1326,10 +1336,17 @@ export default function Workdata() {
                   <MTitle content="Equipment & Driver data" />
                   {[...Array(nJobs)].map((e, i) => (
                     <div className="mb-5 flex flex-row space-x-7">
-                      <div className="flex w-1/2 flex-row items-center space-x-5">
+                      <div className="flex w-1/2 flex-col justify-start space-y-1">
                         <div className="items-cente flex flex-row">
                           <MTextView content="Equipment" />
                           {<div className="text-sm text-red-600">*</div>}
+                          {selEquipments && selEquipments[i] && (
+                            <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
+                              <MTextView
+                                content={selEquipments[i]?.eqDescription}
+                              />
+                            </div>
+                          )}
                         </div>
                         <Dropdown
                           options={equipmentList}
@@ -1358,8 +1375,9 @@ export default function Workdata() {
                           }}
                         />
                       </div>
-                      <div className="flex w-1/2 flex-row items-center space-x-5">
-                        <div className="items-cente flex flex-1 flex-row">
+
+                      <div className="flex w-1/2 flex-col justify-start space-y-1">
+                        <div className="items-cente flex flex-row">
                           <MTextView content="Driver" />
                           {<div className="text-sm text-red-600">*</div>}
                         </div>
