@@ -25,7 +25,7 @@ export default function MenuBar() {
     setUser({})
   }
   return (
-    <div className="flex min-h-screen w-60 flex-col items-center justify-between overflow-y-auto bg-slate-200">
+    <div className="flex min-h-screen w-20 flex-col items-center justify-between overflow-y-auto bg-slate-200 md:w-60">
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
@@ -56,7 +56,9 @@ export default function MenuBar() {
           onClick={() => setScreen('workData')}
         >
           <DocumentDuplicateIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">Forms</div>
+          <div className="hidden w-1/2 font-semibold md:block">
+            Dispatch Forms
+          </div>
         </div>
 
         {user.userType === 'admin' && (
