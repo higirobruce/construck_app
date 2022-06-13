@@ -176,7 +176,7 @@ export default function WorkListTable({
     <div className="hidden md:block">
       {pData.length > 0 && (
         <>
-          <Table size="small">
+          <Table size="small" compact>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>

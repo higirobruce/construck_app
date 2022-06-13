@@ -426,14 +426,13 @@ export default function Workdata() {
 
   useEffect(() => {
     if (startDate && endDate && workList) {
-      let _workList = workList?.filter((w) => {
+      let _workList = ogWorkList?.filter((w) => {
         return (
           Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
           Date.parse(endDate).addHours(23).addMinutes(59) >=
             Date.parse(w?.dispatch?.date)
         )
       })
-      console.log(_workList)
       setWorkList(_workList)
       setLoadingData(false)
     } else {
@@ -856,7 +855,7 @@ export default function Workdata() {
   }
 
   return (
-    <div className="my-5 flex flex-col space-y-5 px-10">
+    <div className="my-5 flex flex-col space-y-3 px-10">
       <div className="text-2xl font-semibold">
         Dispatch Forms ({workList ? workList?.length : 0})
       </div>
