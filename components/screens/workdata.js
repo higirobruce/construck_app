@@ -200,7 +200,7 @@ export default function Workdata() {
           return {
             key: l._id,
             value: l._id,
-            text: l.plateNumber + '-' + l.eqDescription,
+            text: l.plateNumber,
           }
         })
 
@@ -312,7 +312,7 @@ export default function Workdata() {
           return {
             key: l._id,
             value: l._id,
-            text: l.plateNumber + '-' + l.eqDescription,
+            text: l.plateNumber,
           }
         })
 
@@ -1478,10 +1478,15 @@ export default function Workdata() {
                       {[...Array(nMachinesToMove)].map((e, i) => (
                         <div className="flex flex-row space-x-2">
                           {/* Equipment */}
-                          <div className="flex w-1/4 flex-row items-center space-x-2">
-                            <div className="items-cente flex flex-row">
+                          <div className="flex w-1/6 flex-col justify-start space-y-1">
+                            <div className="flex flex-row items-center">
                               <MTextView content="Equipment" />
                               {<div className="text-sm text-red-600">*</div>}
+                              <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
+                                <MTextView
+                                  content={selEquipments[i]?.eqDescription}
+                                />
+                              </div>
                             </div>
                             <Dropdown
                               options={equipmentFullList}
@@ -1522,43 +1527,41 @@ export default function Workdata() {
                           </div>
 
                           {/* Driver */}
-                          <div className="flex w-1/4 flex-row items-center space-x-2">
-                            <div className="items-cente flex flex-1 flex-row">
+                          <div className="flex w-1/6 flex-col justify-start space-y-1">
+                            <div className="flex flex-row items-center">
                               <MTextView content="Driver" />
                               {<div className="text-sm text-red-600">*</div>}
                             </div>
-                            <div className="w-full">
-                              <Dropdown
-                                options={driverList}
-                                placeholder="Select Driver      "
-                                fluid
-                                search
-                                selection
-                                onChange={(e, data) => {
-                                  let selectedDr = _.find(drivers, (d) => {
-                                    return d === data.value
-                                  })
-                                  if (!selectedDr) {
-                                    let _dr = drivers ? [...drivers] : []
-                                    _dr[i] = data.value
-                                    setDrivers(_dr)
+                            <Dropdown
+                              options={driverList}
+                              placeholder="Select Driver      "
+                              fluid
+                              search
+                              selection
+                              onChange={(e, data) => {
+                                let selectedDr = _.find(drivers, (d) => {
+                                  return d === data.value
+                                })
+                                if (!selectedDr) {
+                                  let _dr = drivers ? [...drivers] : []
+                                  _dr[i] = data.value
+                                  setDrivers(_dr)
+                                } else {
+                                  toast.error('Already selected!')
+                                  if (nMachinesToMove === 1) {
                                   } else {
-                                    toast.error('Already selected!')
-                                    if (nMachinesToMove === 1) {
-                                    } else {
-                                      let _e = [...selEquipments]
-                                      _e.pop()
-                                      setSelEquipments(_e)
-                                      setNMachinesToMove(nMachinesToMove - 1)
-                                    }
+                                    let _e = [...selEquipments]
+                                    _e.pop()
+                                    setSelEquipments(_e)
+                                    setNMachinesToMove(nMachinesToMove - 1)
                                   }
-                                }}
-                              />
-                            </div>
+                                }
+                              }}
+                            />
                           </div>
 
                           {/* From Project */}
-                          <div className="flex w-1/4 flex-row items-center space-x-2">
+                          <div className="flex w-1/6 flex-col justify-start space-y-1">
                             <div className="flex flex-row items-center">
                               <MTextView content="From" />
                               {<div className="text-sm text-red-600">*</div>}
@@ -1600,7 +1603,7 @@ export default function Workdata() {
                           </div>
 
                           {/* To Project */}
-                          <div className="flex w-1/4 flex-row items-center space-x-2">
+                          <div className="flex w-1/6 flex-col justify-start space-y-1">
                             <div className="flex flex-row items-center">
                               <MTextView content="To" />
                               {<div className="text-sm text-red-600">*</div>}
@@ -1638,12 +1641,12 @@ export default function Workdata() {
                           </div>
 
                           {/* Job Type */}
-                          <div className="flex w-1/4 flex-row items-center space-x-2">
+                          <div className="flex w-1/6 flex-col justify-start space-y-1">
                             <div className="flex flex-row items-center">
                               <MTextView content="Job Type" />
                               {<div className="text-sm text-red-600">*</div>}
                             </div>
-                            <div className="w-4/5">
+                            <div className="w-full">
                               <Dropdown
                                 options={jobTypeListsbyRow[i]}
                                 placeholder="Select Job type"
@@ -1660,11 +1663,11 @@ export default function Workdata() {
                           </div>
 
                           {/* Date */}
-                          <div className="flex w-1/6 flex-row items-center space-x-2">
-                            {/* <div className="flex flex-row items-center">
+                          <div className="flex flex-col justify-start space-y-1">
+                            <div className="flex flex-row items-center">
                               <MTextView content="Date" />
                               <div className="text-sm text-red-600">*</div>
-                            </div> */}
+                            </div>
                             <div className="w-full">
                               <DatePicker
                                 size={20}
