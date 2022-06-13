@@ -1042,7 +1042,7 @@ export default function Workdata() {
 
       {viewPort === 'new' && (
         <div className="flex flex-col">
-          <div className="mt-5 flex flex-row items-center space-x-5">
+          <div className="mt-5 flex flex-row items-center space-x-2">
             <div class="form-check">
               <input
                 class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
@@ -1660,11 +1660,11 @@ export default function Workdata() {
                           </div>
 
                           {/* Date */}
-                          <div className="flex flex-row items-center space-x-2">
-                            <div className="flex flex-row items-center">
+                          <div className="flex w-1/6 flex-row items-center space-x-2">
+                            {/* <div className="flex flex-row items-center">
                               <MTextView content="Date" />
                               <div className="text-sm text-red-600">*</div>
-                            </div>
+                            </div> */}
                             <div className="w-full">
                               <DatePicker
                                 size={20}
@@ -1685,7 +1685,7 @@ export default function Workdata() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-3 ml-10 flex flex-row space-x-10">
+                    <div className="mt-3 ml-5 flex flex-row space-x-5">
                       <PlusIcon
                         className="h-5 w-5 cursor-pointer text-teal-600"
                         onClick={() => setNMachinesToMove(nMachinesToMove + 1)}
