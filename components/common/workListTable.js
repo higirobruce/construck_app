@@ -485,11 +485,11 @@ export default function WorkListTable({
         </>
       )}
 
-      {/* {pData.length === 0 && !loading && (
+      {pData.length === 0 && (
         <div className="my-2 flex w-full flex-row items-center justify-center">
           No data found!
         </div>
-      )} */}
+      )}
     </div>
   )
 }
