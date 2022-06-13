@@ -102,13 +102,13 @@ export default function EquipmentType({
   }
   return (
     <div className={getClassFromStatus(intent)}>
-      <div className="flex flex-row items-start justify-between py-1">
-        <div className="flex flex-col">
-          <div className="flex flex-row items-center space-x-3">
+      <div className="grid grid-cols-3 py-1">
+        <div className="col-span-2 flex flex-col">
+          <div className="flex flex-row items-center">
             <div className="text-lg font-semibold text-gray-700">
               {data.plateNumber}
             </div>
-            <MStatusIndicator status={data.eqStatus} />
+            {/* <MStatusIndicator status={data.eqStatus} /> */}
           </div>
 
           <div className="text-sm font-semibold text-gray-400">
@@ -118,11 +118,11 @@ export default function EquipmentType({
             {data.eqType + ' - ' + data.eqOwner}
           </div>
         </div>
-        <div className="mt-1 flex flex-row space-x-3">
-          <PencilAltIcon
+        <div className="col-start-4 mt-1 flex flex-row space-x-1">
+          {/* <PencilAltIcon
             className={
               intent === 'available'
-                ? 'h-5 w-5 cursor-pointer text-yellow-600'
+                ? 'h-5 w-5 cursor-pointer self-end text-yellow-600'
                 : 'h-5 w-5 text-zinc-300'
             }
           />
@@ -132,7 +132,7 @@ export default function EquipmentType({
                 ? 'h-5 w-5 cursor-pointer text-blue-500'
                 : 'h-5 w-5 text-zinc-300'
             }
-          />
+          /> */}
           {data.eqStatus !== 'workshop' && data.eqStatus !== 'assigned to job' && (
             <CogIcon
               onClick={() => {

@@ -190,7 +190,9 @@ export default function Workdata() {
     fetch(`https://construck-backend.herokuapp.com/equipments/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        let list = resp['equipments'].filter((r) => r.eqStatus === 'available')
+        let list = resp['equipments'].filter(
+          (r) => r.eqStatus === 'available' && r.eqtype === 'Machine'
+        )
         let listLowbeds = resp['equipments'].filter(
           (r) =>
             r.eqDescription === 'TRACTOR HEAD' && r.eqStatus === 'available'
@@ -380,15 +382,6 @@ export default function Workdata() {
       })
       .catch((err) => {})
   }, [eqType, dispatchDate, dayShift])
-
-  useEffect(() => {
-    if (
-      viewPort === 'new' &&
-      (targetTrips == 0 || (!targetTrips && eqType === 'Truck'))
-    ) {
-      toast.warning('Target trips are mandatory for this entry!')
-    }
-  }, [targetTrips])
 
   useEffect(() => {
     if (search.length >= 3) {
@@ -756,7 +749,7 @@ export default function Workdata() {
             body: JSON.stringify({
               project: toProjects[0],
               equipment: lowbed[0],
-              workDone: '62a70a7197ee8984c1be6c9f',
+              workDone: '62690b97cf45ad62aa6144e2',
               driver: lowbedOperator,
               startTime: Date.now(),
               status: 'created',
@@ -775,7 +768,7 @@ export default function Workdata() {
                 equipments: lowbed,
                 drivers,
                 astDrivers,
-                jobType: '62a70a7197ee8984c1be6c9f',
+                jobType: '62690b97cf45ad62aa6144e2',
                 shift: dayShift ? 'dayShift' : 'nightShift',
                 createdOn: new Date().toISOString(),
                 date: new Date(movementDate),
