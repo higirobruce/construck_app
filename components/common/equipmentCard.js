@@ -91,7 +91,7 @@ export default function EquipmentType({
     } else if (intent == 'dispatched') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-100 ring-1 ring-zinc-200 w-full'
     } else if (intent == 'assigned to job') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-50  w-full ring-1 ring-red-200'
+      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-orange-50  w-full ring-1 ring-orange-200'
     } else if (intent == 'workshop') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-50  w-full ring-1 ring-red-200'
     } else if (intent == 'updating') {

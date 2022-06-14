@@ -364,7 +364,7 @@ export default function Equipments() {
                   className={
                     filterBy !== 'assigned to job'
                       ? 'flex flex-row items-center rounded-lg p-1 text-orange-300 shadow-md ring-1 ring-orange-100'
-                      : 'flex flex-row items-center rounded-lg bg-red-50 p-1 text-orange-400 ring-1 ring-orange-300'
+                      : 'flex flex-row items-center rounded-lg bg-orange-50 p-1 text-orange-400 ring-1 ring-orange-300'
                   }
                 >
                   <LockClosedIcon className="h-5 w-5" />
