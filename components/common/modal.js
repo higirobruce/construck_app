@@ -14,6 +14,7 @@ export default function Modal({
   type,
   handleReasonChange,
   handleSetEndIndex,
+  handleSetStartIndex,
   handleSetDuration,
   handleSetTripsDone,
   handleSetComment,
@@ -160,6 +161,20 @@ export default function Modal({
                     />
                   </div>
                 )}
+              </div>
+            )}
+
+            {type === 'start' && (
+              <div className="grid grid-cols-2 gap-x-2">
+                <div className="mb-3 flex flex-col space-y-4">
+                  <TextInputLogin
+                    label={`Start Index`}
+                    placeholder="0"
+                    setValue={handleSetStartIndex}
+                    type="number"
+                    isRequired
+                  />
+                </div>
               </div>
             )}
 

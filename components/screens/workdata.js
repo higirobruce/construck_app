@@ -89,6 +89,7 @@ export default function Workdata() {
 
   let [recallModalIsShown, setRecallModalIsShown] = useState(false)
   let [stopModalIsShown, setStopModalIsShown] = useState(false)
+  let [startModalIsShown, setStartModalIsShown] = useState(false)
   let [approveModalIsShown, setApproveModalIsShown] = useState(false)
   let [rejectModalIsShown, setRejectModalIsShown] = useState(false)
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
@@ -122,6 +123,7 @@ export default function Workdata() {
 
   let [duration, setDuration] = useState(0)
   let [endIndex, setEndIndex] = useState(0)
+  let [startIndex, setStartIndex] = useState(0)
   let [tripsDone, setTripsDone] = useState(0)
   let [comment, setComment] = useState(0)
 
@@ -190,9 +192,7 @@ export default function Workdata() {
     fetch(`https://construck-backend.herokuapp.com/equipments/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        let list = resp['equipments'].filter(
-          (r) => r.eqStatus === 'available' && r.eqtype === 'Machine'
-        )
+        let list = resp['equipments'].filter((r) => r.eqStatus === 'available')
         let listLowbeds = resp['equipments'].filter(
           (r) =>
             r.eqDescription === 'TRACTOR HEAD' && r.eqStatus === 'available'
@@ -506,10 +506,17 @@ export default function Workdata() {
     setRowIndex(index)
     setRecallModalIsShown(true)
   }
+
   function _setStopRow(row, index) {
     setRow(row)
     setRowIndex(index)
     setStopModalIsShown(true)
+  }
+
+  function _setStartRow(row, index) {
+    setRow(row)
+    setRowIndex(index)
+    setStartModalIsShown(true)
   }
 
   function _setApproveRow(row, index) {
@@ -556,6 +563,25 @@ export default function Workdata() {
         endIndex,
         tripsDone,
         comment,
+      }),
+    })
+      .then((resp) => resp.json())
+      .then((resp) => {
+        refresh()
+      })
+  }
+
+  function start() {
+    let _workList = workList ? [...workList] : []
+    _workList[rowIndex].status = 'updating'
+    setWorkList(_workList)
+
+    // duration, endIndex, tripsDone, comment
+    fetch(`https://construck-backend.herokuapp.com/works/start/${row._id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startIndex,
       }),
     })
       .then((resp) => resp.json())
@@ -984,6 +1010,19 @@ export default function Workdata() {
         />
       )}
 
+      {startModalIsShown && (
+        <Modal
+          title="Start job"
+          body="Please fill the info to start the job!"
+          isShown={startModalIsShown}
+          setIsShown={setStartModalIsShown}
+          handleConfirm={start}
+          handleSetStartIndex={setStartIndex}
+          rowData={workList[rowIndex]}
+          type="start"
+        />
+      )}
+
       {approveModalIsShown && (
         <Modal
           title="Approval of a job"
@@ -1023,6 +1062,7 @@ export default function Workdata() {
               handelReject={_setRejectRow}
               handelRecall={_setRecallRow}
               handelStop={_setStopRow}
+              handelStart={_setStartRow}
               handleOrder={order}
               handleSelect={select}
               handleDeselect={deselect}
@@ -1097,7 +1137,7 @@ export default function Workdata() {
                 class="form-check-label inline-block text-zinc-800"
                 for="checkLowbed"
               >
-                Lowbed work
+                Machine dispatch (by Lowbed)
               </label>
             </div>
           </div>
@@ -1201,9 +1241,10 @@ export default function Workdata() {
           <div className="mt-5 flex flex-row space-x-10">
             {!lowbedWork && (
               <>
-                <div className="mt-5 flex w-2/5 flex-col space-y-5">
+                <div className="mt-5 flex w-1/4 flex-col space-y-5">
                   <MTitle content="Dispatch data" />
 
+                  {/* Project */}
                   <div className="flex flex-row items-center justify-between">
                     <div className="flex flex-row items-center">
                       <MTextView content="Project" />
@@ -1225,7 +1266,8 @@ export default function Workdata() {
                     </div>
                   </div>
 
-                  <div className="mt-5 flex flex-row items-center justify-between">
+                  {/* Equipment type */}
+                  {/* <div className="mt-5 flex flex-row items-center justify-between">
                     <div className="flex flex-row items-center">
                       <MTextView content="Equipment Type" />
                       {<div className="text-sm text-red-600">*</div>}
@@ -1251,9 +1293,10 @@ export default function Workdata() {
                         onChange={(e, data) => setEqType(data.value)}
                       />
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div className="mt-5 flex flex-row items-center justify-between">
+                  {/* Job type */}
+                  {/* <div className="mt-5 flex flex-row items-center justify-between">
                     <div className="flex flex-row items-center">
                       <MTextView content="Job Type" />
                       {<div className="text-sm text-red-600">*</div>}
@@ -1268,7 +1311,7 @@ export default function Workdata() {
                         onChange={(e, data) => setJobType(data.value)}
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {(jobType === '62690bbacf45ad62aa6144e6' ||
                     jobType === '62690b67cf45ad62aa6144d8') && (
@@ -1324,11 +1367,12 @@ export default function Workdata() {
                   </div>
                 </div>
 
-                <div className="mt-5 flex w-2/5 flex-col space-y-5">
+                {/* Equipment Data */}
+                <div className="mt-5 flex w-3/5 flex-col space-y-5">
                   <MTitle content="Equipment & Driver data" />
                   {[...Array(nJobs)].map((e, i) => (
                     <div className="mb-5 flex flex-row space-x-7">
-                      <div className="flex w-1/2 flex-col justify-start space-y-1">
+                      <div className="flex w-1/4 flex-col justify-start space-y-1">
                         <div className="items-cente flex flex-row">
                           <MTextView content="Equipment" />
                           {<div className="text-sm text-red-600">*</div>}
@@ -1341,7 +1385,7 @@ export default function Workdata() {
                           )}
                         </div>
                         <Dropdown
-                          options={equipmentList}
+                          options={equipmentFullList}
                           placeholder="Select Equipment"
                           fluid
                           search
@@ -1352,9 +1396,18 @@ export default function Workdata() {
                             })
                             if (!selecteObj) {
                               let _eq = selEquipments ? [...selEquipments] : []
-                              _eq[i] = equipmentsOg.filter(
+                              _eq[i] = equipmentsOgFull.filter(
                                 (e) => e._id === data.value
                               )[0]
+                              if (_eq[i].eqtype === 'Truck') {
+                                let _jList = [...jobTypeListsbyRow]
+                                _jList[i] = jobTypeListTrucks
+                                setJobTypeListsbyRow(_jList)
+                              } else {
+                                let _jList = [...jobTypeListsbyRow]
+                                _jList[i] = jobTypeListMachines
+                                setJobTypeListsbyRow(_jList)
+                              }
 
                               setSelEquipments(_eq)
                             } else {
@@ -1368,7 +1421,7 @@ export default function Workdata() {
                         />
                       </div>
 
-                      <div className="flex w-1/2 flex-col justify-start space-y-1">
+                      <div className="flex w-1/4 flex-col justify-start space-y-1">
                         <div className="items-cente flex flex-row">
                           <MTextView content="Driver" />
                           {<div className="text-sm text-red-600">*</div>}
@@ -1401,10 +1454,32 @@ export default function Workdata() {
                           }}
                         />
                       </div>
+
+                      {/* Job Type */}
+                      <div className="flex w-1/4 flex-col justify-start space-y-1">
+                        <div className="flex flex-row items-center">
+                          <MTextView content="Job Type" />
+                          {<div className="text-sm text-red-600">*</div>}
+                        </div>
+                        <div className="w-full">
+                          <Dropdown
+                            options={jobTypeListsbyRow[i]}
+                            placeholder="Select Job type"
+                            fluid
+                            search
+                            selection
+                            onChange={(e, data) => {
+                              let _selJT = [...selJobTypes]
+                              _selJT[i] = data.value
+                              setSelJobTypes(_selJT)
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   ))}
 
-                  <div className="rounded bg-slate-200 p-5">
+                  <div className="rounded bg-slate-200 p-2">
                     <MTitle content="Assistant Drivers / Turn boys" />
                     <div className="flex w-full flex-row justify-between">
                       <div className="flex w-1/2 flex-col space-y-5">

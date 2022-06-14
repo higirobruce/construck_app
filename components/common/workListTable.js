@@ -1,11 +1,5 @@
 import { useContext, useState } from 'react'
-import {
-  CashIcon,
-  DotsHorizontalIcon,
-  PrinterIcon,
-  ReceiptRefundIcon,
-  StopIcon,
-} from '@heroicons/react/solid'
+
 import {
   CheckIcon,
   ExclamationIcon,
@@ -13,6 +7,11 @@ import {
   XIcon,
   PauseIcon,
   PlayIcon,
+  CashIcon,
+  DotsHorizontalIcon,
+  PrinterIcon,
+  ReceiptRefundIcon,
+  StopIcon,
 } from '@heroicons/react/solid'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
@@ -146,6 +145,7 @@ export default function WorkListTable({
   handleDeselect,
   loading,
   handelStop,
+  handelStart,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
@@ -463,6 +463,13 @@ export default function WorkListTable({
                               className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <ReceiptRefundIcon className="h-5 w-5 text-zinc-700" />
+                            </div>
+
+                            <div
+                              onClick={() => handelStart(row, index)}
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                            >
+                              <PlayIcon className="h-5 w-5 text-green-600" />
                             </div>
                           </>
                         )}
