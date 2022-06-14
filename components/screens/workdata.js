@@ -82,6 +82,10 @@ export default function Workdata() {
   let [ogLowbedList, setOgLowbedList] = useState(null)
   let [nMachinesToMove, setNMachinesToMove] = useState(1)
   let [selJobTypes, setSelJobTypes] = useState([])
+  let [selJobTypesOthers, setSelJobTypesOthers] = useState([])
+  let [selFromSite, setSelFromSite] = useState([])
+  let [selToSite, setSelToSite] = useState([])
+  let [selTargetTrips, setSelTargetTrips] = useState([])
 
   let [selectedWorks, setSelectedWorks] = useState(null)
 
@@ -703,11 +707,14 @@ export default function Workdata() {
                   startTime: Date.now(),
                   status: 'created',
                   createdOn: Date.now(),
-                  siteWork,
-                  workStartDate,
-                  workEndDate,
+                  siteWork: true,
+                  workStartDate: new Date(dispatchDates[i][0]),
+                  workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
-                    moment(workEndDate).diff(moment(workStartDate), 'days') + 1,
+                    moment(dispatchDates[i][1]).diff(
+                      moment(dispatchDates[i][0]),
+                      'days'
+                    ) + 1,
                   dispatch: {
                     otherJobType: otherJobType ? otherJobType : '',
                     project: toProjects[i],
@@ -721,7 +728,7 @@ export default function Workdata() {
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
                     date: dispatchDates
-                      ? new Date(dispatchDates[i])
+                      ? new Date(dispatchDates[i][0])
                       : new Date().toISOString(),
                   },
                 }),
@@ -737,7 +744,7 @@ export default function Workdata() {
                 body: JSON.stringify({
                   project,
                   equipment: selEquipments[i],
-                  workDone: jobType,
+                  workDone: selJobTypes[i],
                   driver: drivers[i],
                   startTime: Date.now(),
                   status: 'created',
@@ -745,18 +752,22 @@ export default function Workdata() {
                   siteWork,
                   workStartDate,
                   workEndDate,
-                  workDurationDays:
-                    moment(workEndDate).diff(moment(workStartDate), 'days') + 1,
+                  workDurationDays: siteWork
+                    ? moment(workEndDate).diff(moment(workStartDate), 'days') +
+                      1
+                    : 1,
                   dispatch: {
-                    otherJobType: otherJobType ? otherJobType : '',
+                    otherJobType: selJobTypesOthers[i]
+                      ? selJobTypesOthers[i]
+                      : '',
                     project,
-                    fromSite,
-                    toSite,
-                    targetTrips,
-                    equipments: selEquipments,
+                    fromSite: selFromSite[i],
+                    toSite: selToSite[i],
+                    targetTrips: selTargetTrips[i],
+                    equipments: selEquipments[i],
                     drivers,
-                    astDrivers,
-                    jobType,
+                    astDriver: astDrivers[i],
+                    jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
                     date: new Date(dispatchDate),
@@ -980,78 +991,7 @@ export default function Workdata() {
           </div>
         )}
       </div>
-      {/* recall modal */}
-      {recallModalIsShown && (
-        <Modal
-          title="Recall of a job"
-          body="Are you sure you want to recall this job?"
-          isShown={recallModalIsShown}
-          setIsShown={setRecallModalIsShown}
-          handleConfirm={recall}
-        />
-      )}
 
-      {stopModalIsShown && (
-        <Modal
-          title="End job"
-          body="Are you sure you want to end this job?"
-          isShown={stopModalIsShown}
-          setIsShown={setStopModalIsShown}
-          handleConfirm={stop}
-          handleSetEndIndex={setEndIndex}
-          handleSetDuration={setDuration}
-          handleSetTripsDone={setTripsDone}
-          handleSetComment={setComment}
-          handleSetReason={_setReason}
-          reasons={reasonList}
-          rowData={workList[rowIndex]}
-          showReasonField={showReasonField}
-          type="stop"
-        />
-      )}
-
-      {startModalIsShown && (
-        <Modal
-          title="Start job"
-          body="Please fill the info to start the job!"
-          isShown={startModalIsShown}
-          setIsShown={setStartModalIsShown}
-          handleConfirm={start}
-          handleSetStartIndex={setStartIndex}
-          rowData={workList[rowIndex]}
-          type="start"
-        />
-      )}
-
-      {approveModalIsShown && (
-        <Modal
-          title="Approval of a job"
-          body="Are you sure you want to approve this job?"
-          isShown={approveModalIsShown}
-          setIsShown={setApproveModalIsShown}
-          handleConfirm={approve}
-        />
-      )}
-      {rejectModalIsShown && (
-        <Modal
-          title="Rejection of a job"
-          body="Are you sure you want to reject this job?"
-          isShown={rejectModalIsShown}
-          setIsShown={setRejectModalIsShown}
-          handleConfirm={reject}
-          type="reject"
-          handleReasonChange={setReasonForRejection}
-        />
-      )}
-      {orderModalIsShown && (
-        <Modal
-          title="Order of a job"
-          body="Are you sure you want to order this job?"
-          isShown={orderModalIsShown}
-          setIsShown={setOrderModalIsShown}
-          handleConfirm={order}
-        />
-      )}
       {viewPort === 'list' && (
         <>
           {(!workList || loadingData) && <Loader active />}
@@ -1352,7 +1292,7 @@ export default function Workdata() {
 
                   <div className="flex flex-row items-center justify-between">
                     <div className="flex flex-row items-center">
-                      <MTextView content="Dispatch Date" />
+                      <MTextView content="Date" />
                       <div className="text-sm text-red-600">*</div>
                     </div>
                     <div className="w-4/5">
@@ -1371,169 +1311,220 @@ export default function Workdata() {
                 <div className="mt-5 flex w-3/5 flex-col space-y-5">
                   <MTitle content="Equipment & Driver data" />
                   {[...Array(nJobs)].map((e, i) => (
-                    <div className="mb-5 flex flex-row space-x-7">
-                      <div className="flex w-1/4 flex-col justify-start space-y-1">
-                        <div className="items-cente flex flex-row">
-                          <MTextView content="Equipment" />
-                          {<div className="text-sm text-red-600">*</div>}
-                          {selEquipments && selEquipments[i] && (
-                            <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
-                              <MTextView
-                                content={selEquipments[i]?.eqDescription}
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <Dropdown
-                          options={equipmentFullList}
-                          placeholder="Select Equipment"
-                          fluid
-                          search
-                          selection
-                          onChange={(e, data) => {
-                            let selecteObj = _.find(equipments, (e) => {
-                              return e._id === data.value
-                            })
-                            if (!selecteObj) {
-                              let _eq = selEquipments ? [...selEquipments] : []
-                              _eq[i] = equipmentsOgFull.filter(
-                                (e) => e._id === data.value
-                              )[0]
-                              if (_eq[i].eqtype === 'Truck') {
-                                let _jList = [...jobTypeListsbyRow]
-                                _jList[i] = jobTypeListTrucks
-                                setJobTypeListsbyRow(_jList)
-                              } else {
-                                let _jList = [...jobTypeListsbyRow]
-                                _jList[i] = jobTypeListMachines
-                                setJobTypeListsbyRow(_jList)
-                              }
-
-                              setSelEquipments(_eq)
-                            } else {
-                              toast.error('Already selected!')
-                              if (nJobs === 1) {
-                              } else {
-                                setNJobs(nJobs - 1)
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-
-                      <div className="flex w-1/4 flex-col justify-start space-y-1">
-                        <div className="items-cente flex flex-row">
-                          <MTextView content="Driver" />
-                          {<div className="text-sm text-red-600">*</div>}
-                        </div>
-                        <Dropdown
-                          options={driverList}
-                          placeholder="Select Driver      "
-                          fluid
-                          search
-                          selection
-                          onChange={(e, data) => {
-                            let selectedDr = _.find(drivers, (d) => {
-                              return d === data.value
-                            })
-
-                            if (!selectedDr) {
-                              let _dr = drivers ? [...drivers] : []
-                              _dr[i] = data.value
-                              setDrivers(_dr)
-                            } else {
-                              toast.error('Already selected!')
-                              if (nJobs === 1) {
-                              } else {
-                                let _e = selEquipments ? [...selEquipments] : []
-                                _e.pop()
-                                setSelEquipments(_e)
-                                setNJobs(nJobs - 1)
-                              }
-                            }
-                          }}
-                        />
-                      </div>
-
-                      {/* Job Type */}
-                      <div className="flex w-1/4 flex-col justify-start space-y-1">
-                        <div className="flex flex-row items-center">
-                          <MTextView content="Job Type" />
-                          {<div className="text-sm text-red-600">*</div>}
-                        </div>
-                        <div className="w-full">
+                    <div className="bg-zinc-100 p-3">
+                      <div className="mb-2 grid grid-cols-3 gap-2">
+                        {/* Equipment */}
+                        <div className="flex flex-col justify-start space-y-1">
+                          <div className="items-cente flex flex-row">
+                            <MTextView content="Equipment" />
+                            {<div className="text-sm text-red-600">*</div>}
+                            {selEquipments && selEquipments[i] && (
+                              <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
+                                <MTextView
+                                  content={selEquipments[i]?.eqDescription}
+                                />
+                              </div>
+                            )}
+                          </div>
                           <Dropdown
-                            options={jobTypeListsbyRow[i]}
-                            placeholder="Select Job type"
+                            options={equipmentFullList}
+                            placeholder="Select Equipment"
                             fluid
                             search
                             selection
                             onChange={(e, data) => {
-                              let _selJT = [...selJobTypes]
-                              _selJT[i] = data.value
-                              setSelJobTypes(_selJT)
+                              let selecteObj = _.find(equipments, (e) => {
+                                return e._id === data.value
+                              })
+                              if (!selecteObj) {
+                                let _eq = selEquipments
+                                  ? [...selEquipments]
+                                  : []
+                                _eq[i] = equipmentsOgFull.filter(
+                                  (e) => e._id === data.value
+                                )[0]
+                                if (_eq[i].eqtype === 'Truck') {
+                                  let _jList = [...jobTypeListsbyRow]
+                                  _jList[i] = jobTypeListTrucks
+                                  setJobTypeListsbyRow(_jList)
+                                } else {
+                                  let _jList = [...jobTypeListsbyRow]
+                                  _jList[i] = jobTypeListMachines
+                                  setJobTypeListsbyRow(_jList)
+                                }
+
+                                setSelEquipments(_eq)
+                              } else {
+                                toast.error('Already selected!')
+                                if (nJobs === 1) {
+                                } else {
+                                  setNJobs(nJobs - 1)
+                                }
+                              }
                             }}
                           />
+                        </div>
+
+                        {/* Driver */}
+                        <div className="flex flex-col justify-start space-y-1">
+                          <div className="items-cente flex flex-row">
+                            <MTextView content="Driver" />
+                            {<div className="text-sm text-red-600">*</div>}
+                          </div>
+                          <Dropdown
+                            options={driverList}
+                            placeholder="Select Driver      "
+                            fluid
+                            search
+                            selection
+                            onChange={(e, data) => {
+                              let selectedDr = _.find(drivers, (d) => {
+                                return d === data.value
+                              })
+
+                              if (!selectedDr) {
+                                let _dr = drivers ? [...drivers] : []
+                                _dr[i] = data.value
+                                setDrivers(_dr)
+                              } else {
+                                toast.error('Already selected!')
+                                if (nJobs === 1) {
+                                } else {
+                                  let _e = selEquipments
+                                    ? [...selEquipments]
+                                    : []
+                                  _e.pop()
+                                  setSelEquipments(_e)
+                                  setNJobs(nJobs - 1)
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+
+                        {/* Job Type */}
+                        <div className="flex flex-col justify-start space-y-1">
+                          <div className="flex flex-row items-center">
+                            <MTextView content="Job Type" />
+                            {<div className="text-sm text-red-600">*</div>}
+                          </div>
+                          <div className="w-full">
+                            <Dropdown
+                              options={jobTypeListsbyRow[i]}
+                              placeholder="Select Job type"
+                              fluid
+                              search
+                              selection
+                              onChange={(_e, data) => {
+                                let _selJT = [...selJobTypes]
+                                _selJT[i] = data.value
+                                setSelJobTypes(_selJT)
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <>
+                        <div className="grid grid-cols-4 gap-2">
+                          {(selJobTypes[i] === '62690bbacf45ad62aa6144e6' ||
+                            selJobTypes[i] === '62690b67cf45ad62aa6144d8') && (
+                            <TextInput
+                              // label="Specify Job Type"
+                              placeholder="Job type..."
+                              setValue={(e) => {
+                                let _othJTypes = [...selJobTypesOthers]
+                                _othJTypes[i] = e
+                                setSelJobTypesOthers(_othJTypes)
+                              }}
+                              type="text"
+                              isRequired
+                            />
+                          )}
+
+                          {selEquipments &&
+                            selEquipments[i]?.eqtype === 'Truck' && (
+                              <>
+                                <TextInput
+                                  // label="Site origin"
+                                  placeholder="From which site?"
+                                  setValue={(e) => {
+                                    let _lset = [...selFromSite]
+                                    _lset[i] = e
+                                    setSelFromSite(_lset)
+                                  }}
+                                  type="text"
+                                />
+                                <TextInput
+                                  // label="Site Destination"
+                                  placeholder="To which site?"
+                                  setValue={(e) => {
+                                    let _lset = [...selToSite]
+                                    _lset[i] = e
+                                    setSelToSite(_lset)
+                                  }}
+                                  type="text"
+                                />
+
+                                <TextInput
+                                  // label="Target Trips"
+                                  placeholder="Target trips"
+                                  type="number"
+                                  setValue={(e) => {
+                                    let _lset = [...selTargetTrips]
+                                    _lset[i] = e
+                                    setSelTargetTrips(_lset)
+                                  }}
+                                />
+                              </>
+                            )}
+                        </div>
+                      </>
+
+                      <div className="mt-2 flex flex-col items-start space-y-1">
+                        <div className="ml-1">
+                          <MTextView content="Assistant Driver / Turn boys" />
+                        </div>
+                        <div className="flex w-full flex-row justify-between">
+                          <div className="flex w-1/2 flex-col space-y-1">
+                            {[...Array(nAstDrivers)].map((e, i) => (
+                              <div className="flex flex-row items-center space-x-5">
+                                <Dropdown
+                                  options={driverList}
+                                  placeholder="Select Driver"
+                                  fluid
+                                  search
+                                  multiple
+                                  selection
+                                  onChange={(e, data) => {
+                                    let _set = [...astDrivers]
+                                    _set[i] = data.value
+                                    setAstDrivers(_set)
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* <div className="mt-3 flex flex-row space-x-10">
+                            <PlusIcon
+                              className="h-5 w-5 cursor-pointer text-teal-600"
+                              onClick={() => setNAstDrivers(nAstDrivers + 1)}
+                            />
+                            <TrashIcon
+                              className="h-5 w-5 cursor-pointer text-red-500"
+                              onClick={() => {
+                                if (nAstDrivers === 1) {
+                                } else {
+                                  setNAstDrivers(nAstDrivers - 1)
+                                }
+                              }}
+                            />
+                          </div> */}
                         </div>
                       </div>
                     </div>
                   ))}
-
-                  <div className="rounded bg-slate-200 p-2">
-                    <MTitle content="Assistant Drivers / Turn boys" />
-                    <div className="flex w-full flex-row justify-between">
-                      <div className="flex w-1/2 flex-col space-y-5">
-                        {[...Array(nAstDrivers)].map((e, i) => (
-                          <div className="flex flex-row items-center space-x-5">
-                            <Dropdown
-                              options={driverList}
-                              placeholder="Select Driver"
-                              fluid
-                              search
-                              selection
-                              onChange={(e, data) => {
-                                let selectedDr = _.find(astDrivers, (d) => {
-                                  return d === data.value
-                                })
-
-                                if (!selectedDr) {
-                                  let _dr = astDrivers ? [...astDrivers] : []
-                                  _dr[i] = data.value
-                                  setAstDrivers(_dr)
-                                } else {
-                                  toast.error('Already selected!')
-                                  if (nAstDrivers === 1) {
-                                  } else {
-                                    let _astDrivers = astDrivers
-                                      ? [...astDrivers]
-                                      : []
-                                    _astDrivers.pop()
-                                    setNAstDrivers(nAstDrivers - 1)
-                                  }
-                                }
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-3 flex flex-row space-x-10">
-                        <PlusIcon
-                          className="h-5 w-5 cursor-pointer text-teal-600"
-                          onClick={() => setNAstDrivers(nAstDrivers + 1)}
-                        />
-                        <TrashIcon
-                          className="h-5 w-5 cursor-pointer text-red-500"
-                          onClick={() => {
-                            if (nAstDrivers === 1) {
-                            } else {
-                              setNAstDrivers(nAstDrivers - 1)
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="flex flex-row space-x-10">
@@ -1754,7 +1745,7 @@ export default function Workdata() {
                               <div className="text-sm text-red-600">*</div>
                             </div>
                             <div className="w-full">
-                              <DatePicker
+                              <RangePicker
                                 size={20}
                                 defaultValue={moment()}
                                 onChange={(date, dateString) => {
@@ -1796,8 +1787,6 @@ export default function Workdata() {
 
           {((dispatchDate &&
             project &&
-            eqType &&
-            jobType &&
             selEquipments?.length > 0 &&
             drivers?.length > 0) ||
             lowbedWork) && (
@@ -1819,6 +1808,79 @@ export default function Workdata() {
       )}
 
       <ToastContainer />
+
+      {/* recall modal */}
+      {recallModalIsShown && (
+        <Modal
+          title="Recall of a job"
+          body="Are you sure you want to recall this job?"
+          isShown={recallModalIsShown}
+          setIsShown={setRecallModalIsShown}
+          handleConfirm={recall}
+        />
+      )}
+
+      {stopModalIsShown && (
+        <Modal
+          title="End job"
+          body="Are you sure you want to end this job?"
+          isShown={stopModalIsShown}
+          setIsShown={setStopModalIsShown}
+          handleConfirm={stop}
+          handleSetEndIndex={setEndIndex}
+          handleSetDuration={setDuration}
+          handleSetTripsDone={setTripsDone}
+          handleSetComment={setComment}
+          handleSetReason={_setReason}
+          reasons={reasonList}
+          rowData={workList[rowIndex]}
+          showReasonField={showReasonField}
+          type="stop"
+        />
+      )}
+
+      {startModalIsShown && (
+        <Modal
+          title="Start job"
+          body="Please fill the info to start the job!"
+          isShown={startModalIsShown}
+          setIsShown={setStartModalIsShown}
+          handleConfirm={start}
+          handleSetStartIndex={setStartIndex}
+          rowData={workList[rowIndex]}
+          type="start"
+        />
+      )}
+
+      {approveModalIsShown && (
+        <Modal
+          title="Approval of a job"
+          body="Are you sure you want to approve this job?"
+          isShown={approveModalIsShown}
+          setIsShown={setApproveModalIsShown}
+          handleConfirm={approve}
+        />
+      )}
+      {rejectModalIsShown && (
+        <Modal
+          title="Rejection of a job"
+          body="Are you sure you want to reject this job?"
+          isShown={rejectModalIsShown}
+          setIsShown={setRejectModalIsShown}
+          handleConfirm={reject}
+          type="reject"
+          handleReasonChange={setReasonForRejection}
+        />
+      )}
+      {orderModalIsShown && (
+        <Modal
+          title="Order of a job"
+          body="Are you sure you want to order this job?"
+          isShown={orderModalIsShown}
+          setIsShown={setOrderModalIsShown}
+          handleConfirm={order}
+        />
+      )}
     </div>
   )
 }
