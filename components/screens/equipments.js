@@ -238,7 +238,7 @@ export default function Equipments() {
   }
 
   return (
-    <div className="my-5 flex flex-col space-y-5 px-10">
+    <>
       {sendToWorkshopModalIsShown && (
         <Modal
           title="Send to Workshop"
@@ -258,196 +258,198 @@ export default function Equipments() {
           handleConfirm={makeAvailable}
         />
       )}
-      <div className="text-2xl font-semibold">Equipments</div>
-      <div className="flex w-full flex-row items-center justify-between space-x-4">
-        {viewPort === 'list' && (
-          <MSubmitButton
-            submit={() => setViewPort('new')}
-            intent="primary"
-            icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
-            label="New"
-          />
-        )}
-
-        {viewPort === 'list' && (
-          <div className="mx-auto flex flex-grow flex-col px-40">
-            <TextInput placeholder="Search..." setValue={setSearch} />
-          </div>
-        )}
-
-        {viewPort === 'new' && (
-          <MSubmitButton
-            submit={() => {
-              setViewPort('list')
-              refresh()
-            }}
-            intent="primary"
-            icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
-            label="Back"
-          />
-        )}
-
-        {viewPort === 'list' && (
-          <div className="flex flex-row items-center space-x-5">
-            <div
-              className={
-                filterBy === 'available'
-                  ? 'cursor-pointer rounded-lg p-1 font-normal'
-                  : 'cursor-pointer rounded-lg p-1 font-normal'
-              }
-              onClick={() =>
-                filterBy === 'available'
-                  ? setFilterBy('all')
-                  : setFilterBy('available')
-              }
-            >
-              <Tooltip title="Available">
-                <div
-                  className={
-                    filterBy !== 'available'
-                      ? 'flex flex-row items-center rounded-lg p-1 text-green-400 shadow-md ring-1 ring-green-100'
-                      : 'flex flex-row items-center rounded-lg bg-green-50 p-1 text-green-600 ring-1 ring-green-400'
-                  }
-                >
-                  <CheckIcon className="h-5 w-5" />
-                  <div>({nAvailable})</div>
-                </div>
-              </Tooltip>
-            </div>
-
-            <div
-              className={
-                filterBy === 'dispatched'
-                  ? 'cursor-pointer rounded-lg p-1 font-normal'
-                  : 'cursor-pointer rounded-lg p-1 font-normal'
-              }
-              onClick={() =>
-                filterBy === 'dispatched'
-                  ? setFilterBy('all')
-                  : setFilterBy('dispatched')
-              }
-            >
-              <Tooltip title="Dispatched">
-                <div
-                  className={
-                    filterBy !== 'dispatched'
-                      ? 'flex flex-row items-center rounded-lg p-1 text-zinc-500 shadow-md ring-1 ring-zinc-100'
-                      : 'flex flex-row items-center rounded-lg bg-zinc-100 p-1 text-zinc-600 ring-1 ring-zinc-300'
-                  }
-                >
-                  <ExclamationIcon className="h-5 w-5" />
-                  <div>({nDispatched})</div>
-                </div>
-              </Tooltip>
-            </div>
-
-            <div
-              className={
-                filterBy === 'assigned to job'
-                  ? 'cursor-pointer rounded-lg p-1 font-normal'
-                  : 'cursor-pointer rounded-lg p-1 font-normal'
-              }
-              onClick={() =>
-                filterBy === 'assigned to job'
-                  ? setFilterBy('all')
-                  : setFilterBy('assigned to job')
-              }
-            >
-              <Tooltip title="Busy">
-                <div
-                  className={
-                    filterBy !== 'assigned to job'
-                      ? 'flex flex-row items-center rounded-lg p-1 text-orange-300 shadow-md ring-1 ring-orange-100'
-                      : 'flex flex-row items-center rounded-lg bg-orange-50 p-1 text-orange-400 ring-1 ring-orange-300'
-                  }
-                >
-                  <LockClosedIcon className="h-5 w-5" />
-                  <div>({nAssigned})</div>
-                </div>
-              </Tooltip>
-            </div>
-
-            <div
-              className={
-                filterBy === 'workshop'
-                  ? 'cursor-pointer rounded-lg p-1 font-normal'
-                  : 'cursor-pointer rounded-lg p-1 font-normal'
-              }
-              onClick={() =>
-                filterBy === 'workshop'
-                  ? setFilterBy('all')
-                  : setFilterBy('workshop')
-              }
-            >
-              <Tooltip title="In workshop">
-                <div
-                  className={
-                    filterBy !== 'workshop'
-                      ? 'flex flex-row items-center rounded-lg p-1 text-red-300 shadow-md ring-1 ring-red-100'
-                      : 'flex flex-row items-center rounded-lg bg-red-50 p-1 text-red-400 ring-1 ring-red-300'
-                  }
-                >
-                  <CogIcon className="h-5 w-5" />
-                  <div>({nInWorkshop})</div>
-                </div>
-              </Tooltip>
-            </div>
-
-            <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
-
-            <div>
-              <label>
-                <span className="mt-2 cursor-pointer text-base leading-normal">
-                  <UploadIcon className="h-5 w-5" />
-                </span>
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    readFromFile(e.target.files[0])
-                  }}
-                />
-              </label>
-            </div>
-
-            <DownloadIcon className="h-5 w-5 cursor-pointer" />
-            <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
+      <div className="my-5 flex flex-col space-y-5 px-10">
+        <div className="text-2xl font-semibold">Equipments</div>
+        <div className="flex w-full flex-row items-center justify-between space-x-4">
+          {viewPort === 'list' && (
             <MSubmitButton
-              submit={refresh}
-              intent="neutral"
-              icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
-              label="Refresh"
+              submit={() => setViewPort('new')}
+              intent="primary"
+              icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
+              label="New"
             />
-          </div>
-        )}
-      </div>
-      {viewPort === 'list' && (
-        <>
-          {loading || nRecords < 0 ? (
-            <Loader active />
-          ) : (
-            <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
-              {equipments.map((e) => {
-                return (
-                  <EquipmentCard
-                    data={{
-                      eqOwner: e.eqOwner,
-                      plateNumber: e.plateNumber,
-                      eqType: e.eqtype,
-                      eqStatus: e.eqStatus,
-                      description: e.eqDescription,
-                      id: e._id,
-                    }}
-                    intent={e.eqStatus}
-                    handleSendToWorkshop={_setToWorkshopRow}
-                    handleMakeAvailable={_setMakeAvailableRow}
-                  />
-                )
-              })}
+          )}
+
+          {viewPort === 'list' && (
+            <div className="mx-auto flex flex-grow flex-col px-40">
+              <TextInput placeholder="Search..." setValue={setSearch} />
             </div>
           )}
-        </>
-      )}
-    </div>
+
+          {viewPort === 'new' && (
+            <MSubmitButton
+              submit={() => {
+                setViewPort('list')
+                refresh()
+              }}
+              intent="primary"
+              icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
+              label="Back"
+            />
+          )}
+
+          {viewPort === 'list' && (
+            <div className="flex flex-row items-center space-x-5">
+              <div
+                className={
+                  filterBy === 'available'
+                    ? 'cursor-pointer rounded-lg p-1 font-normal'
+                    : 'cursor-pointer rounded-lg p-1 font-normal'
+                }
+                onClick={() =>
+                  filterBy === 'available'
+                    ? setFilterBy('all')
+                    : setFilterBy('available')
+                }
+              >
+                <Tooltip title="Available">
+                  <div
+                    className={
+                      filterBy !== 'available'
+                        ? 'flex flex-row items-center rounded-lg p-1 text-green-400 shadow-md ring-1 ring-green-100'
+                        : 'flex flex-row items-center rounded-lg bg-green-50 p-1 text-green-600 ring-1 ring-green-400'
+                    }
+                  >
+                    <CheckIcon className="h-5 w-5" />
+                    <div>({nAvailable})</div>
+                  </div>
+                </Tooltip>
+              </div>
+
+              <div
+                className={
+                  filterBy === 'dispatched'
+                    ? 'cursor-pointer rounded-lg p-1 font-normal'
+                    : 'cursor-pointer rounded-lg p-1 font-normal'
+                }
+                onClick={() =>
+                  filterBy === 'dispatched'
+                    ? setFilterBy('all')
+                    : setFilterBy('dispatched')
+                }
+              >
+                <Tooltip title="Dispatched">
+                  <div
+                    className={
+                      filterBy !== 'dispatched'
+                        ? 'flex flex-row items-center rounded-lg p-1 text-zinc-500 shadow-md ring-1 ring-zinc-100'
+                        : 'flex flex-row items-center rounded-lg bg-zinc-100 p-1 text-zinc-600 ring-1 ring-zinc-300'
+                    }
+                  >
+                    <ExclamationIcon className="h-5 w-5" />
+                    <div>({nDispatched})</div>
+                  </div>
+                </Tooltip>
+              </div>
+
+              <div
+                className={
+                  filterBy === 'assigned to job'
+                    ? 'cursor-pointer rounded-lg p-1 font-normal'
+                    : 'cursor-pointer rounded-lg p-1 font-normal'
+                }
+                onClick={() =>
+                  filterBy === 'assigned to job'
+                    ? setFilterBy('all')
+                    : setFilterBy('assigned to job')
+                }
+              >
+                <Tooltip title="Busy">
+                  <div
+                    className={
+                      filterBy !== 'assigned to job'
+                        ? 'flex flex-row items-center rounded-lg p-1 text-orange-300 shadow-md ring-1 ring-orange-100'
+                        : 'flex flex-row items-center rounded-lg bg-orange-50 p-1 text-orange-400 ring-1 ring-orange-300'
+                    }
+                  >
+                    <LockClosedIcon className="h-5 w-5" />
+                    <div>({nAssigned})</div>
+                  </div>
+                </Tooltip>
+              </div>
+
+              <div
+                className={
+                  filterBy === 'workshop'
+                    ? 'cursor-pointer rounded-lg p-1 font-normal'
+                    : 'cursor-pointer rounded-lg p-1 font-normal'
+                }
+                onClick={() =>
+                  filterBy === 'workshop'
+                    ? setFilterBy('all')
+                    : setFilterBy('workshop')
+                }
+              >
+                <Tooltip title="In workshop">
+                  <div
+                    className={
+                      filterBy !== 'workshop'
+                        ? 'flex flex-row items-center rounded-lg p-1 text-red-300 shadow-md ring-1 ring-red-100'
+                        : 'flex flex-row items-center rounded-lg bg-red-50 p-1 text-red-400 ring-1 ring-red-300'
+                    }
+                  >
+                    <CogIcon className="h-5 w-5" />
+                    <div>({nInWorkshop})</div>
+                  </div>
+                </Tooltip>
+              </div>
+
+              <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
+
+              <div>
+                <label>
+                  <span className="mt-2 cursor-pointer text-base leading-normal">
+                    <UploadIcon className="h-5 w-5" />
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      readFromFile(e.target.files[0])
+                    }}
+                  />
+                </label>
+              </div>
+
+              <DownloadIcon className="h-5 w-5 cursor-pointer" />
+              <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
+              <MSubmitButton
+                submit={refresh}
+                intent="neutral"
+                icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+                label="Refresh"
+              />
+            </div>
+          )}
+        </div>
+        {viewPort === 'list' && (
+          <>
+            {loading || nRecords < 0 ? (
+              <Loader active />
+            ) : (
+              <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
+                {equipments.map((e) => {
+                  return (
+                    <EquipmentCard
+                      data={{
+                        eqOwner: e.eqOwner,
+                        plateNumber: e.plateNumber,
+                        eqType: e.eqtype,
+                        eqStatus: e.eqStatus,
+                        description: e.eqDescription,
+                        id: e._id,
+                      }}
+                      intent={e.eqStatus}
+                      handleSendToWorkshop={_setToWorkshopRow}
+                      handleMakeAvailable={_setMakeAvailableRow}
+                    />
+                  )
+                })}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
   )
 }

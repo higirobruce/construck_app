@@ -17,6 +17,7 @@ import {
   SwitchHorizontalIcon,
 } from '@heroicons/react/solid'
 import React from 'react'
+import { Icon } from 'semantic-ui-react'
 import MTextView from './mTextView'
 
 const MStatusIndicator = ({ status }) => {
@@ -87,9 +88,9 @@ export default function EquipmentType({
 }) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
+      return 'flex flex-col space-y-10 px-3 py-1 rounded  bg-white shadow-lg ring-1 ring-zinc-200 w-full'
     } else if (intent == 'dispatched') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-100 ring-1 ring-zinc-200 w-full'
+      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-200 ring-1 ring-zinc-200 w-full'
     } else if (intent == 'assigned to job') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-orange-50  w-full ring-1 ring-orange-200'
     } else if (intent == 'workshop') {
@@ -118,8 +119,9 @@ export default function EquipmentType({
             {data.eqType + ' - ' + data.eqOwner}
           </div>
         </div>
-        <div className="col-start-4 mt-1 flex flex-row space-x-1">
-          {/* <PencilAltIcon
+        {data.eqStatus !== 'updating' && (
+          <div className="col-start-4 mt-1 flex flex-row space-x-1">
+            {/* <PencilAltIcon
             className={
               intent === 'available'
                 ? 'h-5 w-5 cursor-pointer self-end text-yellow-600'
@@ -133,32 +135,48 @@ export default function EquipmentType({
                 : 'h-5 w-5 text-zinc-300'
             }
           /> */}
-          {data.eqStatus !== 'workshop' && data.eqStatus !== 'assigned to job' && (
-            <CogIcon
-              onClick={() => {
-                handleSendToWorkshop(data.id)
-              }}
-              className={
-                intent === 'available'
-                  ? 'h-5 w-5 cursor-pointer text-red-400'
-                  : 'h-5 w-5 text-red-300'
-              }
-            />
-          )}
+            {data.eqStatus !== 'workshop' &&
+              data.eqStatus !== 'assigned to job' &&
+              data.eqStatus !== 'dispatched' && (
+                // <CogIcon
+                //   onClick={() => {
+                //     handleSendToWorkshop(data.id)
+                //   }}
+                //   className={
+                //     intent === 'available'
+                //       ? 'h-5 w-5 cursor-pointer text-red-400'
+                //       : 'h-5 w-5 text-red-300'
+                //   }
+                // />
 
-          {data.eqStatus === 'workshop' && (
-            <SwitchHorizontalIcon
-              onClick={() => {
-                handleMakeAvailable(data.id)
-              }}
-              className={
-                intent === 'workshop'
-                  ? 'h-5 w-5 cursor-pointer text-teal-400'
-                  : 'h-5 w-5 text-teal-300'
-              }
-            />
-          )}
-        </div>
+                <Icon
+                  name="wrench"
+                  className="h-5 w-5 cursor-pointer text-red-400"
+                  onClick={() => {
+                    handleSendToWorkshop(data.id)
+                  }}
+                />
+              )}
+
+            {data.eqStatus === 'workshop' && (
+              <SwitchHorizontalIcon
+                onClick={() => {
+                  handleMakeAvailable(data.id)
+                }}
+                className={
+                  intent === 'workshop'
+                    ? 'h-5 w-5 cursor-pointer text-teal-400'
+                    : 'h-5 w-5 text-teal-300'
+                }
+              />
+            )}
+          </div>
+        )}
+        {data.eqStatus === 'updating' && (
+          <div className="col-start-4 mt-1 flex flex-row space-x-1">
+            <DotsHorizontalIcon className="h-5 w-5 text-gray-300" />
+          </div>
+        )}
       </div>
     </div>
   )

@@ -118,6 +118,7 @@ export default function Dashboard() {
     setLoadingFinalRev(true)
     setLoadingProvisionalRev(true)
     setLoadingTotalDays(true)
+    setLoadingAvailability(true)
 
     fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
       method: 'POST',
@@ -171,6 +172,26 @@ export default function Dashboard() {
         setProvisionalRevenues(res.projectedRevenue)
         setLoadingProvisionalRev(false)
         setTotalDays(res.totalDays)
+      })
+      .catch((err) => {})
+
+    fetch('https://construck-backend.herokuapp.com/equipments/')
+      .then((res) => res.json())
+      .then((res) => {
+        let eqs = res?.equipments
+        let nEqs = res.nrecords
+        setNRecords(nEqs)
+
+        let availableEq = eqs.filter((e) => e.eqStatus === 'available')
+        let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
+        let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = eqs.filter((e) => e.eqStatus === 'workshop')
+
+        setNAssigned(assignedEq.length)
+        setNAvailable(availableEq.length)
+        setNDispatched(dispatchedEq.length)
+        setNInWorkshop(inWorkshopEq.length)
+        setLoadingAvailability(false)
       })
       .catch((err) => {})
   }, [startDate, endDate, customer, project, equipment, owner])
