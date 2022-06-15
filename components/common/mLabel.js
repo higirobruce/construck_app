@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react'
 
 export default function MLable({ content }) {
   return (
-    <div className="flex items-center justify-center  w-3/4 mb-1 shadow-md rounded-md bg-white text-gray-500 text-sm  font-semibold py-1 cursor-pointer">
+    <div className="ml-5 flex cursor-pointer items-center justify-center overflow-hidden text-ellipsis rounded-md bg-gray-700 px-1 text-xs font-semibold text-white shadow-md">
       {content}
     </div>
-  );
+  )
 }

@@ -104,7 +104,6 @@ export default function Login() {
           return resp.json()
         })
         .then((resp) => {
-          console.log(resp)
           if (resp.error) {
             toast.error(resp.message, {
               position: 'top-center',

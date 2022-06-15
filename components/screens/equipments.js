@@ -97,7 +97,6 @@ export default function Equipments() {
     let promises = []
     readXlsxFile(file)
       .then((rows) => {
-        console.log(rows)
         rows.forEach((row) => {
           let promise = fetch(
             'https://construck-backend.herokuapp.com/equipments/',
@@ -124,20 +123,15 @@ export default function Equipments() {
       .finally(() => {
         Promise.all(promises)
           .then((res) => {
-            console.log(res)
             refresh()
             setLoading(false)
           })
           .finally(() => {
             refresh()
           })
-          .catch((err) => {
-            console.log(err)
-          })
+          .catch((err) => {})
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err) => {})
   }
 
   useEffect(() => {

@@ -152,24 +152,27 @@ export default function WorkListTable({
   const { user, setUser } = useContext(UserContext)
 
   function handlePageChange(e, data) {
-    console.log(data)
     setPageNumber(data.activePage)
   }
 
-  let pData = paginate(data, pageNumber, pageSize)
+  let pagesObj = paginate(data, pageNumber, pageSize)
+  let pData = pagesObj.pagedData
+  let pageStartIndex = pagesObj.startIndex
 
   if (user.userType === 'customer') {
     let _pData = data.filter((p) => {
       return p.project?.customer === user.company?.name
     })
     data = _pData
-    pData = paginate(_pData, pageNumber, pageSize)
+    pData = paginate(_pData, pageNumber, pageSize).pagedData
+    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'driver') {
     let _pData = data.filter((p) => {
       return p.driver?._id === user._id
     })
     data = _pData
-    pData = paginate(_pData, pageNumber, pageSize)
+    pData = paginate(_pData, pageNumber, pageSize).pagedData
+    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   }
 
   return (
@@ -396,13 +399,17 @@ export default function WorkListTable({
                           row.status === 'stopped' && (
                             <>
                               <div
-                                onClick={() => handelApprove(row, index)}
+                                onClick={() =>
+                                  handelApprove(row, index, pageStartIndex)
+                                }
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <CheckIcon className="h-5 w-5 text-green-400" />
                               </div>
                               <div
-                                onClick={() => handelReject(row, index)}
+                                onClick={() =>
+                                  handelReject(row, index, pageStartIndex)
+                                }
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <XIcon className="h-5 w-5 text-red-400" />
@@ -448,7 +455,9 @@ export default function WorkListTable({
                           row.status === 'in progress' && (
                             <>
                               <div
-                                onClick={() => handelStop(row, index)}
+                                onClick={() =>
+                                  handelStop(row, index, pageStartIndex)
+                                }
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <StopIcon className="h-5 w-5 text-red-500" />
@@ -459,14 +468,18 @@ export default function WorkListTable({
                         {user.userType === 'admin' && row.status === 'created' && (
                           <>
                             <div
-                              onClick={() => handelRecall(row, index)}
+                              onClick={() =>
+                                handelRecall(row, index, pageStartIndex)
+                              }
                               className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <ReceiptRefundIcon className="h-5 w-5 text-zinc-700" />
                             </div>
 
                             <div
-                              onClick={() => handelStart(row, index)}
+                              onClick={() =>
+                                handelStart(row, index, pageStartIndex)
+                              }
                               className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <PlayIcon className="h-5 w-5 text-green-600" />

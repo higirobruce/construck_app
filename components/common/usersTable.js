@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import { DocumentTextIcon } from "@heroicons/react/solid";
+import { useContext, useState } from 'react'
+import { DocumentTextIcon } from '@heroicons/react/solid'
 import {
   ChatIcon,
   DotsHorizontalIcon,
@@ -8,53 +8,53 @@ import {
   ExclamationCircleIcon,
   XIcon,
   PauseIcon,
-} from "@heroicons/react/solid";
-import React from "react";
-import { Table } from "semantic-ui-react";
-import MTextView from "./mTextView";
-import MLable from "./mLabel";
-import MPagination from "./pagination";
-import { paginate } from "../../utils/paginate";
-import { UserContext } from "../../contexts/UserContext";
+} from '@heroicons/react/solid'
+import React from 'react'
+import { Table } from 'semantic-ui-react'
+import MTextView from './mTextView'
+import MLable from './mLabel'
+import MPagination from './pagination'
+import { paginate } from '../../utils/paginate'
+import { UserContext } from '../../contexts/UserContext'
 
 const MStatusIndicator = ({ status }) => {
-  if (status === "approved")
+  if (status === 'approved')
     return (
       <div className="flex flex-row">
         <CheckIcon className="h-5 w-5 text-green-500" />
         <MTextView content={status} />
       </div>
-    );
-  else if (status === "denied") {
+    )
+  else if (status === 'denied') {
     return (
       <div className="flex flex-row">
         <XIcon className="h-5 w-5 text-red-500" />
         <MTextView content={status} />
       </div>
-    );
-  } else if (status === "in progress") {
+    )
+  } else if (status === 'in progress') {
     return (
       <div className="flex flex-row">
         <ExclamationIcon className="h-5 w-5 text-yellow-500" />
         <MTextView content={status} />
       </div>
-    );
-  } else if (status === "checked") {
+    )
+  } else if (status === 'checked') {
     return (
       <div className="flex flex-row">
         <ExclamationCircleIcon className="h-5 w-5 text-blue-500" />
         <MTextView content={status} />
       </div>
-    );
+    )
   } else {
     return (
       <div className="flex flex-row">
         <PauseIcon className="h-5 w-5 text-gray-500" />
         <MTextView content={status} />
       </div>
-    );
+    )
   }
-};
+}
 
 export default function UsersTable({
   data,
@@ -62,22 +62,21 @@ export default function UsersTable({
   handelShowMessages,
   handelUpdateStatus,
 }) {
-  const { user, setUSer } = useContext(UserContext);
-  const [pageSize, setPageSize] = useState(10);
-  const [pageNumber, setPageNumber] = useState(1);
-  let filteredData = data;
+  const { user, setUSer } = useContext(UserContext)
+  const [pageSize, setPageSize] = useState(10)
+  const [pageNumber, setPageNumber] = useState(1)
+  let filteredData = data
 
-  if (user.role === "agent-admin")
+  if (user.role === 'agent-admin')
     filteredData = data.filter(
-      (data) => user.agency === data.agency && data.role !== "agent-admin"
-    );
+      (data) => user.agency === data.agency && data.role !== 'agent-admin'
+    )
 
   function handlePageChange(e, data) {
-    console.log(data);
-    setPageNumber(data.activePage);
+    setPageNumber(data.activePage)
   }
 
-  const pData = paginate(filteredData, pageNumber, pageSize);
+  const pData = paginate(filteredData, pageNumber, pageSize)
   return (
     <div className="hidden md:block">
       <Table size="small">
@@ -117,23 +116,23 @@ export default function UsersTable({
                 </Table.Cell>
 
                 <Table.Cell>
-                  <div className="flex flex-row mr-2">
+                  <div className="mr-2 flex flex-row">
                     <div
                       onClick={() => handelOpen(row)}
-                      className="flex items-center justify-evenly w-11 h-8 bg-white rounded-full shadow-md cursor-pointer p-2 mr-4 hover:scale-105 active:scale-95 active:shadow-sm"
+                      className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
                       <DotsHorizontalIcon className="h-5 w-5 text-blue-400" />
                     </div>
                     <div
-                      onClick={() => handelUpdateStatus(row, "active")}
-                      className="flex items-center justify-evenly w-11 h-8 bg-white rounded-full shadow-md cursor-pointer p-2 mr-4 hover:scale-105 active:scale-95 active:shadow-sm"
+                      onClick={() => handelUpdateStatus(row, 'active')}
+                      className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
                       <CheckIcon className="h-5 w-5 text-green-400" />
                     </div>
 
                     <div
-                      onClick={() => handelUpdateStatus(row, "suspended")}
-                      className="flex items-center justify-evenly w-11 h-8 bg-white rounded-full shadow-md cursor-pointer p-2 hover:scale-105 active:scale-95 active:shadow-sm"
+                      onClick={() => handelUpdateStatus(row, 'suspended')}
+                      className="flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
                       <XIcon className="h-5 w-5 text-red-400" />
                     </div>
@@ -144,7 +143,7 @@ export default function UsersTable({
                 <Table.Cell>{row.permit}</Table.Cell>
                 <Table.Cell>{row.duration}</Table.Cell> */}
               </Table.Row>
-            );
+            )
           })}
         </Table.Body>
       </Table>
@@ -154,5 +153,5 @@ export default function UsersTable({
         pageSize={pageSize}
       />
     </div>
-  );
+  )
 }

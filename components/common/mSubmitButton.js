@@ -10,7 +10,7 @@ export default function MSubmitButton({
 }) {
   function getClassByIntent(intent) {
     if (intent === 'primary') {
-      return 'flex items-center justify-center space-x-1 bg-white-200 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-gray-100 text-zinc-800'
+      return 'flex items-center justify-center space-x-1 bg-white rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-gray-100 text-zinc-800'
     } else if (intent === 'warning') {
       return 'flex items-center justify-center space-x-1 bg-yellow-200 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-gray-100 text-zinc-800'
     } else if (intent === 'danger') {

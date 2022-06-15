@@ -67,7 +67,6 @@ export default function Projects() {
     let promises = []
     readXlsxFile(file)
       .then((rows) => {
-        console.log(rows)
         rows.forEach((row) => {
           let promise = fetch(
             'https://construck-backend.herokuapp.com/projects/',
@@ -86,20 +85,15 @@ export default function Projects() {
       .finally(() => {
         Promise.all(promises)
           .then((res) => {
-            console.log(res)
             refresh()
             setLoading(false)
           })
           .finally(() => {
             refresh()
           })
-          .catch((err) => {
-            console.log(err)
-          })
+          .catch((err) => {})
       })
-      .catch((err) => {
-        console.log(err)
-      })
+      .catch((err) => {})
   }
 
   useEffect(() => {

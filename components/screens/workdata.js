@@ -29,6 +29,7 @@ import * as XLSX from 'xlsx'
 import TextInputV from '../common/TextIputV'
 import 'datejs'
 import moment from 'moment'
+import MLable from '../common/mLabel'
 
 const { RangePicker } = DatePicker
 
@@ -69,8 +70,8 @@ export default function Workdata() {
   let [selEquipments, setSelEquipments] = useState(null)
   let [equipmentsOg, setEquipmentsOg] = useState(null)
   let [equipmentsOgFull, setEquipmentsOgFull] = useState(null)
-  let [drivers, setDrivers] = useState(null)
-  let [astDrivers, setAstDrivers] = useState(null)
+  let [drivers, setDrivers] = useState([])
+  let [astDrivers, setAstDrivers] = useState([])
   let [reasonForRejection, setReasonForRejection] = useState('')
 
   let [fromProjects, setFromProjects] = useState(null)
@@ -389,7 +390,6 @@ export default function Workdata() {
 
   useEffect(() => {
     if (search.length >= 3) {
-      console.log(search)
       setLoadingData(true)
       let _workList = ogWorkList.filter((w) => {
         let _search = search?.toLocaleLowerCase()
@@ -502,36 +502,36 @@ export default function Workdata() {
       .then((r) => {
         refresh()
       })
-      .catch((err) => console.error(err))
+      .catch((err) => {})
   }
 
-  function _setRecallRow(row, index) {
+  function _setRecallRow(row, index, pageStartIndex) {
     setRow(row)
-    setRowIndex(index)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
     setRecallModalIsShown(true)
   }
 
-  function _setStopRow(row, index) {
+  function _setStopRow(row, index, pageStartIndex) {
     setRow(row)
-    setRowIndex(index)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
     setStopModalIsShown(true)
   }
 
-  function _setStartRow(row, index) {
+  function _setStartRow(row, index, pageStartIndex) {
     setRow(row)
-    setRowIndex(index)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
     setStartModalIsShown(true)
   }
 
-  function _setApproveRow(row, index) {
+  function _setApproveRow(row, index, pageStartIndex) {
     setRow(row)
-    setRowIndex(index)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
     setApproveModalIsShown(true)
   }
 
-  function _setRejectRow(row, index) {
+  function _setRejectRow(row, index, pageStartIndex) {
     setRow(row)
-    setRowIndex(index)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
     setRejectModalIsShown(true)
   }
 
@@ -632,14 +632,12 @@ export default function Workdata() {
 
     let _selectedWorks = selectedWorks
     let _newSelected = _selectedWorks.filter((s) => s !== row._id)
-    console.log(_newSelected)
     setSelectedWorks(_newSelected)
 
     setWorkList(_workList)
   }
 
   function _setReason(value) {
-    console.log(value)
     setComment(value)
   }
 
@@ -826,8 +824,6 @@ export default function Workdata() {
         }
       } else {
         setSubmitting(false)
-        console.table(drivers)
-        console.log(selEquipments)
       }
     }
   }
@@ -1107,9 +1103,6 @@ export default function Workdata() {
                 onChange={(values, dateStrings) => {
                   setWorkStartDate(dateStrings[0])
                   setWorkEndDate(dateStrings[1])
-                  console.log(
-                    moment(dateStrings[1]).diff(moment(dateStrings[0]), 'days')
-                  )
                 }}
                 disabled={!siteWork}
               />
@@ -1497,7 +1490,7 @@ export default function Workdata() {
                                   multiple
                                   selection
                                   onChange={(e, data) => {
-                                    let _set = [...astDrivers]
+                                    let _set = astDrivers ? [...astDrivers] : []
                                     _set[i] = data.value
                                     setAstDrivers(_set)
                                   }}
@@ -1558,11 +1551,14 @@ export default function Workdata() {
                             <div className="flex flex-row items-center">
                               <MTextView content="Equipment" />
                               {<div className="text-sm text-red-600">*</div>}
-                              <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
+                              {/* <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
                                 <MTextView
                                   content={selEquipments[i]?.eqDescription}
                                 />
-                              </div>
+                              </div> */}
+                              <MLable
+                                content={selEquipments[i]?.eqDescription}
+                              />
                             </div>
                             <Dropdown
                               options={equipmentFullList}
@@ -1790,7 +1786,7 @@ export default function Workdata() {
             selEquipments?.length > 0 &&
             drivers?.length > 0) ||
             lowbedWork) && (
-            <div className="mt-5 w-24">
+            <div className="mt-10 w-24 self-center">
               <MSubmitButton
                 icon={
                   !submitting && <CheckIcon className="h-5 w-5 text-zinc-800" />

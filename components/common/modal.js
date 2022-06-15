@@ -110,7 +110,7 @@ export default function Modal({
               <div className="grid grid-cols-2 gap-x-2">
                 <div className="mb-3 flex flex-col space-y-4">
                   <TextInputLogin
-                    label={`End Index [from ${rowData.startIndex}]`}
+                    label={`End Index [from ${rowData?.startIndex}]`}
                     placeholder="0"
                     setValue={handleSetEndIndex}
                     type="number"

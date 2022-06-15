@@ -33,10 +33,18 @@ export default function Dashboard() {
   let [finalRevenues, setFinalRevenues] = useState(0)
   let [provisionalRevenues, setProvisionalRevenues] = useState(0)
   let [totalDays, setTotalDays] = useState(0)
+  let [assetUtilization, setAssetUtilization] = useState(0)
+  let [assetAvailability, setAssetAvailability] = useState(0)
 
   let [loadingFinalRev, setLoadingFinalRev] = useState(true)
   let [loadingProvisionalRev, setLoadingProvisionalRev] = useState(true)
   let [loadingTotalDays, setLoadingTotalDays] = useState(true)
+  let [loadingAvailability, setLoadingAvailability] = useState(true)
+  let [nAvailable, setNAvailable] = useState(0)
+  let [nAssigned, setNAssigned] = useState(0)
+  let [nInWorkshop, setNInWorkshop] = useState(0)
+  let [nDispatched, setNDispatched] = useState(0)
+  let [nRecords, setNRecords] = useState(-1)
 
   useEffect(() => {
     fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
@@ -82,6 +90,26 @@ export default function Dashboard() {
       .then((res) => {
         setProvisionalRevenues(res.projectedRevenue)
         setLoadingProvisionalRev(false)
+      })
+      .catch((err) => {})
+
+    fetch('https://construck-backend.herokuapp.com/equipments/')
+      .then((res) => res.json())
+      .then((res) => {
+        let eqs = res?.equipments
+        let nEqs = res.nrecords
+        setNRecords(nEqs)
+
+        let availableEq = eqs.filter((e) => e.eqStatus === 'available')
+        let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
+        let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = eqs.filter((e) => e.eqStatus === 'workshop')
+
+        setNAssigned(assignedEq.length)
+        setNAvailable(availableEq.length)
+        setNDispatched(dispatchedEq.length)
+        setNInWorkshop(inWorkshopEq.length)
+        setLoadingAvailability(false)
       })
       .catch((err) => {})
   }, [])
@@ -279,10 +307,10 @@ export default function Dashboard() {
           <StatisticCard
             data={{
               title: 'Asset availability',
-              content: loadingTotalDays ? (
+              content: loadingAvailability ? (
                 <Loader active inline size="mini" />
               ) : (
-                totalDays + '%'
+                Math.round((nAvailable / nRecords) * 100) + '%'
               ),
             }}
             icon={<TruckIcon className="h-5 w-5 text-orange-500" />}

@@ -137,7 +137,6 @@ export default function EquipmentType({
             <CogIcon
               onClick={() => {
                 handleSendToWorkshop(data.id)
-                console.log(data.id)
               }}
               className={
                 intent === 'available'
@@ -151,7 +150,6 @@ export default function EquipmentType({
             <SwitchHorizontalIcon
               onClick={() => {
                 handleMakeAvailable(data.id)
-                console.log(data.id)
               }}
               className={
                 intent === 'workshop'

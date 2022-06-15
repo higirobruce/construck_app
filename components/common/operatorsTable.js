@@ -1,23 +1,22 @@
-import { DotsHorizontalIcon, PencilIcon } from "@heroicons/react/solid";
-import React, { useContext, useState } from "react";
-import { Table } from "semantic-ui-react";
-import MTextView from "./mTextView";
-import MPagination from "./pagination";
+import { DotsHorizontalIcon, PencilIcon } from '@heroicons/react/solid'
+import React, { useContext, useState } from 'react'
+import { Table } from 'semantic-ui-react'
+import MTextView from './mTextView'
+import MPagination from './pagination'
 
-import { paginate } from "../../utils/paginate";
-import { LanguageContext } from "../../contexts/languageContext";
-import { labels, messages, placeholders } from "../../utils/labels";
+import { paginate } from '../../utils/paginate'
+import { LanguageContext } from '../../contexts/languageContext'
+import { labels, messages, placeholders } from '../../utils/labels'
 
 export default function OperatorsTable({ data, handleOpen }) {
-  const [pageSize, setPageSize] = useState(5);
-  const [pageNumber, setPageNumber] = useState(1);
-  const { language, setLanguage } = useContext(LanguageContext);
+  const [pageSize, setPageSize] = useState(5)
+  const [pageNumber, setPageNumber] = useState(1)
+  const { language, setLanguage } = useContext(LanguageContext)
   function handlePageChange(e, data) {
-    console.log(data);
-    setPageNumber(data.activePage);
+    setPageNumber(data.activePage)
   }
 
-  const pData = paginate(data, pageNumber, pageSize);
+  const pData = paginate(data, pageNumber, pageSize)
   return (
     <div>
       <Table size="small">
@@ -64,14 +63,14 @@ export default function OperatorsTable({ data, handleOpen }) {
                   <MTextView content={row.nationalCarrier} />
                 </Table.Cell>
                 <Table.Cell>
-                  <div className="flex flex-row mr-2">
+                  <div className="mr-2 flex flex-row">
                     <div
                       onClick={() => handleOpen(row)}
-                      className="flex items-center justify-evenly w-11 h-8 bg-white rounded-full shadow-md cursor-pointer p-2 mr-4 hover:scale-105 active:scale-95 active:shadow-sm"
+                      className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
                       <DotsHorizontalIcon className="h-5 w-5 text-blue-400" />
                     </div>
-                    <div className="flex items-center justify-evenly w-11 h-8 bg-white rounded-full shadow-md cursor-pointer p-2 mr-4 hover:scale-105 active:scale-95 active:shadow-sm">
+                    <div className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm">
                       <PencilIcon className="h-5 w-5 text-yellow-400" />
                     </div>
                   </div>
@@ -81,7 +80,7 @@ export default function OperatorsTable({ data, handleOpen }) {
                 <Table.Cell>{row.permit}</Table.Cell>
                 <Table.Cell>{row.duration}</Table.Cell> */}
               </Table.Row>
-            );
+            )
           })}
         </Table.Body>
       </Table>
@@ -91,5 +90,5 @@ export default function OperatorsTable({ data, handleOpen }) {
         pageSize={pageSize}
       />
     </div>
-  );
+  )
 }
