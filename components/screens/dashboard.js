@@ -93,25 +93,35 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/equipments/')
+    fetch(
+      'https://construck-backend.herokuapp.com/assetAvailability/getAnalytics',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startDate: startDate
+            ? Date.parse(startDate)
+            : Date.today().clearTime().moveToFirstDayOfMonth(),
+          endDate: endDate
+            ? Date.parse(endDate).addHours(23).addMinutes(59)
+            : Date.today().clearTime().moveToLastDayOfMonth(),
+          status: 'projected',
+          customer,
+          project,
+          equipment,
+          owner,
+        }),
+      }
+    )
       .then((res) => res.json())
       .then((res) => {
-        let eqs = res?.equipments
-        let nEqs = res.nrecords
-        setNRecords(nEqs)
-
-        let availableEq = eqs.filter((e) => e.eqStatus === 'available')
-        let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
-        let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = eqs.filter((e) => e.eqStatus === 'workshop')
-
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
         setLoadingAvailability(false)
+        setAssetAvailability(res?.assetAvailability)
+        console.log(res)
       })
-      .catch((err) => {})
+      .catch((err) => console.log(err))
   }, [])
 
   useEffect(() => {
@@ -175,25 +185,34 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/equipments/')
+    fetch(
+      'https://construck-backend.herokuapp.com/assetAvailability/getAnalytics',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startDate: startDate
+            ? Date.parse(startDate)
+            : Date.today().clearTime().moveToFirstDayOfMonth(),
+          endDate: endDate
+            ? Date.parse(endDate).addHours(23).addMinutes(59)
+            : Date.today().clearTime().moveToLastDayOfMonth(),
+          status: 'projected',
+          customer,
+          project,
+          equipment,
+          owner,
+        }),
+      }
+    )
       .then((res) => res.json())
       .then((res) => {
-        let eqs = res?.equipments
-        let nEqs = res.nrecords
-        setNRecords(nEqs)
-
-        let availableEq = eqs.filter((e) => e.eqStatus === 'available')
-        let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
-        let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = eqs.filter((e) => e.eqStatus === 'workshop')
-
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
         setLoadingAvailability(false)
+        setAssetAvailability(res?.assetAvailability)
       })
-      .catch((err) => {})
+      .catch((err) => console.log(err))
   }, [startDate, endDate, customer, project, equipment, owner])
 
   function go() {
@@ -331,7 +350,7 @@ export default function Dashboard() {
               content: loadingAvailability ? (
                 <Loader active inline size="mini" />
               ) : (
-                Math.round((nAvailable / nRecords) * 100) + '%'
+                assetAvailability + '%'
               ),
             }}
             icon={<TruckIcon className="h-5 w-5 text-orange-500" />}

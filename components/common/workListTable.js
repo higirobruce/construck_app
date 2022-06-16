@@ -364,7 +364,9 @@ export default function WorkListTable({
                     <Table.Cell>
                       <MTextView
                         content={
-                          row.driver?.firstName + ' ' + row.driver?.lastName
+                          row.driver
+                            ? row.driver?.firstName + ' ' + row.driver?.lastName
+                            : row.equipment?.eqOwner
                         }
                       />
                     </Table.Cell>

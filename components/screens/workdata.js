@@ -125,7 +125,7 @@ export default function Workdata() {
   let [customer, setCustomer] = useState()
   let [searchProject, setSearchProject] = useState('')
   let [searchDriver, setSearchDriver] = useState('')
-  let [owner, setOwner] = useState('')
+  let [owner, setOwner] = useState('All')
 
   // duration, endIndex, tripsDone, comment
 
@@ -193,6 +193,11 @@ export default function Workdata() {
               text: l.firstName + ' ' + l.lastName,
             }
           })
+        userOptions.push({
+          key: 'NA',
+          value: 'NA',
+          text: 'Not applicable',
+        })
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
@@ -311,6 +316,11 @@ export default function Workdata() {
               text: l.firstName + ' ' + l.lastName,
             }
           })
+        userOptions.push({
+          key: 'NA',
+          value: 'NA',
+          text: 'Not applicable',
+        })
         setDriverList(userOptions)
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
@@ -436,11 +446,11 @@ export default function Workdata() {
       setLoadingData(false)
     }
 
-    if (search.length < 3 && searchDriver.length < 3) {
+    if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
       setWorkList(ogWorkList)
       setLoadingData(false)
     }
-  }, [search, owner, searchDriver])
+  }, [search, owner, searchDriver, owner])
 
   useEffect(() => {
     if (startDate && endDate && workList) {
@@ -862,26 +872,29 @@ export default function Workdata() {
   function download() {
     let _workList = workList.map((w) => {
       return {
-        'Dispatch date': Date.parse(w.dispatch.date).toString('d-MMM-yyyy'),
-        'Dispatch Shift': w.dispatch.shift,
+        'Dispatch date': Date.parse(w.dispatch?.date).toString('d-MMM-yyyy'),
+        'Dispatch Shift': w.dispatch?.shift,
         'Project Description': w.project.prjDescription,
-        'Equipment-PlateNumber': w.equipment.plateNumber,
-        'Equipment Type': w.equipment.eqDescription,
-        Rate: w.equipment.rate,
-        'Unit of measurement': w.equipment.uom,
-        'Duration (HRS)': w.equipment.uom === 'hour' ? msToTime(w.duration) : 0,
+        'Equipment-PlateNumber': w.equipment?.plateNumber,
+        'Equipment Type': w.equipment?.eqDescription,
+        Rate: w.equipment?.rate,
+        'Unit of measurement': w.equipment?.uom,
+        'Duration (HRS)':
+          w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
         'Duration (DAYS)':
-          w.equipment.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
+          w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
         'Work done': w.workDone.jobDescription,
-        'Other work description': w.dispatch.otherJobType,
+        'Other work description': w.dispatch?.otherJobType,
         'Projected Revenue': w.projectedRevenue,
         'Actual Revenue': w.totalRevenue,
-        'Driver Names': w.driver.firstName + ' ' + w.driver.lastName,
-        'Driver contacts': w.driver.phone,
-        'Target trips': w.dispatch.targetTrips,
+        'Driver Names': w.driver
+          ? w.driver.firstName + ' ' + w.driver.lastName
+          : w.equipment?.eqOwner,
+        'Driver contacts': w.driver?.phone,
+        'Target trips': w.dispatch?.targetTrips,
         'Trips done': w.tripsDone,
         "Driver's/Operator's Comment": w.comment,
-        Customer: w.project.customer,
+        Customer: w.project?.customer,
         Status: w.status,
       }
     })
@@ -1166,7 +1179,7 @@ export default function Workdata() {
                         selection
                         onChange={(e, data) => {
                           setLowbedOperator(data.value)
-                          let _drList = driverList.filter(
+                          let _drList = lowBedDriverList.filter(
                             (d) => d.value !== data.value
                           )
                           setDriverList(_drList)
@@ -1379,6 +1392,25 @@ export default function Workdata() {
                                     }
                                   )
 
+                                  if (_eq[i].eqOwner !== 'Construck') {
+                                    let _drOw = drivers ? [...drivers] : []
+                                    _drOw[i] = 'NA'
+                                    setDrivers(_drOw)
+                                    let _dr = drivers ? [...drivers] : []
+
+                                    let _drLists = [...driverLists]
+                                    let filteredDrList = driverList.filter(
+                                      (e) => {
+                                        let _drId = e.value
+                                        let _seleDrIds = _dr.map((s) => s)
+                                        return !_seleDrIds.includes(_drId)
+                                      }
+                                    )
+
+                                    _drLists[i + 1] = filteredDrList
+                                    setDriverLists(_drLists)
+                                  }
+
                                   _eqLists[i + 1] = filteredEqList
                                   setEquipmentFullLists(_eqLists)
 
@@ -1395,44 +1427,46 @@ export default function Workdata() {
                           </div>
 
                           {/* Driver */}
-                          <div className="flex flex-col justify-start space-y-1">
-                            <div className="items-cente flex flex-row">
-                              <MTextView content="Driver" />
-                              {<div className="text-sm text-red-600">*</div>}
+                          {selEquipments[i]?.eqOwner === 'Construck' && (
+                            <div className="flex flex-col justify-start space-y-1">
+                              <div className="items-cente flex flex-row">
+                                <MTextView content="Driver" />
+                                {<div className="text-sm text-red-600">*</div>}
+                              </div>
+                              <Dropdown
+                                options={driverLists[i]}
+                                placeholder="Select Driver      "
+                                fluid
+                                search
+                                selection
+                                onChange={(e, data) => {
+                                  let selectedDr = _.find(drivers, (d) => {
+                                    return d === data.value
+                                  })
+
+                                  if (!selectedDr) {
+                                    let _dr = drivers ? [...drivers] : []
+                                    _dr[i] = data.value
+
+                                    let _drLists = [...driverLists]
+                                    let filteredDrList = driverList.filter(
+                                      (e) => {
+                                        let _drId = e.value
+                                        let _seleDrIds = _dr.map((s) => s)
+                                        return !_seleDrIds.includes(_drId)
+                                      }
+                                    )
+
+                                    _drLists[i + 1] = filteredDrList
+                                    setDriverLists(_drLists)
+                                    setDrivers(_dr)
+                                  } else {
+                                    toast.error('Already selected!')
+                                  }
+                                }}
+                              />
                             </div>
-                            <Dropdown
-                              options={driverLists[i]}
-                              placeholder="Select Driver      "
-                              fluid
-                              search
-                              selection
-                              onChange={(e, data) => {
-                                let selectedDr = _.find(drivers, (d) => {
-                                  return d === data.value
-                                })
-
-                                if (!selectedDr) {
-                                  let _dr = drivers ? [...drivers] : []
-                                  _dr[i] = data.value
-
-                                  let _drLists = [...driverLists]
-                                  let filteredDrList = driverList.filter(
-                                    (e) => {
-                                      let _drId = e.value
-                                      let _seleDrIds = _dr.map((s) => s)
-                                      return !_seleDrIds.includes(_drId)
-                                    }
-                                  )
-
-                                  _drLists[i + 1] = filteredDrList
-                                  setDriverLists(_drLists)
-                                  setDrivers(_dr)
-                                } else {
-                                  toast.error('Already selected!')
-                                }
-                              }}
-                            />
-                          </div>
+                          )}
 
                           {/* Job Type */}
                           <div className="flex flex-col justify-start space-y-1">
@@ -1514,34 +1548,35 @@ export default function Workdata() {
                           </div>
                         </>
 
-                        <div className="mt-2 flex flex-col items-start space-y-1">
-                          <div className="ml-1">
-                            <MTextView content="Assistant Driver / Turn boys" />
-                          </div>
-                          <div className="flex w-full flex-row justify-between">
-                            <div className="flex w-1/2 flex-col space-y-1">
-                              {[...Array(nAstDrivers)].map((e, i) => (
-                                <div className="flex flex-row items-center space-x-5">
-                                  <Dropdown
-                                    options={driverList}
-                                    placeholder="Select Driver"
-                                    fluid
-                                    search
-                                    multiple
-                                    selection
-                                    onChange={(e, data) => {
-                                      let _set = astDrivers
-                                        ? [...astDrivers]
-                                        : []
-                                      _set[i] = data.value
-                                      setAstDrivers(_set)
-                                    }}
-                                  />
-                                </div>
-                              ))}
+                        {selEquipments[i]?.eqOwner === 'Construck' && (
+                          <div className="mt-2 flex flex-col items-start space-y-1">
+                            <div className="ml-1">
+                              <MTextView content="Assistant Driver / Turn boys" />
                             </div>
+                            <div className="flex w-full flex-row justify-between">
+                              <div className="flex w-1/2 flex-col space-y-1">
+                                {[...Array(nAstDrivers)].map((e, i) => (
+                                  <div className="flex flex-row items-center space-x-5">
+                                    <Dropdown
+                                      options={driverList}
+                                      placeholder="Select Driver"
+                                      fluid
+                                      search
+                                      multiple
+                                      selection
+                                      onChange={(e, data) => {
+                                        let _set = astDrivers
+                                          ? [...astDrivers]
+                                          : []
+                                        _set[i] = data.value
+                                        setAstDrivers(_set)
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
 
-                            {/* <div className="mt-3 flex flex-row space-x-10">
+                              {/* <div className="mt-3 flex flex-row space-x-10">
                             <PlusIcon
                               className="h-5 w-5 cursor-pointer text-teal-600"
                               onClick={() => setNAstDrivers(nAstDrivers + 1)}
@@ -1556,8 +1591,9 @@ export default function Workdata() {
                               }}
                             />
                           </div> */}
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1642,6 +1678,25 @@ export default function Workdata() {
 
                                     _eqLists[i + 1] = filteredEqList
                                     setEquipmentFullLists(_eqLists)
+
+                                    if (_eq[i].eqOwner !== 'Construck') {
+                                      let _drOw = drivers ? [...drivers] : []
+                                      _drOw[i] = 'NA'
+                                      setDrivers(_drOw)
+                                      let _dr = drivers ? [...drivers] : []
+
+                                      let _drLists = [...driverLists]
+                                      let filteredDrList = driverList.filter(
+                                        (e) => {
+                                          let _drId = e.value
+                                          let _seleDrIds = _dr.map((s) => s)
+                                          return !_seleDrIds.includes(_drId)
+                                        }
+                                      )
+
+                                      _drLists[i + 1] = filteredDrList
+                                      setDriverLists(_drLists)
+                                    }
                                     setSelEquipments(_eq)
                                   } else {
                                     toast.error('Already selected!')
@@ -1654,51 +1709,56 @@ export default function Workdata() {
                               />
                             </div>
 
-                            {/* Driver */}
-                            <div className="flex w-1/6 flex-col justify-start space-y-1">
-                              <div className="flex flex-row items-center">
-                                <MTextView content="Driver" />
-                                {<div className="text-sm text-red-600">*</div>}
-                              </div>
-                              <Dropdown
-                                options={driverLists[i]}
-                                placeholder="Select Driver      "
-                                fluid
-                                search
-                                selection
-                                onChange={(e, data) => {
-                                  let selectedDr = _.find(drivers, (d) => {
-                                    return d === data.value
-                                  })
-                                  if (!selectedDr) {
-                                    let _dr = drivers ? [...drivers] : []
-                                    _dr[i] = data.value
-
-                                    let _drLists = [...driverLists]
-                                    let filteredDrList = driverList.filter(
-                                      (e) => {
-                                        let _drId = e.value
-                                        let _seleDrIds = _dr.map((s) => s)
-                                        return !_seleDrIds.includes(_drId)
-                                      }
-                                    )
-
-                                    _drLists[i + 1] = filteredDrList
-                                    setDriverLists(_drLists)
-                                    setDrivers(_dr)
-                                  } else {
-                                    toast.error('Already selected!')
-                                    if (nMachinesToMove === 1) {
-                                    } else {
-                                      let _e = [...selEquipments]
-                                      _e.pop()
-                                      setSelEquipments(_e)
-                                      setNMachinesToMove(nMachinesToMove - 1)
-                                    }
+                            {selEquipments[i]?.eqOwner === 'Construck' && (
+                              <div className="flex w-1/6 flex-col justify-start space-y-1">
+                                <div className="flex flex-row items-center">
+                                  <MTextView content="Driver" />
+                                  {
+                                    <div className="text-sm text-red-600">
+                                      *
+                                    </div>
                                   }
-                                }}
-                              />
-                            </div>
+                                </div>
+                                <Dropdown
+                                  options={driverLists[i]}
+                                  placeholder="Select Driver      "
+                                  fluid
+                                  search
+                                  selection
+                                  onChange={(e, data) => {
+                                    let selectedDr = _.find(drivers, (d) => {
+                                      return d === data.value
+                                    })
+                                    if (!selectedDr) {
+                                      let _dr = drivers ? [...drivers] : []
+                                      _dr[i] = data.value
+
+                                      let _drLists = [...driverLists]
+                                      let filteredDrList = driverList.filter(
+                                        (e) => {
+                                          let _drId = e.value
+                                          let _seleDrIds = _dr.map((s) => s)
+                                          return !_seleDrIds.includes(_drId)
+                                        }
+                                      )
+
+                                      _drLists[i + 1] = filteredDrList
+                                      setDriverLists(_drLists)
+                                      setDrivers(_dr)
+                                    } else {
+                                      toast.error('Already selected!')
+                                      if (nMachinesToMove === 1) {
+                                      } else {
+                                        let _e = [...selEquipments]
+                                        _e.pop()
+                                        setSelEquipments(_e)
+                                        setNMachinesToMove(nMachinesToMove - 1)
+                                      }
+                                    }
+                                  }}
+                                />
+                              </div>
+                            )}
 
                             {/* From Project */}
                             <div className="flex w-1/6 flex-col justify-start space-y-1">
