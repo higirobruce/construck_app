@@ -40,11 +40,14 @@ export default function Workdata() {
   let [projectList, setProjectList] = useState(null)
   let [equipmentList, setEquipmentList] = useState(null)
   let [equipmentFullList, setEquipmentFullList] = useState(null)
+  let [equipmentFullLists, setEquipmentFullLists] = useState([])
   let [jobTypeList, setJobTypeList] = useState(null)
   let [jobTypeListTrucks, setJobTypeListTrucks] = useState(null)
   let [jobTypeListMachines, setJobTypeListMachines] = useState(null)
   let [jobTypeListsbyRow, setJobTypeListsbyRow] = useState([])
-  let [driverList, setDriverList] = useState(null)
+  let [driverList, setDriverList] = useState([])
+  let [lowBedDriverList, seLowBedDriverList] = useState([])
+  let [driverLists, setDriverLists] = useState([])
   let [reasonList, setReasonList] = useState(null)
   let [viewPort, setViewPort] = useState('list')
   let [nJobs, setNJobs] = useState(1)
@@ -67,7 +70,7 @@ export default function Workdata() {
   let [otherJobType, setOtherJobType] = useState('')
   let [targetTrips, setTargetTrips] = useState(0)
   let [equipments, setEquipments] = useState(null)
-  let [selEquipments, setSelEquipments] = useState(null)
+  let [selEquipments, setSelEquipments] = useState([])
   let [equipmentsOg, setEquipmentsOg] = useState(null)
   let [equipmentsOgFull, setEquipmentsOgFull] = useState(null)
   let [drivers, setDrivers] = useState([])
@@ -191,6 +194,9 @@ export default function Workdata() {
             }
           })
         setDriverList(userOptions)
+        seLowBedDriverList(userOptions)
+        let _drLists = [userOptions]
+        setDriverLists(_drLists)
       })
       .catch((err) => {})
 
@@ -223,6 +229,8 @@ export default function Workdata() {
           setOgLowbedList(listLowbeds)
           setEquipmentsOgFull(list)
           setEquipmentFullList(equipmentsFullOptions)
+          let _eqLists = [equipmentsFullOptions]
+          setEquipmentFullLists(_eqLists)
         } else {
           setLowbedList([])
         }
@@ -304,6 +312,10 @@ export default function Workdata() {
             }
           })
         setDriverList(userOptions)
+        setDriverList(userOptions)
+        seLowBedDriverList(userOptions)
+        let _drLists = [userOptions]
+        setDriverLists(_drLists)
       })
 
     fetch(`https://construck-backend.herokuapp.com/equipments/`)
@@ -335,6 +347,8 @@ export default function Workdata() {
           setOgLowbedList(listLowbeds)
           setEquipmentsOgFull(list)
           setEquipmentFullList(equipmentsFullOptions)
+          let _eqLists = [equipmentsFullOptions]
+          setEquipmentFullLists(_eqLists)
         } else {
           setLowbedList([])
         }
@@ -1063,10 +1077,14 @@ export default function Workdata() {
                     setDispatchDates(null)
                     setFromProjects([])
                     settoProjects([])
-                    setDrivers(null)
+                    setDrivers([])
                     setNJobs(1)
                     setNAstDrivers(1)
                     setSelectedWorks(null)
+                    setNJobs(1)
+                    setNMachinesToMove(1)
+                    let _eqLists = [equipmentFullLists[0]]
+                    setEquipmentFullLists(_eqLists)
                     setLowbedWork(!lowbedWork)
                   }}
                 />
@@ -1141,13 +1159,18 @@ export default function Workdata() {
                     </div>
                     <div className="w-4/5">
                       <Dropdown
-                        options={driverList}
+                        options={lowBedDriverList}
                         placeholder="Select Driver      "
                         fluid
                         search
                         selection
                         onChange={(e, data) => {
                           setLowbedOperator(data.value)
+                          let _drList = driverList.filter(
+                            (d) => d.value !== data.value
+                          )
+                          setDriverList(_drList)
+                          setDriverLists([_drList])
                         }}
                       />
                     </div>
@@ -1313,15 +1336,16 @@ export default function Workdata() {
                               <MTextView content="Equipment" />
                               {<div className="text-sm text-red-600">*</div>}
                               {selEquipments && selEquipments[i] && (
-                                <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
+                                <div className="ml-2 rounded shadow-md">
                                   <MTextView
                                     content={selEquipments[i]?.eqDescription}
+                                    selected
                                   />
                                 </div>
                               )}
                             </div>
                             <Dropdown
-                              options={equipmentFullList}
+                              options={equipmentFullLists[i]}
                               placeholder="Select Equipment"
                               fluid
                               search
@@ -1346,14 +1370,25 @@ export default function Workdata() {
                                     _jList[i] = jobTypeListMachines
                                     setJobTypeListsbyRow(_jList)
                                   }
+                                  let _eqLists = [...equipmentFullLists]
+                                  let filteredEqList = equipmentFullList.filter(
+                                    (e) => {
+                                      let _eqId = e.value
+                                      let _seleEqIds = _eq.map((s) => s._id)
+                                      return !_seleEqIds.includes(_eqId)
+                                    }
+                                  )
+
+                                  _eqLists[i + 1] = filteredEqList
+                                  setEquipmentFullLists(_eqLists)
 
                                   setSelEquipments(_eq)
                                 } else {
-                                  toast.error('Already selected!')
-                                  if (nJobs === 1) {
-                                  } else {
-                                    setNJobs(nJobs - 1)
-                                  }
+                                  toast.warning('Already selected!')
+                                  // if (nJobs === 1) {
+                                  // } else {
+                                  //   setNJobs(nJobs - 1)
+                                  // }
                                 }
                               }}
                             />
@@ -1366,7 +1401,7 @@ export default function Workdata() {
                               {<div className="text-sm text-red-600">*</div>}
                             </div>
                             <Dropdown
-                              options={driverList}
+                              options={driverLists[i]}
                               placeholder="Select Driver      "
                               fluid
                               search
@@ -1379,18 +1414,21 @@ export default function Workdata() {
                                 if (!selectedDr) {
                                   let _dr = drivers ? [...drivers] : []
                                   _dr[i] = data.value
+
+                                  let _drLists = [...driverLists]
+                                  let filteredDrList = driverList.filter(
+                                    (e) => {
+                                      let _drId = e.value
+                                      let _seleDrIds = _dr.map((s) => s)
+                                      return !_seleDrIds.includes(_drId)
+                                    }
+                                  )
+
+                                  _drLists[i + 1] = filteredDrList
+                                  setDriverLists(_drLists)
                                   setDrivers(_dr)
                                 } else {
                                   toast.error('Already selected!')
-                                  if (nJobs === 1) {
-                                  } else {
-                                    let _e = selEquipments
-                                      ? [...selEquipments]
-                                      : []
-                                    _e.pop()
-                                    setSelEquipments(_e)
-                                    setNJobs(nJobs - 1)
-                                  }
                                 }
                               }}
                             />
@@ -1535,6 +1573,9 @@ export default function Workdata() {
                         if (nJobs === 1) {
                         } else {
                           setNJobs(nJobs - 1)
+                          equipmentFullLists.pop()
+                          selEquipments.pop()
+                          driverLists.pop()
                         }
                       }}
                     />
@@ -1555,17 +1596,15 @@ export default function Workdata() {
                               <div className="flex flex-row items-center">
                                 <MTextView content="Equipment" />
                                 {<div className="text-sm text-red-600">*</div>}
-                                {/* <div className="ml-2 rounded bg-yellow-50 px-1 shadow-md">
-                                <MTextView
-                                  content={selEquipments[i]?.eqDescription}
-                                />
-                              </div> */}
-                                <MLable
-                                  content={selEquipments[i]?.eqDescription}
-                                />
+                                <div className="ml-2 shadow-md">
+                                  <MTextView
+                                    selected
+                                    content={selEquipments[i]?.eqDescription}
+                                  />
+                                </div>
                               </div>
                               <Dropdown
-                                options={equipmentFullList}
+                                options={equipmentFullLists[i]}
                                 placeholder="Select Equipment"
                                 fluid
                                 search
@@ -1593,13 +1632,23 @@ export default function Workdata() {
                                       _jList[i] = jobTypeListMachines
                                       setJobTypeListsbyRow(_jList)
                                     }
+                                    let _eqLists = [...equipmentFullLists]
+                                    let filteredEqList =
+                                      equipmentFullList.filter((e) => {
+                                        let _eqId = e.value
+                                        let _seleEqIds = _eq.map((s) => s._id)
+                                        return !_seleEqIds.includes(_eqId)
+                                      })
+
+                                    _eqLists[i + 1] = filteredEqList
+                                    setEquipmentFullLists(_eqLists)
                                     setSelEquipments(_eq)
                                   } else {
                                     toast.error('Already selected!')
-                                    if (nMachinesToMove === 1) {
-                                    } else {
-                                      setNMachinesToMove(nMachinesToMove - 1)
-                                    }
+                                    // if (nMachinesToMove === 1) {
+                                    // } else {
+                                    //   setNMachinesToMove(nMachinesToMove - 1)
+                                    // }
                                   }
                                 }}
                               />
@@ -1612,7 +1661,7 @@ export default function Workdata() {
                                 {<div className="text-sm text-red-600">*</div>}
                               </div>
                               <Dropdown
-                                options={driverList}
+                                options={driverLists[i]}
                                 placeholder="Select Driver      "
                                 fluid
                                 search
@@ -1624,6 +1673,18 @@ export default function Workdata() {
                                   if (!selectedDr) {
                                     let _dr = drivers ? [...drivers] : []
                                     _dr[i] = data.value
+
+                                    let _drLists = [...driverLists]
+                                    let filteredDrList = driverList.filter(
+                                      (e) => {
+                                        let _drId = e.value
+                                        let _seleDrIds = _dr.map((s) => s)
+                                        return !_seleDrIds.includes(_drId)
+                                      }
+                                    )
+
+                                    _drLists[i + 1] = filteredDrList
+                                    setDriverLists(_drLists)
                                     setDrivers(_dr)
                                   } else {
                                     toast.error('Already selected!')
@@ -1787,6 +1848,8 @@ export default function Workdata() {
                             if (nMachinesToMove === 1) {
                             } else {
                               setNMachinesToMove(nMachinesToMove - 1)
+                              selEquipments.pop()
+                              equipmentFullLists.pop()
                             }
                           }}
                         />
