@@ -22,6 +22,10 @@ export default function Modal({
   reasons,
   rowData,
   showReasonField,
+  startIndexInvalid = false,
+  endIndexInvalid = false,
+  startIndexErrorMessage = 'Invalid value!',
+  endIndexErrorMessage = 'Invalid value!',
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
   let uom = rowData?.equipment?.uom
@@ -115,6 +119,8 @@ export default function Modal({
                     setValue={handleSetEndIndex}
                     type="number"
                     isRequired
+                    error={endIndexInvalid}
+                    errorMessage={endIndexErrorMessage}
                   />
 
                   <TextInputLogin
@@ -168,11 +174,17 @@ export default function Modal({
               <div className="grid grid-cols-2 gap-x-2">
                 <div className="mb-3 flex flex-col space-y-4">
                   <TextInputLogin
-                    label={`Start Index`}
-                    placeholder="0"
+                    label={`Start Index `}
+                    placeholder={
+                      rowData.equipment?.millage
+                        ? rowData.equipment?.millage
+                        : 0
+                    }
                     setValue={handleSetStartIndex}
                     type="number"
                     isRequired
+                    error={startIndexInvalid}
+                    errorMessage={startIndexErrorMessage}
                   />
                 </div>
               </div>
@@ -189,16 +201,18 @@ export default function Modal({
                 Cancel
               </button>
 
-              <button
-                onClick={() => {
-                  handleConfirm()
-                  setIsShown(false)
-                }}
-                type="button"
-                className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
-              >
-                Ok
-              </button>
+              {!startIndexInvalid && !endIndexInvalid && (
+                <button
+                  onClick={() => {
+                    handleConfirm()
+                    setIsShown(false)
+                  }}
+                  type="button"
+                  className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
+                >
+                  Ok
+                </button>
+              )}
             </div>
           </div>
         </div>

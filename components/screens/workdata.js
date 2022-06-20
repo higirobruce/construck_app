@@ -1898,18 +1898,30 @@ export default function Workdata() {
                       <div className="mt-3 ml-5 flex flex-row space-x-5">
                         <PlusIcon
                           className="h-5 w-5 cursor-pointer text-teal-600"
-                          onClick={() =>
-                            setNMachinesToMove(nMachinesToMove + 1)
-                          }
+                          onClick={() => {
+                            let nSelEq = selEquipments.length
+                            console.log(nSelEq + 'vs' + nMachinesToMove)
+                            if (nSelEq == nMachinesToMove) {
+                              setNMachinesToMove(nMachinesToMove + 1)
+                            }
+                          }}
                         />
                         <TrashIcon
                           className="h-5 w-5 cursor-pointer text-red-500"
                           onClick={() => {
                             if (nMachinesToMove === 1) {
                             } else {
-                              setNMachinesToMove(nMachinesToMove - 1)
-                              selEquipments.pop()
-                              equipmentFullLists.pop()
+                              let nSelEq = selEquipments.length
+                              if (
+                                nSelEq <= nMachinesToMove &&
+                                nMachinesToMove !== 1
+                              ) {
+                                setNMachinesToMove(nMachinesToMove - 1)
+                                if (nSelEq > 1) {
+                                  selEquipments.pop()
+                                  equipmentFullLists.pop()
+                                }
+                              }
                             }
                           }}
                         />
@@ -1974,19 +1986,41 @@ export default function Workdata() {
           rowData={workList[rowIndex]}
           showReasonField={showReasonField}
           type="stop"
+          startIndexInvalid={false}
+          endIndexInvalid={
+            !endIndex ||
+            endIndex === 0 ||
+            endIndex < parseInt(workList[rowIndex]?.startIndex)
+          }
+          endIndexErrorMessage={
+            !endIndex || endIndex === 0
+              ? 'End Index can not be empty or zero!'
+              : 'End Index should not be lesser than the Start Index!'
+          }
         />
       )}
 
       {startModalIsShown && (
         <Modal
           title="Start job"
-          body="Please fill the info to start the job!"
+          body="Please fill the info to start the job! "
           isShown={startModalIsShown}
           setIsShown={setStartModalIsShown}
           handleConfirm={start}
           handleSetStartIndex={setStartIndex}
           rowData={workList[rowIndex]}
           type="start"
+          endIndexInvalid={false}
+          startIndexInvalid={
+            !startIndex ||
+            startIndex == 0 ||
+            startIndex < workList[rowIndex]?.equipment?.millage
+          }
+          startIndexErrorMessage={
+            !startIndex || startIndex == 0
+              ? 'Start Index can not be empty or zero!'
+              : 'Start Index should not be lesser that the last index!'
+          }
         />
       )}
 

@@ -137,7 +137,8 @@ export default function EquipmentType({
           /> */}
             {data.eqStatus !== 'workshop' &&
               data.eqStatus !== 'assigned to job' &&
-              data.eqStatus !== 'dispatched' && (
+              data.eqStatus !== 'dispatched' &&
+              data.eqOwner === 'Construck' && (
                 // <CogIcon
                 //   onClick={() => {
                 //     handleSendToWorkshop(data.id)

@@ -439,7 +439,9 @@ export default function Equipments() {
                         description: e.eqDescription,
                         id: e._id,
                       }}
-                      intent={e.eqStatus}
+                      intent={
+                        e.eqOwner === 'Construck' ? e.eqStatus : 'dispatched'
+                      }
                       handleSendToWorkshop={_setToWorkshopRow}
                       handleMakeAvailable={_setMakeAvailableRow}
                     />
