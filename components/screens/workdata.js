@@ -185,7 +185,11 @@ export default function Workdata() {
       .then((resp) => {
         let list = resp
         let userOptions = list
-          .filter((l) => l.type === 'driver' || l.type === 'operator')
+          .filter(
+            (l) =>
+              (l.type === 'driver' || l.type === 'operator') &&
+              l.status === 'active'
+          )
           .map((l) => {
             return {
               key: l._id,
@@ -193,11 +197,11 @@ export default function Workdata() {
               text: l.firstName + ' ' + l.lastName,
             }
           })
-        userOptions.push({
-          key: 'NA',
-          value: 'NA',
-          text: 'Not applicable',
-        })
+        // userOptions.push({
+        //   key: 'NA',
+        //   value: 'NA',
+        //   text: 'Not applicable',
+        // })
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
@@ -308,7 +312,11 @@ export default function Workdata() {
       .then((resp) => {
         let list = resp
         let userOptions = list
-          .filter((l) => l.type === 'driver' || l.type === 'operator')
+          .filter(
+            (l) =>
+              (l.type === 'driver' || l.type === 'operator') &&
+              l.status == 'active'
+          )
           .map((l) => {
             return {
               key: l._id,
@@ -316,11 +324,11 @@ export default function Workdata() {
               text: l.firstName + ' ' + l.lastName,
             }
           })
-        userOptions.push({
-          key: 'NA',
-          value: 'NA',
-          text: 'Not applicable',
-        })
+        // userOptions.push({
+        //   key: 'NA',
+        //   value: 'NA',
+        //   text: 'Not applicable',
+        // })
         setDriverList(userOptions)
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
