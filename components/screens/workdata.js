@@ -249,8 +249,18 @@ export default function Workdata() {
     fetch(`https://construck-backend.herokuapp.com/jobTypes/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        let jobsForTrucks = resp.filter((eq) => eq.eqType === 'Truck')
-        let jobsForMachines = resp.filter((eq) => eq.eqType === 'Machine')
+        let jobsForTrucks = resp.filter(
+          (eq) =>
+            eq.eqType === 'Truck' &&
+            eq._id !== '62690b97cf45ad62aa6144e2' &&
+            eq._id !== '62a70a7197ee8984c1be6c9f'
+        )
+        let jobsForMachines = resp.filter(
+          (eq) =>
+            eq.eqType === 'Machine' &&
+            eq._id !== '62690b97cf45ad62aa6144e2' &&
+            eq._id !== '62a70a7197ee8984c1be6c9f'
+        )
         setJobTypeListTrucks(
           jobsForTrucks.map((j) => {
             return {
@@ -413,7 +423,13 @@ export default function Workdata() {
                 text: jT.jobDescription,
               }
             })
-            setJobTypeList(jobTypeOptions)
+            setJobTypeList(
+              jobTypeOptions.filter(
+                (j) =>
+                  j.value !== '62a70a7197ee8984c1be6c9f' &&
+                  j.value !== '62690b97cf45ad62aa6144e2'
+              )
+            )
           }
         }
       })
