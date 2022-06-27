@@ -135,9 +135,11 @@ export default function Workdata() {
   let [tripsDone, setTripsDone] = useState(0)
   let [comment, setComment] = useState(0)
 
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
+
   useEffect(() => {
     setLoadingData(true)
-    fetch('https://construck-backend.herokuapp.com/works/v3/')
+    fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
         setWorkList(resp)
@@ -148,7 +150,7 @@ export default function Workdata() {
         setLoadingData(false)
         toast.error('Connection issue!!!')
       })
-    fetch('https://construck-backend.herokuapp.com/projects/v2')
+    fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -165,7 +167,7 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/reasons')
+    fetch(`${url}/reasons`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -180,7 +182,7 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/employees/')
+    fetch(`${url}/employees/`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -209,7 +211,7 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch(`https://construck-backend.herokuapp.com/equipments/`)
+    fetch(`${url}/equipments/`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp['equipments'].filter((r) => r.eqStatus === 'available')
@@ -246,7 +248,7 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch(`https://construck-backend.herokuapp.com/jobTypes/`)
+    fetch(`${url}/jobTypes/`)
       .then((resp) => resp.json())
       .then((resp) => {
         let jobsForTrucks = resp.filter(
@@ -293,7 +295,7 @@ export default function Workdata() {
   useEffect(() => {
     setLoadingData(true)
 
-    fetch('https://construck-backend.herokuapp.com/works/v3/')
+    fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
         setWorkList(resp)
@@ -301,7 +303,7 @@ export default function Workdata() {
         setLoadingData(false)
       })
 
-    fetch('https://construck-backend.herokuapp.com/projects/v2')
+    fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -317,7 +319,7 @@ export default function Workdata() {
         setProjects(list)
       })
 
-    fetch('https://construck-backend.herokuapp.com/employees/')
+    fetch(`${url}/employees/`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -346,7 +348,7 @@ export default function Workdata() {
         setDriverLists(_drLists)
       })
 
-    fetch(`https://construck-backend.herokuapp.com/equipments/`)
+    fetch(`${url}/equipments/`)
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp['equipments'].filter((r) => r.eqStatus === 'available')
@@ -386,7 +388,7 @@ export default function Workdata() {
 
   useEffect(() => {
     fetch(
-      `https://construck-backend.herokuapp.com/equipments/type/${eqType}/${dispatchDate}/${
+      `${url}/equipments/type/${eqType}/${dispatchDate}/${
         dayShift ? 'dayShift' : 'nightShift'
       }`
     )
@@ -410,7 +412,7 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/jobtypes/eqType/' + eqType)
+    fetch(`${url}/jobtypes/eqType/` + eqType)
       .then((resp) => resp.json())
       .then((resp) => {
         if (resp) {
@@ -499,7 +501,7 @@ export default function Workdata() {
     setLowbedWork(false)
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
-    fetch('https://construck-backend.herokuapp.com/works/v3/')
+    fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
         setWorkList(resp)
@@ -524,7 +526,7 @@ export default function Workdata() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
-    fetch(`https://construck-backend.herokuapp.com/works/approve/${row._id}`, {
+    fetch(`${url}/works/approve/${row._id}`, {
       method: 'PUT',
     })
       .then((resp) => resp.json())
@@ -537,12 +539,9 @@ export default function Workdata() {
     setLoadingData(true)
     let promises = []
     selectedWorks.forEach((s) => {
-      let p = fetch(
-        `https://construck-backend.herokuapp.com/works/approve/${s}`,
-        {
-          method: 'PUT',
-        }
-      )
+      let p = fetch(`${url}/works/approve/${s}`, {
+        method: 'PUT',
+      })
       promises.push(p)
     })
 
@@ -592,7 +591,7 @@ export default function Workdata() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
-    fetch(`https://construck-backend.herokuapp.com/works/recall/${row._id}`, {
+    fetch(`${url}/works/recall/${row._id}`, {
       method: 'PUT',
     })
       .then((resp) => resp.json())
@@ -607,7 +606,7 @@ export default function Workdata() {
     setWorkList(_workList)
 
     // duration, endIndex, tripsDone, comment
-    fetch(`https://construck-backend.herokuapp.com/works/stop/${row._id}`, {
+    fetch(`${url}/works/stop/${row._id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -629,7 +628,7 @@ export default function Workdata() {
     setWorkList(_workList)
 
     // duration, endIndex, tripsDone, comment
-    fetch(`https://construck-backend.herokuapp.com/works/start/${row._id}`, {
+    fetch(`${url}/works/start/${row._id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -646,7 +645,7 @@ export default function Workdata() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
-    fetch(`https://construck-backend.herokuapp.com/works/reject/${row._id}`, {
+    fetch(`${url}/works/reject/${row._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -742,7 +741,7 @@ export default function Workdata() {
         for (let i = 0; i < selEquipments.length; i++) {
           if (lowbedWork) {
             promises.push(
-              fetch('https://construck-backend.herokuapp.com/works', {
+              fetch(`${url}/works`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -784,7 +783,7 @@ export default function Workdata() {
 
           if (!lowbedWork) {
             promises.push(
-              fetch('https://construck-backend.herokuapp.com/works', {
+              fetch(`${url}/works`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -825,7 +824,7 @@ export default function Workdata() {
         }
 
         if (lowbedWork) {
-          await fetch('https://construck-backend.herokuapp.com/works', {
+          await fetch(`${url}/works`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -896,7 +895,7 @@ export default function Workdata() {
   function download() {
     let _workList = workList.map((w) => {
       return {
-        'Dispatch date': Date.parse(w.dispatch?.date).toString('d-MMM-yyyy'),
+        'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
         'Dispatch Shift': w.dispatch?.shift,
         'Project Description': w.project.prjDescription,
         'Equipment-PlateNumber': w.equipment?.plateNumber,
@@ -911,6 +910,7 @@ export default function Workdata() {
         'Other work description': w.dispatch?.otherJobType,
         'Projected Revenue': w.projectedRevenue,
         'Actual Revenue': w.totalRevenue,
+        'Supplier payment': w.totalExpenditure,
         'Driver Names': w.driver
           ? w.driver.firstName + ' ' + w.driver.lastName
           : w.equipment?.eqOwner,

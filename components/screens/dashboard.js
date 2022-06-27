@@ -45,9 +45,10 @@ export default function Dashboard() {
   let [nInWorkshop, setNInWorkshop] = useState(0)
   let [nDispatched, setNDispatched] = useState(0)
   let [nRecords, setNRecords] = useState(-1)
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   useEffect(() => {
-    fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
+    fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
+    fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,28 +94,25 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch(
-      'https://construck-backend.herokuapp.com/assetAvailability/getAnalytics',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          startDate: startDate
-            ? Date.parse(startDate)
-            : Date.today().clearTime().moveToFirstDayOfMonth(),
-          endDate: endDate
-            ? Date.parse(endDate).addHours(23).addMinutes(59)
-            : Date.today().clearTime().moveToLastDayOfMonth(),
-          status: 'projected',
-          customer,
-          project,
-          equipment,
-          owner,
-        }),
-      }
-    )
+    fetch(`${url}/assetAvailability/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today().clearTime().moveToLastDayOfMonth(),
+        status: 'projected',
+        customer,
+        project,
+        equipment,
+        owner,
+      }),
+    })
       .then((res) => res.json())
       .then((res) => {
         setLoadingAvailability(false)
@@ -130,7 +128,7 @@ export default function Dashboard() {
     setLoadingTotalDays(true)
     setLoadingAvailability(true)
 
-    fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
+    fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -158,7 +156,7 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
+    fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -185,28 +183,25 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch(
-      'https://construck-backend.herokuapp.com/assetAvailability/getAnalytics',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          startDate: startDate
-            ? Date.parse(startDate)
-            : Date.today().clearTime().moveToFirstDayOfMonth(),
-          endDate: endDate
-            ? Date.parse(endDate).addHours(23).addMinutes(59)
-            : Date.today().clearTime().moveToLastDayOfMonth(),
-          status: 'projected',
-          customer,
-          project,
-          equipment,
-          owner,
-        }),
-      }
-    )
+    fetch(`${url}/assetAvailability/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today().clearTime().moveToLastDayOfMonth(),
+        status: 'projected',
+        customer,
+        project,
+        equipment,
+        owner,
+      }),
+    })
       .then((res) => res.json())
       .then((res) => {
         setLoadingAvailability(false)
@@ -216,7 +211,7 @@ export default function Dashboard() {
   }, [startDate, endDate, customer, project, equipment, owner])
 
   function go() {
-    fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
+    fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -238,7 +233,7 @@ export default function Dashboard() {
       })
       .catch((err) => {})
 
-    fetch('https://construck-backend.herokuapp.com/works/getAnalytics', {
+    fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

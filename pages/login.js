@@ -26,11 +26,12 @@ export default function Login() {
   const [accountType, setAccountType] = useState('')
   const [country, setCountry] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   function login() {
     setSubmitting(true)
     try {
-      fetch(`https://construck-backend.herokuapp.com/users/login`, {
+      fetch(`${url}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

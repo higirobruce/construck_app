@@ -40,6 +40,8 @@ export default function Equipments() {
   let [makeAvailableModalIsShown, setMakeAvailableModalIsShown] =
     useState(false)
 
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
+
   useEffect(() => {
     setLoading(true)
     refresh()
@@ -66,7 +68,7 @@ export default function Equipments() {
 
   function refresh() {
     setLoading(true)
-    fetch('https://construck-backend.herokuapp.com/equipments/')
+    fetch(`${url}/equipments/`)
       .then((res) => res.json())
       .then((res) => {
         let eqs = res?.equipments
@@ -98,24 +100,21 @@ export default function Equipments() {
     readXlsxFile(file)
       .then((rows) => {
         rows.forEach((row) => {
-          let promise = fetch(
-            'https://construck-backend.herokuapp.com/equipments/',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                plateNumber: row[2],
-                eqtype: row[5],
-                eqStatus: 'available',
-                rate: row[6],
-                uom: row[7],
-                eqOwner: row[8],
-                eqDescription: row[1],
-                assetClass: row[4],
-                supplierRate: row[9],
-              }),
-            }
-          )
+          let promise = fetch(`${url}/equipments/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              plateNumber: row[2],
+              eqtype: row[5],
+              eqStatus: 'available',
+              rate: row[6],
+              uom: row[7],
+              eqOwner: row[8],
+              eqDescription: row[1],
+              assetClass: row[4],
+              supplierRate: row[9],
+            }),
+          })
 
           promises.push(promise)
         })
@@ -160,13 +159,10 @@ export default function Equipments() {
     _eqs[indexToUpdate] = eqToUpdate
     setEquipments(_eqs)
 
-    fetch(
-      `https://construck-backend.herokuapp.com/equipments/sendToWorkshop/${rowId}`,
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    fetch(`${url}/equipments/sendToWorkshop/${rowId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+    })
       .then((res) => res.json())
       .then((res) => {
         let _eqs = [...equipments]
@@ -205,13 +201,10 @@ export default function Equipments() {
     _eqs[indexToUpdate] = eqToUpdate
     setEquipments(_eqs)
 
-    fetch(
-      `https://construck-backend.herokuapp.com/equipments/makeAvailable/${rowId}`,
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    fetch(`${url}/equipments/makeAvailable/${rowId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+    })
       .then((res) => res.json())
       .then((res) => {
         let _eqs = [...equipments]

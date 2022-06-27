@@ -12,9 +12,10 @@ export default function Customers() {
   let [search, setSearch] = useState('')
 
   let [loadingCustomers, setLoadingCustomers] = useState(true)
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   useEffect(() => {
-    fetch('https://construck-backend.herokuapp.com/customers/')
+    fetch(`${url}/customers/`)
       .then((res) => res.json())
       .then((resp) => {
         setCustomers(resp)

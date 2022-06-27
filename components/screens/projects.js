@@ -21,9 +21,10 @@ export default function Projects() {
   let [loading, setLoading] = useState(true)
   let [statusFilter, setStatusFilter] = useState('')
   let [filterBy, setFilterBy] = useState('')
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   useEffect(() => {
-    fetch('https://construck-backend.herokuapp.com/projects/v2')
+    fetch(`${url}/projects/v2`)
       .then((res) => res.json())
       .then((res) => {
         setProjects(res)
@@ -53,7 +54,7 @@ export default function Projects() {
 
   function refresh() {
     setLoading(true)
-    fetch('https://construck-backend.herokuapp.com/projects/v2')
+    fetch(`${url}/projects/v2`)
       .then((res) => res.json())
       .then((res) => {
         setProjects(res)
@@ -68,16 +69,13 @@ export default function Projects() {
     readXlsxFile(file)
       .then((rows) => {
         rows.forEach((row) => {
-          let promise = fetch(
-            'https://construck-backend.herokuapp.com/projects/',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                prjDescription: row[2],
-              }),
-            }
-          )
+          let promise = fetch(`${url}/projects/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prjDescription: row[2],
+            }),
+          })
 
           promises.push(promise)
         })
