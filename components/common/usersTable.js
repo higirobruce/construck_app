@@ -86,6 +86,7 @@ export default function UsersTable({
             <Table.HeaderCell>Username</Table.HeaderCell>
             <Table.HeaderCell>Email</Table.HeaderCell>
             <Table.HeaderCell>Phone</Table.HeaderCell>
+            <Table.HeaderCell>Role</Table.HeaderCell>
             <Table.HeaderCell>Status</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             {/* <Table.HeaderCell>Created on</Table.HeaderCell>
@@ -110,6 +111,9 @@ export default function UsersTable({
                 </Table.Cell>
                 <Table.Cell>
                   <MTextView content={row.phone} />
+                </Table.Cell>
+                <Table.Cell>
+                  <MTextView content={row.userType} />
                 </Table.Cell>
                 <Table.Cell>
                   <MTextView content={row.status} />
