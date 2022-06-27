@@ -67,25 +67,25 @@ export default function UsersTable({
   const [pageNumber, setPageNumber] = useState(1)
   let filteredData = data
 
-  if (user.role === 'agent-admin')
-    filteredData = data.filter(
-      (data) => user.agency === data.agency && data.role !== 'agent-admin'
-    )
+  // if (user.role === 'agent-admin')
+  //   filteredData = data.filter(
+  //     (data) => user.agency === data.agency && data.role !== 'agent-admin'
+  //   )
 
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
   }
 
-  const pData = paginate(filteredData, pageNumber, pageSize)
+  const pData = paginate(filteredData, pageNumber, pageSize).pagedData
   return (
     <div className="hidden md:block">
-      <Table size="small">
+      <Table size="tiny" compact>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Full Names</Table.HeaderCell>
+            <Table.HeaderCell>Username</Table.HeaderCell>
             <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Role</Table.HeaderCell>
-            <Table.HeaderCell>Agency</Table.HeaderCell>
+            <Table.HeaderCell>Phone</Table.HeaderCell>
             <Table.HeaderCell>Status</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             {/* <Table.HeaderCell>Created on</Table.HeaderCell>
@@ -100,16 +100,16 @@ export default function UsersTable({
             return (
               <Table.Row key={row._id}>
                 <Table.Cell>
-                  <MTextView content={row.names} />
+                  <MTextView content={row.firstName + ' ' + row.lastName} />
                 </Table.Cell>
                 <Table.Cell>
                   <MTextView content={row.email} />
                 </Table.Cell>
                 <Table.Cell>
-                  <MTextView content={row.role} />
+                  <MTextView content={row.username} />
                 </Table.Cell>
                 <Table.Cell>
-                  <MTextView content={row.agency} />
+                  <MTextView content={row.phone} />
                 </Table.Cell>
                 <Table.Cell>
                   <MTextView content={row.status} />

@@ -6,6 +6,7 @@ import Dashboard from '../screens/dashboard'
 import Customers from '../screens/customers'
 import Equipments from '../screens/equipments'
 import Projects from '../screens/projects'
+import Users from '../screens/users'
 
 export default function Main() {
   let { screen, setScreen } = useContext(ScreenContext)
@@ -18,6 +19,7 @@ export default function Main() {
       {screen === 'customers' && <Customers />}
       {screen === 'equipments' && <Equipments />}
       {screen === 'projects' && <Projects />}
+      {screen === 'users' && <Users />}
     </div>
   )
 }
