@@ -63,6 +63,7 @@ export default function Login() {
           setSubmitting(false)
         })
         .catch((err) => {
+          console.log(err)
           toast.error(`${messages[`${language}`].checkDataService}`)
           setSubmitting(false)
         })
