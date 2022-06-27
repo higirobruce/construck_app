@@ -272,11 +272,11 @@ export default function WorkListTable({
                         }
                       />
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell singleLine>
                       <MTextView content={row.project?.prjDescription} />
                     </Table.Cell>
 
-                    <Table.Cell>
+                    <Table.Cell singleLine>
                       <Tooltip
                         title={
                           'RWF ' +
@@ -290,7 +290,7 @@ export default function WorkListTable({
                         </div>
                       </Tooltip>
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell singleLine>
                       <MTextView content={row.equipment?.eqDescription} />
                     </Table.Cell>
 
