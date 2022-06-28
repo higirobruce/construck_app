@@ -44,6 +44,7 @@ export default function Login() {
         .then((resp) => resp.json())
         .then((resp) => {
           let _user = resp.user
+          console.log(_user)
           if (resp.message === 'Allowed') {
             _user.loggedIn = true
             setUser(_user)

@@ -118,7 +118,7 @@ export default function Equipments() {
               eqOwner: row[8],
               eqDescription: row[1],
               assetClass: row[4],
-              supplierRate: row[9],
+              vendorRate: row[9],
               vendor: row[10],
             }),
           })

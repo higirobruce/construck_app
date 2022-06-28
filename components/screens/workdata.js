@@ -30,6 +30,7 @@ import TextInputV from '../common/TextIputV'
 import 'datejs'
 import moment from 'moment'
 import MLable from '../common/mLabel'
+import { isNull } from 'util'
 
 const { RangePicker } = DatePicker
 
@@ -39,7 +40,7 @@ export default function Workdata() {
   let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
   let canStartAndStopJob =
     user.userType === 'revenue' || user.userType === 'admin'
-  let canViewRenues = user.userType === 'revenue'
+  let canViewRenues = user.userType === 'revenue' || user.userType === 'admin'
 
   let [workList, setWorkList] = useState(null)
   let [ogWorkList, setOgWorkList] = useState(null)
@@ -509,11 +510,13 @@ export default function Workdata() {
         let driver =
           w?.driver?.firstName?.toLocaleLowerCase() +
           w?.driver?.lastName?.toLocaleLowerCase()
+        if (isNaN(driver)) driver = w?.equipment?.eqOwner
+
         return (
           desc.includes(_search) ||
           plateNumber.includes(_search) ||
           customer.includes(_search) ||
-          driver.includes(_search)
+          driver?.includes(_search)
         )
       })
       setWorkList(_workList)
@@ -526,7 +529,7 @@ export default function Workdata() {
         let driver =
           w?.driver?.firstName?.toLocaleLowerCase() +
           w?.driver?.lastName?.toLocaleLowerCase()
-        return driver.includes(_searchDriver)
+        return driver?.includes(_searchDriver)
       })
       setWorkList(_workList)
       setLoadingData(false)
@@ -980,7 +983,7 @@ export default function Workdata() {
           'Other work description': w.dispatch?.otherJobType,
           'Projected Revenue': w.projectedRevenue,
           'Actual Revenue': w.totalRevenue,
-          'Supplier payment': w.totalExpenditure,
+          'vendor payment': w.totalExpenditure,
           'Driver Names': w.driver
             ? w.driver.firstName + ' ' + w.driver.lastName
             : w.equipment?.eqOwner,

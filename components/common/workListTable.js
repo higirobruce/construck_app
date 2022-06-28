@@ -153,7 +153,9 @@ export default function WorkListTable({
   //Authorization
   let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
   let canStartAndStopJob =
-    user.userType === 'revenue' || user.userType === 'admin'
+    user.userType === 'revenue' ||
+    user.userType === 'admin' ||
+    user.userType === 'vendor'
   let canViewRenues = user.userType === 'revenue'
 
   function handlePageChange(e, data) {
@@ -174,6 +176,13 @@ export default function WorkListTable({
   } else if (user.userType === 'driver') {
     let _pData = data.filter((p) => {
       return p.driver?._id === user._id
+    })
+    data = _pData
+    pData = paginate(_pData, pageNumber, pageSize).pagedData
+    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
+  } else if (user.userType === 'vendor') {
+    let _pData = data.filter((p) => {
+      return p.equipment?.eqOwner === user.firstName
     })
     data = _pData
     pData = paginate(_pData, pageNumber, pageSize).pagedData
