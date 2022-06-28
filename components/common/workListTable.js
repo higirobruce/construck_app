@@ -150,6 +150,11 @@ export default function WorkListTable({
   const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
   const { user, setUser } = useContext(UserContext)
+  //Authorization
+  let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
+  let canStartAndStopJob =
+    user.userType === 'revenue' || user.userType === 'admin'
+  let canViewRenues = user.userType === 'revenue'
 
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
@@ -208,27 +213,19 @@ export default function WorkListTable({
                 </Table.HeaderCell>
 
                 <Table.HeaderCell>Duration</Table.HeaderCell>
-                {/* <Table.HeaderCell>Rate</Table.HeaderCell> */}
 
-                {/* <Table.HeaderCell singleLine>
-                  <div
-                    className="flex cursor-pointer flex-row items-center space-x-1"
-                    onClick={() => handleOrder('byProjectedAmount')}
-                  >
-                    <div>Projected Revenue</div>
-                    <SwitchVerticalIcon className="h-4 w-4" />
-                  </div>
-                </Table.HeaderCell> */}
+                {canViewRenues && (
+                  <Table.HeaderCell singleLine>
+                    <div
+                      className="flex cursor-pointer flex-row items-center space-x-1"
+                      onClick={() => handleOrder('byTotalAmount')}
+                    >
+                      <div>Actual revenue</div>
+                      <SwitchVerticalIcon className="h-4 w-4" />
+                    </div>
+                  </Table.HeaderCell>
+                )}
 
-                <Table.HeaderCell singleLine>
-                  <div
-                    className="flex cursor-pointer flex-row items-center space-x-1"
-                    onClick={() => handleOrder('byTotalAmount')}
-                  >
-                    <div>Actual revenue</div>
-                    <SwitchVerticalIcon className="h-4 w-4" />
-                  </div>
-                </Table.HeaderCell>
                 <Table.HeaderCell>Status</Table.HeaderCell>
                 <Table.HeaderCell>
                   <div
@@ -310,54 +307,32 @@ export default function WorkListTable({
                         }
                       />
                     </Table.Cell>
-                    {/* <Table.Cell>
-                      <MTextView
-                        content={
-                          row.status === 'created' ||
-                          row.status === 'recalled' ||
-                          row.status === 'in progress'
-                            ? 'RWF ' +
-                              row.equipment?.rate?.toLocaleString() +
-                              ' per ' +
-                              row?.equipment?.uom
-                            : 'RWF ' +
-                              row.rate?.toLocaleString() +
-                              ' per ' +
-                              row?.uom
-                        }
-                      />
-                    </Table.Cell> */}
-                    {/* <Table.Cell>
-                      <MTextView
-                        selected={row?.selected}
-                        content={
-                          row.projectedRevenue
-                            ? 'RWF ' +
-                              _.round(row?.projectedRevenue, 2).toLocaleString()
-                            : '...'
-                        }
-                      />
-                    </Table.Cell> */}
-                    <Table.Cell>
-                      <Tooltip
-                        title={
-                          'Projected Revenue: RWF ' +
-                          row.projectedRevenue.toLocaleString()
-                        }
-                      >
-                        <div>
-                          <MTextView
-                            selected={row?.selected}
-                            content={
-                              row.totalRevenue
-                                ? 'RWF ' +
-                                  _.round(row?.totalRevenue, 2).toLocaleString()
-                                : '...'
-                            }
-                          />
-                        </div>
-                      </Tooltip>
-                    </Table.Cell>
+
+                    {canViewRenues && (
+                      <Table.Cell>
+                        <Tooltip
+                          title={
+                            'Projected Revenue: RWF ' +
+                            row.projectedRevenue.toLocaleString()
+                          }
+                        >
+                          <div>
+                            <MTextView
+                              selected={row?.selected}
+                              content={
+                                row.totalRevenue
+                                  ? 'RWF ' +
+                                    _.round(
+                                      row?.totalRevenue,
+                                      2
+                                    ).toLocaleString()
+                                  : '...'
+                              }
+                            />
+                          </div>
+                        </Tooltip>
+                      </Table.Cell>
+                    )}
                     <Table.Cell>
                       <MStatusIndicator status={row.status} />
                     </Table.Cell>
@@ -453,21 +428,21 @@ export default function WorkListTable({
                               </div>
                             </>
                           )}
-                        {user.userType === 'admin' &&
-                          row.status === 'in progress' && (
-                            <>
-                              <div
-                                onClick={() =>
-                                  handelStop(row, index, pageStartIndex)
-                                }
-                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
-                              >
-                                <StopIcon className="h-5 w-5 text-red-500" />
-                              </div>
-                            </>
-                          )}
 
-                        {user.userType === 'admin' && row.status === 'created' && (
+                        {canStartAndStopJob && row.status === 'in progress' && (
+                          <>
+                            <div
+                              onClick={() =>
+                                handelStop(row, index, pageStartIndex)
+                              }
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                            >
+                              <StopIcon className="h-5 w-5 text-red-500" />
+                            </div>
+                          </>
+                        )}
+
+                        {canDispatch && row.status === 'created' && (
                           <>
                             <div
                               onClick={() =>
@@ -477,16 +452,18 @@ export default function WorkListTable({
                             >
                               <ReceiptRefundIcon className="h-5 w-5 text-zinc-700" />
                             </div>
-
-                            <div
-                              onClick={() =>
-                                handelStart(row, index, pageStartIndex)
-                              }
-                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
-                            >
-                              <PlayIcon className="h-5 w-5 text-green-600" />
-                            </div>
                           </>
+                        )}
+
+                        {canStartAndStopJob && row.status === 'created' && (
+                          <div
+                            onClick={() =>
+                              handelStart(row, index, pageStartIndex)
+                            }
+                            className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                          >
+                            <PlayIcon className="h-5 w-5 text-green-600" />
+                          </div>
                         )}
                       </div>
                     </Table.Cell>

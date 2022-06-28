@@ -35,6 +35,12 @@ const { RangePicker } = DatePicker
 
 export default function Workdata() {
   let { user, setUser } = useContext(UserContext)
+  //AUTORIZATION
+  let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
+  let canStartAndStopJob =
+    user.userType === 'revenue' || user.userType === 'admin'
+  let canViewRenues = user.userType === 'revenue'
+
   let [workList, setWorkList] = useState(null)
   let [ogWorkList, setOgWorkList] = useState(null)
   let [projectList, setProjectList] = useState(null)
@@ -894,32 +900,59 @@ export default function Workdata() {
 
   function download() {
     let _workList = workList.map((w) => {
-      return {
-        'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-        'Dispatch Shift': w.dispatch?.shift,
-        'Project Description': w.project.prjDescription,
-        'Equipment-PlateNumber': w.equipment?.plateNumber,
-        'Equipment Type': w.equipment?.eqDescription,
-        Rate: w.equipment?.rate,
-        'Unit of measurement': w.equipment?.uom,
-        'Duration (HRS)':
-          w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
-        'Duration (DAYS)':
-          w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
-        'Work done': w.workDone.jobDescription,
-        'Other work description': w.dispatch?.otherJobType,
-        'Projected Revenue': w.projectedRevenue,
-        'Actual Revenue': w.totalRevenue,
-        'Supplier payment': w.totalExpenditure,
-        'Driver Names': w.driver
-          ? w.driver.firstName + ' ' + w.driver.lastName
-          : w.equipment?.eqOwner,
-        'Driver contacts': w.driver?.phone,
-        'Target trips': w.dispatch?.targetTrips,
-        'Trips done': w.tripsDone,
-        "Driver's/Operator's Comment": w.comment,
-        Customer: w.project?.customer,
-        Status: w.status,
+      if (canViewRenues) {
+        return {
+          'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
+          'Dispatch Shift': w.dispatch?.shift,
+          'Project Description': w.project.prjDescription,
+          'Equipment-PlateNumber': w.equipment?.plateNumber,
+          'Equipment Type': w.equipment?.eqDescription,
+          Rate: w.equipment?.rate,
+          'Unit of measurement': w.equipment?.uom,
+          'Duration (HRS)':
+            w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+          'Duration (DAYS)':
+            w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
+          'Work done': w.workDone.jobDescription,
+          'Other work description': w.dispatch?.otherJobType,
+          'Projected Revenue': w.projectedRevenue,
+          'Actual Revenue': w.totalRevenue,
+          'Supplier payment': w.totalExpenditure,
+          'Driver Names': w.driver
+            ? w.driver.firstName + ' ' + w.driver.lastName
+            : w.equipment?.eqOwner,
+          'Driver contacts': w.driver?.phone,
+          'Target trips': w.dispatch?.targetTrips,
+          'Trips done': w.tripsDone,
+          "Driver's/Operator's Comment": w.comment,
+          Customer: w.project?.customer,
+          Status: w.status,
+        }
+      } else {
+        return {
+          'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
+          'Dispatch Shift': w.dispatch?.shift,
+          'Project Description': w.project.prjDescription,
+          'Equipment-PlateNumber': w.equipment?.plateNumber,
+          'Equipment Type': w.equipment?.eqDescription,
+
+          'Duration (HRS)':
+            w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+          'Duration (DAYS)':
+            w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
+          'Work done': w.workDone.jobDescription,
+          'Other work description': w.dispatch?.otherJobType,
+
+          'Driver Names': w.driver
+            ? w.driver.firstName + ' ' + w.driver.lastName
+            : w.equipment?.eqOwner,
+          'Driver contacts': w.driver?.phone,
+          'Target trips': w.dispatch?.targetTrips,
+          'Trips done': w.tripsDone,
+          "Driver's/Operator's Comment": w.comment,
+          Customer: w.project?.customer,
+          Status: w.status,
+        }
       }
     })
 
@@ -945,7 +978,7 @@ export default function Workdata() {
           Dispatch Forms ({workList ? workList?.length : 0})
         </div>
         <div className="flex w-full flex-row items-center justify-between space-x-10">
-          {viewPort === 'list' && user.userType === 'admin' && (
+          {viewPort === 'list' && canDispatch && (
             <MSubmitButton
               submit={() => setViewPort('new')}
               intent="primary"

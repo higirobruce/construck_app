@@ -6,14 +6,19 @@ import {
   RefreshIcon,
   UploadIcon,
 } from '@heroicons/react/outline'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import ProjectCard from '../common/projectCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
 import { Loader } from 'semantic-ui-react'
+import { UserContext } from '../../contexts/UserContext'
 
 export default function Projects() {
+  let { user, setUser } = useContext(UserContext)
+  //AUTORIZATION
+  let canCreateData = user.userType === 'admin'
+
   let [projects, setProjects] = useState([])
   let [ogProjectList, setOgProjectList] = useState([])
   let [viewPort, setViewPort] = useState('list')
@@ -112,7 +117,7 @@ export default function Projects() {
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Projects</div>
       <div className="flex w-full flex-row items-center justify-between space-x-4">
-        {viewPort === 'list' && (
+        {viewPort === 'list' && canCreateData && (
           <MSubmitButton
             submit={() => setViewPort('new')}
             intent="primary"

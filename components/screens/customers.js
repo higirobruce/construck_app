@@ -1,11 +1,16 @@
 import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Loader } from 'semantic-ui-react'
+import { UserContext } from '../../contexts/UserContext'
 import CustomerCard from '../common/customerCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 
 export default function Customers() {
+  let { user, setUser } = useContext(UserContext)
+  //AUTORIZATION
+  let canCreateData = user.userType === 'admin'
+
   let [customers, setCustomers] = useState([])
   let [ogCustomerList, setOgCustomerList] = useState([])
   let [viewPort, setViewPort] = useState('list')
@@ -48,7 +53,7 @@ export default function Customers() {
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Customers</div>
       <div className="flex w-full flex-row items-center justify-between space-x-4">
-        {viewPort === 'list' && (
+        {viewPort === 'list' && canCreateData && (
           <MSubmitButton
             submit={() => setViewPort('new')}
             intent="primary"

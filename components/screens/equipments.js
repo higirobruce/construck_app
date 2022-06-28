@@ -9,7 +9,7 @@ import {
   RefreshIcon,
   UploadIcon,
 } from '@heroicons/react/outline'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import EquipmentCard from '../common/equipmentCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
@@ -18,8 +18,14 @@ import { Loader } from 'semantic-ui-react'
 import { Tooltip } from 'antd'
 import { ExclamationIcon, LockClosedIcon } from '@heroicons/react/solid'
 import Modal from '../common/modal'
+import { UserContext } from '../../contexts/UserContext'
 
 export default function Equipments() {
+  let { user, setUser } = useContext(UserContext)
+  //AUTORIZATION
+  let canCreateData = user.userType === 'admin'
+  let canMoveAssets = user.userType === 'dispatch' || user.userType === 'admin'
+
   let [equipments, setEquipments] = useState([])
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
@@ -254,7 +260,7 @@ export default function Equipments() {
       <div className="my-5 flex flex-col space-y-5 px-10">
         <div className="text-2xl font-semibold">Equipments</div>
         <div className="flex w-full flex-row items-center justify-between space-x-4">
-          {viewPort === 'list' && (
+          {viewPort === 'list' && canCreateData && (
             <MSubmitButton
               submit={() => setViewPort('new')}
               intent="primary"
@@ -387,25 +393,27 @@ export default function Equipments() {
                 </Tooltip>
               </div>
 
-              <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
+              {/* <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" /> */}
 
-              <div>
-                <label>
-                  <span className="mt-2 cursor-pointer text-base leading-normal">
-                    <UploadIcon className="h-5 w-5" />
-                  </span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => {
-                      readFromFile(e.target.files[0])
-                    }}
-                  />
-                </label>
-              </div>
+              {canCreateData && (
+                <div>
+                  <label>
+                    <span className="mt-2 cursor-pointer text-base leading-normal">
+                      <UploadIcon className="h-5 w-5" />
+                    </span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => {
+                        readFromFile(e.target.files[0])
+                      }}
+                    />
+                  </label>
+                </div>
+              )}
 
-              <DownloadIcon className="h-5 w-5 cursor-pointer" />
-              <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
+              {/* <DownloadIcon className="h-5 w-5 cursor-pointer" /> */}
+              {/* <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" /> */}
               <MSubmitButton
                 submit={refresh}
                 intent="neutral"
@@ -437,6 +445,7 @@ export default function Equipments() {
                       }
                       handleSendToWorkshop={_setToWorkshopRow}
                       handleMakeAvailable={_setMakeAvailableRow}
+                      canMoveAssets={canMoveAssets}
                     />
                   )
                 })}

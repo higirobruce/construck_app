@@ -85,6 +85,7 @@ export default function EquipmentType({
   icon,
   handleSendToWorkshop,
   handleMakeAvailable,
+  canMoveAssets,
 }) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
@@ -138,7 +139,8 @@ export default function EquipmentType({
             {data.eqStatus !== 'workshop' &&
               data.eqStatus !== 'assigned to job' &&
               data.eqStatus !== 'dispatched' &&
-              data.eqOwner === 'Construck' && (
+              data.eqOwner === 'Construck' &&
+              canMoveAssets && (
                 // <CogIcon
                 //   onClick={() => {
                 //     handleSendToWorkshop(data.id)
@@ -159,7 +161,7 @@ export default function EquipmentType({
                 />
               )}
 
-            {data.eqStatus === 'workshop' && (
+            {data.eqStatus === 'workshop' && canMoveAssets && (
               <SwitchHorizontalIcon
                 onClick={() => {
                   handleMakeAvailable(data.id)
