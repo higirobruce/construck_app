@@ -59,8 +59,9 @@ export default function Equipments() {
       let eqList = equipments.filter((w) => {
         let _search = search?.toLocaleLowerCase()
         let plateNumber = w?.plateNumber?.toLocaleLowerCase()
+        let assetType = w?.eqDescription.toLocaleLowerCase()
 
-        return plateNumber.includes(_search)
+        return plateNumber.includes(_search) || assetType.includes(_search)
       })
       setEquipments(eqList)
       setLoading(false)
@@ -441,9 +442,7 @@ export default function Equipments() {
                         description: e.eqDescription,
                         id: e._id,
                       }}
-                      intent={
-                        e.eqOwner === 'Construck' ? e.eqStatus : 'dispatched'
-                      }
+                      intent={e.eqOwner === 'Construck' ? e.eqStatus : 'hired'}
                       handleSendToWorkshop={_setToWorkshopRow}
                       handleMakeAvailable={_setMakeAvailableRow}
                       canMoveAssets={canMoveAssets}

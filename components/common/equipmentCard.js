@@ -98,6 +98,8 @@ export default function EquipmentType({
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-50  w-full ring-1 ring-red-200'
     } else if (intent == 'updating') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-white w-full ring-1 ring-zinc-200'
+    } else if (intent == 'hired') {
+      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-blue-50 w-full ring-1 ring-blue-200'
     } else {
       return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
     }
