@@ -510,8 +510,9 @@ export default function Workdata() {
         let driver =
           w?.driver?.firstName?.toLocaleLowerCase() +
           w?.driver?.lastName?.toLocaleLowerCase()
-        if (isNaN(driver)) driver = w?.equipment?.eqOwner
+        let owner = w?.equipment?.eqOwner.toLocaleLowerCase()
 
+        if (!driver) driver = owner
         return (
           desc.includes(_search) ||
           plateNumber.includes(_search) ||
@@ -523,19 +524,7 @@ export default function Workdata() {
       setLoadingData(false)
     }
 
-    if (searchDriver.length >= 3) {
-      let _searchDriver = searchDriver?.toLocaleLowerCase()
-      let _workList = workList.filter((w) => {
-        let driver =
-          w?.driver?.firstName?.toLocaleLowerCase() +
-          w?.driver?.lastName?.toLocaleLowerCase()
-        return driver?.includes(_searchDriver)
-      })
-      setWorkList(_workList)
-      setLoadingData(false)
-    }
-
-    if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
+    if (search.length < 3 && searchDriver.length < 3) {
       setWorkList(ogWorkList)
       setLoadingData(false)
     }
