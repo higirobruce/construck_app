@@ -217,14 +217,15 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch(`${url}/equipments/`)
+    fetch(
+      `${url}/equipments/${dispatchDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }`
+    )
       .then((resp) => resp.json())
       .then((resp) => {
-        let list = resp['equipments'].filter((r) => r.eqStatus === 'available')
-        let listLowbeds = resp['equipments'].filter(
-          (r) =>
-            r.eqDescription === 'TRACTOR HEAD' && r.eqStatus === 'available'
-        )
+        let list = resp
+        let listLowbeds = resp
 
         let equipmentsFullOptions = list.map((l) => {
           return {
@@ -418,6 +419,50 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
+    fetch(
+      `${url}/equipments/${dispatchDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }`
+    )
+      .then((resp) => resp.json())
+      .then((resp) => {
+        console.log(
+          `${url}/equipments/${dispatchDate}/${
+            dayShift ? 'dayShift' : 'nightShift'
+          }`
+        )
+        console.log(resp)
+        let list = resp
+        let listLowbeds = resp
+
+        let equipmentsFullOptions = list.map((l) => {
+          return {
+            key: l._id,
+            value: l._id,
+            text: l.plateNumber,
+          }
+        })
+
+        if (resp && listLowbeds.length > 0) {
+          let equipmentsOptions = listLowbeds.map((l) => {
+            return {
+              key: l._id,
+              value: l._id,
+              text: l.plateNumber,
+            }
+          })
+          setLowbedList(equipmentsOptions)
+          setOgLowbedList(listLowbeds)
+          setEquipmentsOgFull(list)
+          setEquipmentFullList(equipmentsFullOptions)
+          let _eqLists = [equipmentsFullOptions]
+          setEquipmentFullLists(_eqLists)
+        } else {
+          setLowbedList([])
+        }
+      })
+      .catch((err) => {})
+
     fetch(`${url}/jobtypes/eqType/` + eqType)
       .then((resp) => resp.json())
       .then((resp) => {
@@ -599,6 +644,10 @@ export default function Workdata() {
     setWorkList(_workList)
     fetch(`${url}/works/recall/${row._id}`, {
       method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recalledBy: user._id,
+      }),
     })
       .then((resp) => resp.json())
       .then((resp) => {
@@ -620,6 +669,7 @@ export default function Workdata() {
         endIndex,
         tripsDone,
         comment,
+        stoppedBy: user._id,
       }),
     })
       .then((resp) => resp.json())
@@ -639,6 +689,7 @@ export default function Workdata() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         startIndex,
+        startedBy: user._id,
       }),
     })
       .then((resp) => resp.json())
@@ -782,6 +833,7 @@ export default function Workdata() {
                       ? new Date(dispatchDates[i][0])
                       : new Date().toISOString(),
                   },
+                  createdBy: user._id,
                 }),
               })
             )
@@ -823,6 +875,7 @@ export default function Workdata() {
                     createdOn: new Date().toISOString(),
                     date: new Date(dispatchDate),
                   },
+                  createdBy: user._id,
                 }),
               })
             )
@@ -860,6 +913,7 @@ export default function Workdata() {
                 createdOn: new Date().toISOString(),
                 date: new Date(movementDate),
               },
+              createdBy: user._id,
             }),
           }).then(async (res) => {
             await Promise.all(promises).then(() => {
