@@ -2008,7 +2008,9 @@ export default function Workdata() {
           handleSetReason={_setReason}
           reasons={reasonList}
           rowData={workList[rowIndex]}
-          showReasonField={showReasonField}
+          showReasonField={
+            tripsDone < workList[rowIndex]?.dispatch?.targetTrips
+          }
           type="stop"
           startIndexInvalid={false}
           endIndexInvalid={

@@ -65,7 +65,7 @@ export default function Users() {
         email,
         phone,
         userType: role,
-        company: '',
+        company: null,
         status: 'active',
       }),
     })
