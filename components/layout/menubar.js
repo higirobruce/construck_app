@@ -20,6 +20,17 @@ export default function MenuBar() {
   let { screen, setScreen } = useContext(ScreenContext)
   let { user, setUser } = useContext(UserContext)
 
+  let role = user?.userType
+
+  let canSeeDashboard = role === 'admin' || role === 'display'
+  let canSeeDispatches =
+    role === 'admin' ||
+    role === 'dispatch' ||
+    role === 'revenue' ||
+    role === 'supplier'
+  let canSeeUsers = role === 'admin'
+  let canSeeSettings = role === 'admin'
+
   function logout() {
     localStorage.removeItem('user')
     setUser({})
@@ -33,7 +44,7 @@ export default function MenuBar() {
           Construck App
         </div>
 
-        {user.userType === 'admin' && (
+        {canSeeDashboard && (
           <div
             className={
               screen === 'dashboard'
@@ -47,65 +58,57 @@ export default function MenuBar() {
           </div>
         )}
 
+        {canSeeDispatches && (
+          <div
+            className={
+              screen === 'workData'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('workData')}
+          >
+            <DocumentDuplicateIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">
+              Dispatch Forms
+            </div>
+          </div>
+        )}
+
         <div
           className={
-            screen === 'workData'
+            screen === 'customers'
               ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
               : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
           }
-          onClick={() => setScreen('workData')}
+          onClick={() => setScreen('customers')}
         >
-          <DocumentDuplicateIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">
-            Dispatch Forms
-          </div>
+          <UserGroupIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">Customers</div>
         </div>
 
-        {user.userType === 'admin' && (
-          <>
-            <div
-              className={
-                screen === 'customers'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-                  : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-              }
-              onClick={() => setScreen('customers')}
-            >
-              <UserGroupIcon className="h-5 w-5" />
-              <div className="hidden w-1/2 font-semibold md:block">
-                Customers
-              </div>
-            </div>
+        <div
+          className={
+            screen === 'equipments'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('equipments')}
+        >
+          <TruckIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">Equipments</div>
+        </div>
 
-            <div
-              className={
-                screen === 'equipments'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-                  : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-              }
-              onClick={() => setScreen('equipments')}
-            >
-              <TruckIcon className="h-5 w-5" />
-              <div className="hidden w-1/2 font-semibold md:block">
-                Equipments
-              </div>
-            </div>
-
-            <div
-              className={
-                screen === 'projects'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-                  : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-              }
-              onClick={() => setScreen('projects')}
-            >
-              <ViewGridAddIcon className="h-5 w-5" />
-              <div className="hidden w-1/2 font-semibold md:block">
-                Projects
-              </div>
-            </div>
-          </>
-        )}
+        <div
+          className={
+            screen === 'projects'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('projects')}
+        >
+          <ViewGridAddIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">Projects</div>
+        </div>
 
         <div
           className={
@@ -119,29 +122,33 @@ export default function MenuBar() {
           <div className="hidden w-1/2 font-semibold md:block">Profile</div>
         </div>
 
-        <div
-          className={
-            screen === 'users'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-          }
-          onClick={() => setScreen('users')}
-        >
-          <UsersIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">Users</div>
-        </div>
+        {canSeeUsers && (
+          <div
+            className={
+              screen === 'users'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('users')}
+          >
+            <UsersIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Users</div>
+          </div>
+        )}
 
-        <div
-          className={
-            screen === 'settings'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-          }
-          onClick={() => setScreen('settings')}
-        >
-          <CogIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">Settings</div>
-        </div>
+        {canSeeSettings && (
+          <div
+            className={
+              screen === 'settings'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('settings')}
+          >
+            <CogIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Settings</div>
+          </div>
+        )}
       </div>
 
       <div className="flex w-full flex-row justify-evenly">
