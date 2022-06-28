@@ -231,7 +231,10 @@ export default function Workdata() {
           return {
             key: l._id,
             value: l._id,
-            text: l.plateNumber,
+            text:
+              l.eqOwner == 'Construck'
+                ? l.plateNumber
+                : l.plateNumber + '-' + l.eqOwner,
           }
         })
 
@@ -408,7 +411,10 @@ export default function Workdata() {
             return {
               key: l._id,
               value: l._id,
-              text: l.plateNumber,
+              text:
+                l.eqOwner === 'Construck'
+                  ? l.plateNumber
+                  : l.plateNumber + '-' + l.eqOwner,
             }
           })
           setEquipmentList(equipmentsOptions)
@@ -439,7 +445,10 @@ export default function Workdata() {
           return {
             key: l._id,
             value: l._id,
-            text: l.plateNumber,
+            text:
+              l.eqOwner === 'Construck'
+                ? l.plateNumber
+                : l.plateNumber + ' - ' + l.eqOwner,
           }
         })
 
