@@ -982,13 +982,39 @@ export default function Workdata() {
           'Other work description': w.dispatch?.otherJobType,
           'Projected Revenue': w?.projectedRevenue,
           'Actual Revenue': w.totalRevenue,
-          'vendor payment': w.totalExpenditure,
+          'Vendor payment': w.totalExpenditure,
           'Driver Names': w.driver
             ? w.driver.firstName + ' ' + w.driver.lastName
             : w.equipment?.eqOwner,
           'Driver contacts': w.driver?.phone,
           'Target trips': w.dispatch?.targetTrips,
           'Trips done': w.tripsDone,
+          "Driver's/Operator's Comment": w.comment,
+          Customer: w.project?.customer,
+          Status: w.status,
+        }
+      } else if (isVendor) {
+        return {
+          'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
+          'Dispatch Shift': w.dispatch?.shift,
+          'Project Description': w.project.prjDescription,
+          'Equipment-PlateNumber': w.equipment?.plateNumber,
+          'Equipment Type': w.equipment?.eqDescription,
+          Rate: w.equipment?.supplierRate,
+          'Unit of measurement': w.equipment?.uom,
+          'Duration (HRS)':
+            w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+          'Duration (DAYS)':
+            w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
+          'Work done': w?.workDone?.jobDescription,
+          'Other work description': w.dispatch?.otherJobType,
+          'Revenue from CTK': w.totalExpenditure,
+          'Driver Names': w.driver
+            ? w?.driver?.firstName + ' ' + w?.driver?.lastName
+            : w.equipment?.eqOwner,
+          'Driver contacts': w.driver?.phone,
+          'Target trips': w.dispatch?.targetTrips,
+          'Trips done': w?.tripsDone,
           "Driver's/Operator's Comment": w.comment,
           Customer: w.project?.customer,
           Status: w.status,
@@ -1000,14 +1026,12 @@ export default function Workdata() {
           'Project Description': w.project.prjDescription,
           'Equipment-PlateNumber': w.equipment?.plateNumber,
           'Equipment Type': w.equipment?.eqDescription,
-
           'Duration (HRS)':
             w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
           'Duration (DAYS)':
             w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
           'Work done': w?.workDone?.jobDescription,
           'Other work description': w.dispatch?.otherJobType,
-
           'Driver Names': w.driver
             ? w?.driver?.firstName + ' ' + w?.driver?.lastName
             : w.equipment?.eqOwner,
