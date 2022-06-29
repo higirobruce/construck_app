@@ -21,11 +21,12 @@ export default function Modal({
   handleSetReason,
   reasons,
   rowData,
-  showReasonField,
+  showReasonField = false,
   startIndexInvalid = false,
   endIndexInvalid = false,
   startIndexErrorMessage = 'Invalid value!',
   endIndexErrorMessage = 'Invalid value!',
+  reasonSelected = false,
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
   let uom = rowData?.equipment?.uom
@@ -42,7 +43,10 @@ export default function Modal({
         <div className="flex min-h-screen items-end justify-center px-4 text-center sm:block sm:p-0 md:items-center">
           <div
             x-cloak
-            onClick={() => setIsShown(false)}
+            onClick={() => {
+              setIsShown(false)
+              handleSetReason(null)
+            }}
             x-show={isShown}
             x-transitionEnter="transition ease-out duration-300 transform"
             x-transitionEnter-start="opacity-0"
@@ -194,6 +198,7 @@ export default function Modal({
               <button
                 onClick={() => {
                   setIsShown(false)
+                  showReasonField && handleSetReason('NA')
                 }}
                 type="button"
                 className="transform rounded-md bg-white px-3 py-2 text-sm capitalize tracking-wide text-zinc-800 ring-1 ring-gray-200 transition-colors duration-200 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring focus:ring-zinc-300 focus:ring-opacity-50 dark:bg-sky-600 dark:hover:bg-sky-700 dark:focus:bg-sky-700"
@@ -201,7 +206,8 @@ export default function Modal({
                 Cancel
               </button>
 
-              {!startIndexInvalid && !endIndexInvalid && (
+              {((!startIndexInvalid && !endIndexInvalid) ||
+                (type === 'stop' && reasonSelected)) && (
                 <button
                   onClick={() => {
                     handleConfirm()

@@ -141,7 +141,7 @@ export default function Workdata() {
   let [endIndex, setEndIndex] = useState(0)
   let [startIndex, setStartIndex] = useState(0)
   let [tripsDone, setTripsDone] = useState(0)
-  let [comment, setComment] = useState(0)
+  let [comment, setComment] = useState(null)
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
@@ -2131,7 +2131,8 @@ export default function Workdata() {
           reasons={reasonList}
           rowData={workList[rowIndex]}
           showReasonField={
-            tripsDone < workList[rowIndex]?.dispatch?.targetTrips
+            tripsDone < workList[rowIndex]?.dispatch?.targetTrips ||
+            (workList[rowIndex]?.equipment?.uom === 'hour' && duration < 5)
           }
           type="stop"
           startIndexInvalid={false}
@@ -2145,6 +2146,7 @@ export default function Workdata() {
               ? 'End Index can not be empty or zero!'
               : 'End Index should not be lesser than the Start Index!'
           }
+          reasonSelected={(duration < 5 && comment) || duration > 5}
         />
       )}
 
