@@ -968,9 +968,9 @@ export default function Workdata() {
             w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
           'Duration (DAYS)':
             w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
-          'Work done': w.workDone.jobDescription,
+          'Work done': w?.workDone?.jobDescription,
           'Other work description': w.dispatch?.otherJobType,
-          'Projected Revenue': w.projectedRevenue,
+          'Projected Revenue': w?.projectedRevenue,
           'Actual Revenue': w.totalRevenue,
           'vendor payment': w.totalExpenditure,
           'Driver Names': w.driver
@@ -995,15 +995,15 @@ export default function Workdata() {
             w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
           'Duration (DAYS)':
             w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
-          'Work done': w.workDone.jobDescription,
+          'Work done': w?.workDone?.jobDescription,
           'Other work description': w.dispatch?.otherJobType,
 
           'Driver Names': w.driver
-            ? w.driver.firstName + ' ' + w.driver.lastName
+            ? w?.driver?.firstName + ' ' + w?.driver?.lastName
             : w.equipment?.eqOwner,
           'Driver contacts': w.driver?.phone,
           'Target trips': w.dispatch?.targetTrips,
-          'Trips done': w.tripsDone,
+          'Trips done': w?.tripsDone,
           "Driver's/Operator's Comment": w.comment,
           Customer: w.project?.customer,
           Status: w.status,
