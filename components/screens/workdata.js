@@ -109,6 +109,7 @@ export default function Workdata() {
   let [approveModalIsShown, setApproveModalIsShown] = useState(false)
   let [rejectModalIsShown, setRejectModalIsShown] = useState(false)
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
+  let [endModalIsShown, setEndModalIsShown] = useState(false)
   let [showReasonField, setShowReasonField] = useState(false)
 
   let [row, setRow] = useState()
@@ -514,6 +515,7 @@ export default function Workdata() {
         let desc = w?.project?.prjDescription?.toLocaleLowerCase()
         let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
         let customer = w?.project?.customer?.toLocaleLowerCase()
+        let equipmentType = w?.equipment?.eqDescription?.toLocaleLowerCase()
         let driver =
           w?.driver?.firstName?.toLocaleLowerCase() +
           w?.driver?.lastName?.toLocaleLowerCase()
@@ -524,6 +526,7 @@ export default function Workdata() {
           desc.includes(_search) ||
           plateNumber.includes(_search) ||
           customer.includes(_search) ||
+          equipmentType.includes(_search) ||
           driver?.includes(_search)
         )
       })
@@ -552,6 +555,14 @@ export default function Workdata() {
       setWorkList(ogWorkList)
     }
   }, [startDate, endDate])
+
+  useEffect(() => {
+    workList &&
+      setShowReasonField(
+        tripsDone < workList[rowIndex]?.dispatch?.targetTrips ||
+          (workList[rowIndex]?.equipment?.uom === 'hour' && duration < 5)
+      )
+  }, [duration])
 
   function refresh() {
     setLoadingData(true)
@@ -626,6 +637,12 @@ export default function Workdata() {
     setStopModalIsShown(true)
   }
 
+  function _setEndRow(row, index, pageStartIndex) {
+    setRow(row)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
+    setEndModalIsShown(true)
+  }
+
   function _setStartRow(row, index, pageStartIndex) {
     setRow(row)
     setRowIndex(parseInt(index) + parseInt(pageStartIndex))
@@ -689,6 +706,28 @@ export default function Workdata() {
       })
   }
 
+  function end() {
+    let _workList = workList ? [...workList] : []
+    _workList[rowIndex].status = 'updating'
+    setWorkList(_workList)
+
+    // duration, endIndex, tripsDone, comment
+    fetch(`${url}/works/end/${row._id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        duration,
+        endIndex,
+        tripsDone,
+        comment,
+        stoppedBy: user._id,
+      }),
+    })
+      .then((resp) => resp.json())
+      .then((resp) => {
+        refresh()
+      })
+  }
   function start() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
@@ -1176,6 +1215,7 @@ export default function Workdata() {
                 handleOrder={order}
                 handleSelect={select}
                 handleDeselect={deselect}
+                handelEnd={_setEndRow}
                 loading
               />
             )}
@@ -2147,6 +2187,18 @@ export default function Workdata() {
               : 'End Index should not be lesser than the Start Index!'
           }
           reasonSelected={(duration < 5 && comment) || duration > 5}
+        />
+      )}
+
+      {endModalIsShown && (
+        <Modal
+          title="End site work!"
+          body="Are you sure you want to end this site work?"
+          isShown={endModalIsShown}
+          setIsShown={setEndModalIsShown}
+          handleConfirm={end}
+          rowData={workList[rowIndex]}
+          type="end"
         />
       )}
 

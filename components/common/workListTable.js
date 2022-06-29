@@ -25,6 +25,7 @@ import {
   ClipboardCheckIcon,
   ClipboardIcon,
   SwitchVerticalIcon,
+  TrashIcon,
 } from '@heroicons/react/outline'
 import { ResponsiveWrapper } from '@nivo/core'
 import { Tooltip } from 'antd'
@@ -146,6 +147,7 @@ export default function WorkListTable({
   loading,
   handelStop,
   handelStart,
+  handelEnd,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
@@ -156,7 +158,7 @@ export default function WorkListTable({
     user.userType === 'revenue' ||
     user.userType === 'admin' ||
     user.userType === 'vendor'
-  let canViewRenues = user.userType === 'revenue'
+  let canViewRenues = user.userType === 'revenue' || user.userType == 'admin'
   let isVendor = user.userType === 'vendor'
 
   function handlePageChange(e, data) {
@@ -312,7 +314,8 @@ export default function WorkListTable({
                           row.status === 'stopped' ||
                           row.status === 'in progress' ||
                           row.status === 'approved' ||
-                          row.status === 'rejected'
+                          row.status === 'rejected' ||
+                          (row.siteWork && row.duration)
                             ? row?.equipment?.uom === 'hour'
                               ? msToTime(
                                   getDuration(row?.startTime, row?.duration)
@@ -480,6 +483,19 @@ export default function WorkListTable({
                             <PlayIcon className="h-5 w-5 text-green-600" />
                           </div>
                         )}
+
+                        {canStartAndStopJob &&
+                          row.status === 'created' &&
+                          row.siteWork && (
+                            <div
+                              onClick={() =>
+                                handelEnd(row, index, pageStartIndex)
+                              }
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                            >
+                              <TrashIcon className="h-5 w-5 text-red-600" />
+                            </div>
+                          )}
                       </div>
                     </Table.Cell>
                     {/* <Table.Cell>{row.createdOn}</Table.Cell>
