@@ -41,6 +41,7 @@ export default function Workdata() {
   let canStartAndStopJob =
     user.userType === 'revenue' || user.userType === 'admin'
   let canViewRenues = user.userType === 'revenue' || user.userType === 'admin'
+  let isVendor = user.userType === 'vendor'
 
   let [workList, setWorkList] = useState(null)
   let [ogWorkList, setOgWorkList] = useState(null)
@@ -149,8 +150,11 @@ export default function Workdata() {
     fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        setWorkList(resp)
-        setOgWorkList(resp)
+        let data = !isVendor
+          ? resp
+          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+        setWorkList(data)
+        setOgWorkList(data)
         setLoadingData(false)
       })
       .catch((err) => {
@@ -309,8 +313,11 @@ export default function Workdata() {
     fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        setWorkList(resp)
-        setOgWorkList(resp)
+        let data = !isVendor
+          ? resp
+          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+        setWorkList(data)
+        setOgWorkList(data)
         setLoadingData(false)
       })
 
@@ -556,8 +563,11 @@ export default function Workdata() {
     fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        setWorkList(resp)
-        setOgWorkList(resp)
+        let data = !isVendor
+          ? resp
+          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+        setWorkList(data)
+        setOgWorkList(data)
 
         setEquipments([])
         setEquipmentList([])
