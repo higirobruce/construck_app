@@ -157,6 +157,7 @@ export default function WorkListTable({
     user.userType === 'admin' ||
     user.userType === 'vendor'
   let canViewRenues = user.userType === 'revenue'
+  let isVendor = user.userType === 'vendor'
 
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
@@ -285,10 +286,15 @@ export default function WorkListTable({
                     <Table.Cell singleLine>
                       <Tooltip
                         title={
-                          'RWF ' +
-                          row.equipment?.rate?.toLocaleString() +
-                          ' per ' +
-                          row?.equipment?.uom
+                          isVendor
+                            ? 'RWF ' +
+                              row.equipment?.supplierRate?.toLocaleString() +
+                              ' per ' +
+                              row?.equipment?.uom
+                            : 'RWF ' +
+                              row.equipment?.rate?.toLocaleString() +
+                              ' per ' +
+                              row?.equipment?.uom
                         }
                       >
                         <div>
