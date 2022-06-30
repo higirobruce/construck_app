@@ -49,7 +49,7 @@ const MStatusIndicator = ({ status }) => {
         </div>
       </Tooltip>
     )
-  } else if (status === 'in progress') {
+  } else if (status === 'in progress' || status === 'on going') {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
@@ -273,13 +273,20 @@ export default function WorkListTable({
                 return (
                   <Table.Row key={row._id}>
                     <Table.Cell singleLine>
-                      <MTextView
-                        content={
-                          new Date(row?.dispatch?.date).toLocaleDateString() +
-                          '-' +
-                          getShiftLabel(row?.dispatch?.shift)
-                        }
-                      />
+                      <div className="flex flex-row space-x-1">
+                        <MTextView
+                          content={
+                            new Date(row?.dispatch?.date).toLocaleDateString() +
+                            '-' +
+                            getShiftLabel(row?.dispatch?.shift)
+                          }
+                        />
+                        {row?.siteWork && (
+                          <div className="rounded text-xs font-bold text-red-600">
+                            sw
+                          </div>
+                        )}
+                      </div>
                     </Table.Cell>
                     <Table.Cell singleLine>
                       <MTextView content={row.project?.prjDescription} />
@@ -473,20 +480,24 @@ export default function WorkListTable({
                           </>
                         )}
 
-                        {canStartAndStopJob && row.status === 'created' && (
-                          <div
-                            onClick={() =>
-                              handelStart(row, index, pageStartIndex)
-                            }
-                            className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
-                          >
-                            <PlayIcon className="h-5 w-5 text-green-600" />
-                          </div>
-                        )}
+                        {canStartAndStopJob &&
+                          (row.status === 'created' ||
+                            row.status === 'on going') && (
+                            <div
+                              onClick={() =>
+                                handelStart(row, index, pageStartIndex)
+                              }
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                            >
+                              <PlayIcon className="h-5 w-5 text-green-600" />
+                            </div>
+                          )}
 
                         {canStartAndStopJob &&
                           row.status === 'created' &&
-                          row.siteWork && (
+                          row.siteWork &&
+                          (row.equipment.eqStatus === 'assigned to job' ||
+                            row.equipment.eqStatus === 'dispatched') && (
                             <div
                               onClick={() =>
                                 handelEnd(row, index, pageStartIndex)
