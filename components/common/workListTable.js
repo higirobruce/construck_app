@@ -245,11 +245,13 @@ export default function WorkListTable({
                     className="flex cursor-pointer flex-row items-center space-x-1"
                     onClick={() => handleOrder('byDriver')}
                   >
-                    <div>Driver</div>
+                    {isVendor ? 'Vendor Name' : ' Driver'}
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
-                <Table.HeaderCell>Driver's contact</Table.HeaderCell>
+                <Table.HeaderCell>
+                  {isVendor ? "Vendor's Contact" : " Driver's contact"}
+                </Table.HeaderCell>
 
                 <Table.HeaderCell singleLine>
                   <div
@@ -506,7 +508,7 @@ export default function WorkListTable({
                             </div>
                           )}
 
-                        {canStartAndStopJob &&
+                        {canDispatch &&
                           (row.status === 'created' ||
                             row.status === 'on going') &&
                           row.siteWork &&

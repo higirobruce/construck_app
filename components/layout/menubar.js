@@ -10,6 +10,7 @@ import {
   ViewGridAddIcon,
   LogoutIcon,
   BellIcon,
+  UserCircleIcon,
 } from '@heroicons/react/outline'
 
 import React, { useContext } from 'react'
@@ -162,12 +163,20 @@ export default function MenuBar() {
         )}
       </div>
 
-      <div className="flex w-full flex-row justify-evenly">
-        <LogoutIcon
-          className="mb-5 h-7 w-7 cursor-pointer text-red-400"
-          onClick={() => logout()}
-        />
-        <BellIcon className="mb-5 h-7 w-7 text-yellow-600" />
+      <div className="">
+        <div className="flex flex-col">
+          <div className="mt-5 mb-1 flex flex-row items-center text-sm text-zinc-800">
+            <UserCircleIcon className="h-5 w-5" />
+            {user.firstName + ' ' + user.lastName}
+          </div>
+          <div className="flex w-full flex-row justify-evenly">
+            <LogoutIcon
+              className="mb-5 h-7 w-7 cursor-pointer text-red-400"
+              onClick={() => logout()}
+            />
+            <BellIcon className="mb-5 h-7 w-7 text-yellow-600" />
+          </div>
+        </div>
       </div>
     </div>
   )
