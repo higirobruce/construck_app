@@ -367,20 +367,24 @@ export default function Workdata() {
         setDriverLists(_drLists)
       })
 
-    fetch(`${url}/equipments/`)
+    fetch(
+      `${url}/equipments/${dispatchDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }`
+    )
       .then((resp) => resp.json())
       .then((resp) => {
-        let list = resp['equipments'].filter((r) => r.eqStatus === 'available')
-        let listLowbeds = resp['equipments'].filter(
-          (r) =>
-            r.eqDescription === 'TRACTOR HEAD' && r.eqStatus === 'available'
-        )
+        let list = resp
+        let listLowbeds = resp
 
         let equipmentsFullOptions = list.map((l) => {
           return {
             key: l._id,
             value: l._id,
-            text: l.plateNumber,
+            text:
+              l.eqOwner == 'Construck'
+                ? l.plateNumber
+                : l.plateNumber + '-' + l.eqOwner,
           }
         })
 
@@ -666,6 +670,8 @@ export default function Workdata() {
     setOrderModalIsShown(true)
   }
 
+  function _setSelTargetTrips(value) {}
+
   function recall() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
@@ -872,7 +878,7 @@ export default function Workdata() {
                     project: toProjects[i],
                     fromSite,
                     toSite,
-                    targetTrips,
+                    targetTrips: selTargetTrips[i],
                     equipments: selEquipments,
                     drivers,
                     astDrivers,
@@ -1719,16 +1725,18 @@ export default function Workdata() {
                                     type="text"
                                   />
 
-                                  <TextInput
-                                    // label="Target Trips"
-                                    placeholder="Target trips"
-                                    type="number"
-                                    setValue={(e) => {
-                                      let _lset = [...selTargetTrips]
-                                      _lset[i] = e
-                                      setSelTargetTrips(_lset)
-                                    }}
-                                  />
+                                  {!siteWork && (
+                                    <TextInput
+                                      // label="Target Trips"
+                                      placeholder="Target trips"
+                                      type="number"
+                                      setValue={(e) => {
+                                        let _lset = [...selTargetTrips]
+                                        _lset[i] = e
+                                        setSelTargetTrips(_lset)
+                                      }}
+                                    />
+                                  )}
                                 </>
                               )}
                           </div>
@@ -1812,7 +1820,7 @@ export default function Workdata() {
                     <div className="flex min-w-full flex-row justify-between">
                       <div className="flex flex-1 flex-col space-y-2">
                         {[...Array(nMachinesToMove)].map((e, i) => (
-                          <div className="flex flex-row space-x-2">
+                          <div className="flex flex-row items-center space-x-2">
                             {/* Equipment */}
                             <div className="flex w-1/6 flex-col justify-start space-y-1">
                               <div className="flex flex-row items-center">
@@ -2078,6 +2086,29 @@ export default function Workdata() {
                                 />
                               </div>
                             </div>
+                            {selEquipments[i]?.eqType === 'Truck' && (
+                              <div className="flex flex-col justify-start space-y-1">
+                                <div className="flex flex-row items-center">
+                                  <MTextView content="Target trips" />
+                                  {
+                                    <div className="text-sm text-red-600">
+                                      *
+                                    </div>
+                                  }
+                                </div>
+                                {/* Target trips */}
+                                <TextInput
+                                  // label="Target Trips"
+                                  placeholder="Target trips"
+                                  type="number"
+                                  setValue={(e) => {
+                                    let _lset = [...selTargetTrips]
+                                    _lset[i] = e
+                                    setSelTargetTrips(_lset)
+                                  }}
+                                />
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

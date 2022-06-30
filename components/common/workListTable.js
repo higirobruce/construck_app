@@ -29,6 +29,7 @@ import {
 } from '@heroicons/react/outline'
 import { ResponsiveWrapper } from '@nivo/core'
 import { Tooltip } from 'antd'
+import moment from 'moment'
 
 const MStatusIndicator = ({ status }) => {
   if (status === 'approved')
@@ -270,6 +271,11 @@ export default function WorkListTable({
 
             <Table.Body>
               {pData.map((row, index) => {
+                let dailWorks = row.siteWork ? row.dailyWork : []
+                let siteWorkPostedToday = _.find(dailWorks, {
+                  date: moment().format('DD-MM-YYYY'),
+                })
+
                 return (
                   <Table.Row key={row._id}>
                     <Table.Cell singleLine>
@@ -320,9 +326,9 @@ export default function WorkListTable({
                         content={
                           row.status === 'stopped' ||
                           row.status === 'in progress' ||
+                          row.status === 'on going' ||
                           row.status === 'approved' ||
-                          row.status === 'rejected' ||
-                          (row.siteWork && row.duration)
+                          row.status === 'rejected'
                             ? row?.equipment?.uom === 'hour'
                               ? msToTime(
                                   getDuration(row?.startTime, row?.duration)
@@ -376,19 +382,25 @@ export default function WorkListTable({
                     </Table.Cell>
 
                     <Table.Cell>
-                      <Tooltip
-                        title={
-                          row?.dispatch?.targetTrips
-                            ? 'Target trips: ' + row?.dispatch?.targetTrips
-                            : 'NA'
-                        }
-                      >
+                      {row.siteWork ? (
                         <div>
-                          <MTextView
-                            content={row?.tripsDone ? row?.tripsDone : 0}
-                          />
+                          <MTextView content="N/A" />
                         </div>
-                      </Tooltip>
+                      ) : (
+                        <Tooltip
+                          title={
+                            row?.dispatch?.targetTrips
+                              ? 'Target trips: ' + row?.dispatch?.targetTrips
+                              : 'NA'
+                          }
+                        >
+                          <div>
+                            <MTextView
+                              content={row?.tripsDone ? row?.tripsDone : 0}
+                            />
+                          </div>
+                        </Tooltip>
+                      )}
                     </Table.Cell>
 
                     <Table.Cell>
@@ -481,6 +493,7 @@ export default function WorkListTable({
                         )}
 
                         {canStartAndStopJob &&
+                          !siteWorkPostedToday &&
                           (row.status === 'created' ||
                             row.status === 'on going') && (
                             <div
@@ -494,7 +507,8 @@ export default function WorkListTable({
                           )}
 
                         {canStartAndStopJob &&
-                          row.status === 'created' &&
+                          (row.status === 'created' ||
+                            row.status === 'on going') &&
                           row.siteWork &&
                           (row.equipment.eqStatus === 'assigned to job' ||
                             row.equipment.eqStatus === 'dispatched') && (
