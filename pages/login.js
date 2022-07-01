@@ -324,7 +324,10 @@ export default function Login() {
 
                 <button
                   className="hover:text-blue-cvl-500 mt-10 cursor-pointer p-1 text-center text-sm text-gray-400 hover:underline"
-                  onClick={() => setViewPort('forgotPassword')}
+                  onClick={
+                    () => {}
+                    // setViewPort('forgotPassword')
+                  }
                 >
                   Forgot password
                 </button>
@@ -440,7 +443,10 @@ export default function Login() {
 
                 <button
                   className="hover:text-blue-cvl-500 mt-10 cursor-pointer p-1 text-center text-sm text-gray-400 hover:underline"
-                  onClick={() => setViewPort('forgotPassword')}
+                  onClick={
+                    () => {}
+                    // setViewPort('forgotPassword')
+                  }
                 >
                   Forgot password
                 </button>
