@@ -21,6 +21,7 @@ export default function Login() {
   const [agencyWebsite, setAgencyWebsite] = useState('')
   const [agencyEmail, setAgencyEmail] = useState('')
   const [agencyPhone, setAgencyPhone] = useState('')
+  const [newPassword, setNewPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
   const [viewPort, setViewPort] = useState('login')
   const [accountType, setAccountType] = useState('')
@@ -44,7 +45,6 @@ export default function Login() {
         .then((resp) => resp.json())
         .then((resp) => {
           let _user = resp.user
-          console.log(_user)
           if (resp.message === 'Allowed') {
             _user.loggedIn = true
             setUser(_user)
@@ -64,7 +64,67 @@ export default function Login() {
           setSubmitting(false)
         })
         .catch((err) => {
-          console.log(err)
+          toast.error(`${messages[`${language}`].checkDataService}`)
+          setSubmitting(false)
+        })
+    } catch (err) {
+      toast.error(JSON.stringify(err), {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+
+      setSubmitting(false)
+    }
+  }
+
+  function resetPassword() {
+    setSubmitting(true)
+    try {
+      fetch(`${url}/users/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          oldPassword: password,
+          newPassword,
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.error) {
+            toast.error(`${res.message}`)
+            setSubmitting(false)
+          } else {
+            fetch(`${url}/email/send`, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              method: 'POST',
+              body: JSON.stringify({
+                to: email,
+                from: 'info@construck.rw',
+                subject: 'Password has been reset.',
+                messageType: 'passwordReset',
+                password: newPassword,
+              }),
+            })
+              .then((res) => res.json())
+              .then((res) => {
+                setSubmitting(false)
+                setPassword('')
+                setViewPort('login')
+              })
+              .catch((err) => {})
+          }
+        })
+        .catch((err) => {
           toast.error(`${messages[`${language}`].checkDataService}`)
           setSubmitting(false)
         })
@@ -149,6 +209,14 @@ export default function Login() {
 
   function _setPassword(value) {
     setPassword(value)
+  }
+
+  function _setCurrentPassword(value) {
+    _setCurrentPassword(value)
+  }
+
+  function _setNewPassword(value) {
+    setNewPassword(value)
   }
 
   function _setEmail(value) {
@@ -245,6 +313,138 @@ export default function Login() {
                   <Loader active inline size="small" />
                 </div>
               )}
+
+              <div className="flex flex-row justify-between">
+                <button
+                  className="hover:text-blue-cvl-500 mt-10 cursor-pointer p-1 text-center text-sm text-gray-400 hover:underline"
+                  onClick={() => setViewPort('resetPassword')}
+                >
+                  Reset password
+                </button>
+
+                <button
+                  className="hover:text-blue-cvl-500 mt-10 cursor-pointer p-1 text-center text-sm text-gray-400 hover:underline"
+                  onClick={() => setViewPort('forgotPassword')}
+                >
+                  Forgot password
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* <div className="mt-8 flex flex-row">
+            <div className="mt-3 w-36 border-t-2 border-gray-200"></div>
+            <div className="mx-4 text-gray-400">{`${
+              labels[`${language}`]?.or
+            }`}</div>
+            <div className="mt-3 w-36 border-t-2 border-gray-200"></div>
+          </div>
+
+          <div className="sm:w-full md:w-1/5">
+            <button
+              type="submit"
+              onClick={() => {
+                setViewPort('signup')
+              }}
+              className="mt-3 flex w-full cursor-pointer items-center justify-center space-x-2 rounded-md bg-blue-400 p-3 shadow-md transition duration-75 ease-out hover:shadow-sm active:scale-95 active:shadow-sm"
+            >
+             
+              <div className="text-white">{`${
+                labels[`${language}`]?.signup
+              }`}</div>
+            </button>
+          </div> */}
+        </>
+      )}
+
+      {viewPort === 'resetPassword' && (
+        <>
+          <div className="mb-5 flex flex-row items-center space-x-5">
+            <div className="text-4xl font-bold text-zinc-800">
+              Reset Password
+            </div>
+          </div>
+          <div className="sm:w-full md:w-1/5">
+            <form action="#">
+              <div className="flex w-full flex-col items-start justify-start space-y-3">
+                {/* Login form */}
+
+                <TextInputLogin
+                  label={`${labels[`${language}`]?.username}`}
+                  value={email}
+                  type="email"
+                  setValue={_setEmail}
+                />
+                <TextInputLogin
+                  label={`${labels[`${language}`]?.password}`}
+                  value={password}
+                  isPassword={true}
+                  setValue={setPassword}
+                />
+                <TextInputLogin
+                  label={`${labels[`${language}`]?.newPassword}`}
+                  value={newPassword}
+                  isPassword={true}
+                  setValue={setNewPassword}
+                />
+                <TextInputLogin
+                  label={`${labels[`${language}`]?.repeatPassword}`}
+                  value={repeatPassword}
+                  isPassword={true}
+                  setValue={setRepeatPassword}
+                />
+              </div>
+              {!submitting && (
+                <button
+                  onClick={() => {
+                    if (
+                      email.length < 1 ||
+                      password.length < 1 ||
+                      newPassword !== repeatPassword
+                    ) {
+                      toast.error(`${messages[`${language}`]?.checkInputs}`, {
+                        position: 'top-center',
+                        autoClose: 3000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      })
+                    } else {
+                      resetPassword()
+                    }
+                  }}
+                  className="mt-5 flex w-full cursor-pointer items-center justify-center space-x-2 rounded-md bg-zinc-800 p-3 shadow-md transition duration-75 ease-out hover:shadow-sm active:scale-95 active:shadow-sm"
+                >
+                  {
+                    <div className="text-white">{`${
+                      labels[`${language}`]?.submit
+                    }`}</div>
+                  }
+                </button>
+              )}
+              {submitting && (
+                <div className="mt-5 flex w-full cursor-not-allowed items-center justify-center space-x-2 rounded-md bg-zinc-100 p-3 shadow-md transition duration-75 ease-out">
+                  <Loader active inline size="small" />
+                </div>
+              )}
+
+              <div className="flex flex-row justify-between">
+                <button
+                  className="hover:text-blue-cvl-500 mt-10 cursor-pointer p-1 text-center text-sm text-gray-400 hover:underline"
+                  onClick={() => setViewPort('login')}
+                >
+                  Login instead
+                </button>
+
+                <button
+                  className="hover:text-blue-cvl-500 mt-10 cursor-pointer p-1 text-center text-sm text-gray-400 hover:underline"
+                  onClick={() => setViewPort('forgotPassword')}
+                >
+                  Forgot password
+                </button>
+              </div>
             </form>
           </div>
 
