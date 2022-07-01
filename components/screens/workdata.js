@@ -598,7 +598,15 @@ export default function Workdata() {
         let data = !isVendor
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-        setWorkList(data)
+
+        let _workList = data?.filter((w) => {
+          return (
+            Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+            Date.parse(endDate).addHours(23).addMinutes(59) >=
+              Date.parse(w?.dispatch?.date)
+          )
+        })
+        setWorkList(_workList)
         setOgWorkList(data)
 
         setEquipments([])
@@ -1030,7 +1038,8 @@ export default function Workdata() {
       if (canViewRenues) {
         return {
           'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-          'Dispatch Shift': w.dispatch?.shift,
+          'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+          'Site work': w.siteWork ? 'YES' : 'NO',
           'Project Description': w.project.prjDescription,
           'Equipment-PlateNumber': w.equipment?.plateNumber,
           'Equipment Type': w.equipment?.eqDescription,
@@ -1058,7 +1067,8 @@ export default function Workdata() {
       } else if (isVendor) {
         return {
           'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-          'Dispatch Shift': w.dispatch?.shift,
+          'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+          'Site work': w.siteWork ? 'YES' : 'NO',
           'Project Description': w.project.prjDescription,
           'Equipment-PlateNumber': w.equipment?.plateNumber,
           'Equipment Type': w.equipment?.eqDescription,
@@ -1084,7 +1094,8 @@ export default function Workdata() {
       } else {
         return {
           'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-          'Dispatch Shift': w.dispatch?.shift,
+          'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+          'Site work': w.siteWork ? 'YES' : 'NO',
           'Project Description': w.project.prjDescription,
           'Equipment-PlateNumber': w.equipment?.plateNumber,
           'Equipment Type': w.equipment?.eqDescription,
