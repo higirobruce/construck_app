@@ -119,10 +119,10 @@ export default function Workdata() {
   let [loadingData, setLoadingData] = useState(true)
 
   let [startDate, setStartDate] = useState(
-    Date.today().clearTime().moveToFirstDayOfMonth()
+    Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
   )
   let [endDate, setEndDate] = useState(
-    Date.today().clearTime().moveToFirstDayOfMonth()
+    Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
   )
 
   let [workStartDate, setWorkStartDate] = useState(
