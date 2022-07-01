@@ -122,7 +122,7 @@ export default function Workdata() {
     Date.today().clearTime().moveToFirstDayOfMonth()
   )
   let [endDate, setEndDate] = useState(
-    Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
+    Date.today().clearTime().moveToFirstDayOfMonth()
   )
 
   let [workStartDate, setWorkStartDate] = useState(
@@ -154,7 +154,15 @@ export default function Workdata() {
         let data = !isVendor
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-        setWorkList(data)
+
+        let _workList = data?.filter((w) => {
+          return (
+            Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+            Date.parse(endDate).addHours(23).addMinutes(59) >=
+              Date.parse(w?.dispatch?.date)
+          )
+        })
+        setWorkList(_workList)
         setOgWorkList(data)
         setLoadingData(false)
       })
@@ -317,8 +325,17 @@ export default function Workdata() {
         let data = !isVendor
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-        setWorkList(data)
+
+        let _workList = data?.filter((w) => {
+          return (
+            Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+            Date.parse(endDate).addHours(23).addMinutes(59) >=
+              Date.parse(w?.dispatch?.date)
+          )
+        })
+        setWorkList(_workList)
         setOgWorkList(data)
+
         setLoadingData(false)
       })
 
