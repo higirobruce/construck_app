@@ -84,6 +84,7 @@ export default function Workdata() {
   let [drivers, setDrivers] = useState([])
   let [astDrivers, setAstDrivers] = useState([])
   let [reasonForRejection, setReasonForRejection] = useState('')
+  let [moreComment, setMoreComment] = useState('')
 
   let [fromProjects, setFromProjects] = useState(null)
   let [toProjects, settoProjects] = useState(null)
@@ -728,6 +729,7 @@ export default function Workdata() {
         endIndex,
         tripsDone,
         comment,
+        moreComment,
         stoppedBy: user._id,
       }),
     })
@@ -2226,6 +2228,7 @@ export default function Workdata() {
           handleSetDuration={setDuration}
           handleSetTripsDone={setTripsDone}
           handleSetComment={setComment}
+          handleSetMoreComment={setMoreComment}
           handleSetReason={_setReason}
           reasons={reasonList}
           rowData={workList[rowIndex]}

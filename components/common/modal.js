@@ -18,6 +18,7 @@ export default function Modal({
   handleSetDuration,
   handleSetTripsDone,
   handleSetComment,
+  handleSetMoreComment,
   handleSetReason,
   reasons,
   rowData,
@@ -155,20 +156,35 @@ export default function Modal({
                 </div>
 
                 {showReasonField && (
-                  <div className="flex flex-col">
-                    <div className="mb-1 flex flex-row items-center">
-                      <MTextView content="Reason" />
+                  <div className="flex flex-col space-y-3">
+                    <div>
+                      <div className="mb-1 flex flex-row items-center">
+                        <MTextView content="Reason" />
+                      </div>
+                      <Dropdown
+                        options={reasons}
+                        placeholder="Select reason"
+                        search
+                        compact
+                        selection
+                        onChange={(e, data) => {
+                          handleSetReason(data.value)
+                        }}
+                      />
                     </div>
-                    <Dropdown
-                      options={reasons}
-                      placeholder="Select reason"
-                      search
-                      compact
-                      selection
-                      onChange={(e, data) => {
-                        handleSetReason(data.value)
-                      }}
-                    />
+                    <div>
+                      <div className="mb-1 flex flex-row items-center">
+                        <MTextView content="Comment" />
+                      </div>
+                      <textarea
+                        onChange={(e) => handleSetMoreComment(e.target.value)}
+                        className="form-control m-0 block w-full rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition
+                                      ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+                        id="exampleFormControlTextarea1"
+                        rows="3"
+                        placeholder="Your comment"
+                      ></textarea>
+                    </div>
                   </div>
                 )}
               </div>
