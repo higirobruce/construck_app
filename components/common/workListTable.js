@@ -275,7 +275,7 @@ export default function WorkListTable({
               {pData.map((row, index) => {
                 let dailWorks = row.siteWork ? row.dailyWork : []
                 let siteWorkPostedToday = _.find(dailWorks, {
-                  date: moment().format('DD-MM-YYYY'),
+                  date: moment().format('DD-MMM-YYYY'),
                 })
 
                 return (

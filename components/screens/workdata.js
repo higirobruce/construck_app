@@ -186,7 +186,10 @@ export default function Workdata() {
         setProjectList(projectOptions)
         setProjects(list)
       })
-      .catch((err) => {})
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+      })
 
     fetch(`${url}/reasons`)
       .then((resp) => resp.json())
@@ -201,7 +204,10 @@ export default function Workdata() {
         })
         setReasonList(reasonOptions)
       })
-      .catch((err) => {})
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+      })
 
     fetch(
       `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
@@ -226,7 +232,10 @@ export default function Workdata() {
         let _drLists = [userOptions]
         setDriverLists(_drLists)
       })
-      .catch((err) => {})
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+      })
 
     fetch(
       `${url}/equipments/${dispatchDate}/${
@@ -335,6 +344,10 @@ export default function Workdata() {
 
         setLoadingData(false)
       })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+      })
 
     fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
@@ -350,6 +363,10 @@ export default function Workdata() {
         })
         setProjectList(projectOptions)
         setProjects(list)
+      })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
       })
 
     fetch(
@@ -640,6 +657,10 @@ export default function Workdata() {
         setLoadingData(false)
         setSubmitting(false)
       })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+      })
   }
 
   function approve() {
@@ -778,6 +799,7 @@ export default function Workdata() {
         refresh()
       })
   }
+
   function start() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
@@ -1263,7 +1285,7 @@ export default function Workdata() {
 
     exportToCSV(
       _workList,
-      `Dispatch report ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+      `Dispatch report ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
     )
     // exportToCSV(
     //   _siteWorkDetails,

@@ -31,6 +31,7 @@ export default function Modal({
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
   let uom = rowData?.equipment?.uom
+  let [startIndexNotApplicable, setStartIndxNotApp] = useState(false)
 
   return (
     <div>
@@ -118,15 +119,17 @@ export default function Modal({
             {type === 'stop' && (
               <div className="grid grid-cols-2 gap-x-2">
                 <div className="mb-3 flex flex-col space-y-4">
-                  <TextInputLogin
-                    label={`End Index [from ${rowData?.startIndex}]`}
-                    placeholder="0"
-                    setValue={handleSetEndIndex}
-                    type="number"
-                    isRequired
-                    error={endIndexInvalid}
-                    errorMessage={endIndexErrorMessage}
-                  />
+                  {parseInt(rowData?.startIndex) > 0 && (
+                    <TextInputLogin
+                      label={`End Index [from ${rowData?.startIndex}]`}
+                      placeholder="0"
+                      setValue={handleSetEndIndex}
+                      type="number"
+                      isRequired
+                      error={endIndexInvalid}
+                      errorMessage={endIndexErrorMessage}
+                    />
+                  )}
 
                   <TextInputLogin
                     label="Duration (Hrs)"
@@ -191,22 +194,42 @@ export default function Modal({
             )}
 
             {type === 'start' && (
-              <div className="grid grid-cols-2 gap-x-2">
-                <div className="mb-3 flex flex-col space-y-4">
-                  <TextInputLogin
-                    label={`Start Index `}
-                    placeholder={
-                      rowData.equipment?.millage
-                        ? rowData.equipment?.millage
-                        : 0
-                    }
-                    setValue={handleSetStartIndex}
-                    type="number"
-                    isRequired
-                    error={startIndexInvalid}
-                    errorMessage={startIndexErrorMessage}
+              <div className="flex flex-col space-y-2">
+                <div class="form-check">
+                  <input
+                    class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
+                    type="checkbox"
+                    name="check"
+                    id="checkNoIndex"
+                    onChange={() => {
+                      setStartIndxNotApp(!startIndexNotApplicable)
+                    }}
                   />
+                  <label
+                    class="form-check-label inline-block text-zinc-800"
+                    for="checkNoIndex"
+                  >
+                    Not applicable
+                  </label>
                 </div>
+
+                {!startIndexNotApplicable && (
+                  <div className="mb-3 flex w-1/2 flex-col space-y-4">
+                    <TextInputLogin
+                      label={`Start Index `}
+                      placeholder={
+                        rowData.equipment?.millage
+                          ? rowData.equipment?.millage
+                          : 0
+                      }
+                      setValue={handleSetStartIndex}
+                      type="number"
+                      isRequired
+                      error={startIndexInvalid}
+                      errorMessage={startIndexErrorMessage}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -223,6 +246,8 @@ export default function Modal({
               </button>
 
               {((!startIndexInvalid && !endIndexInvalid) ||
+                startIndexNotApplicable ||
+                !rowData?.startIndex ||
                 (type === 'stop' && reasonSelected)) && (
                 <button
                   onClick={() => {
