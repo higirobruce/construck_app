@@ -203,23 +203,19 @@ export default function Workdata() {
       })
       .catch((err) => {})
 
-    fetch(`${url}/employees/`)
+    fetch(
+      `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+    )
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
-        let userOptions = list
-          .filter(
-            (l) =>
-              (l.type === 'driver' || l.type === 'operator') &&
-              l.status === 'active'
-          )
-          .map((l) => {
-            return {
-              key: l._id,
-              value: l._id,
-              text: l.firstName + ' ' + l.lastName,
-            }
-          })
+        let userOptions = list.map((l) => {
+          return {
+            key: l._id,
+            value: l._id,
+            text: l.firstName + ' ' + l.lastName,
+          }
+        })
         // userOptions.push({
         //   key: 'NA',
         //   value: 'NA',
@@ -356,34 +352,30 @@ export default function Workdata() {
         setProjects(list)
       })
 
-    fetch(`${url}/employees/`)
+    fetch(
+      `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+    )
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
-        let userOptions = list
-          .filter(
-            (l) =>
-              (l.type === 'driver' || l.type === 'operator') &&
-              l.status == 'active'
-          )
-          .map((l) => {
-            return {
-              key: l._id,
-              value: l._id,
-              text: l.firstName + ' ' + l.lastName,
-            }
-          })
+        let userOptions = list.map((l) => {
+          return {
+            key: l._id,
+            value: l._id,
+            text: l.firstName + ' ' + l.lastName,
+          }
+        })
         // userOptions.push({
         //   key: 'NA',
         //   value: 'NA',
         //   text: 'Not applicable',
         // })
         setDriverList(userOptions)
-        setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
         setDriverLists(_drLists)
       })
+      .catch((err) => {})
 
     fetch(
       `${url}/equipments/${dispatchDate}/${
@@ -428,6 +420,31 @@ export default function Workdata() {
   }, [viewPort])
 
   useEffect(() => {
+    fetch(
+      `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+    )
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let list = resp
+        let userOptions = list.map((l) => {
+          return {
+            key: l._id,
+            value: l._id,
+            text: l.firstName + ' ' + l.lastName,
+          }
+        })
+        // userOptions.push({
+        //   key: 'NA',
+        //   value: 'NA',
+        //   text: 'Not applicable',
+        // })
+        setDriverList(userOptions)
+        seLowBedDriverList(userOptions)
+        let _drLists = [userOptions]
+        setDriverLists(_drLists)
+      })
+      .catch((err) => {})
+
     fetch(
       `${url}/equipments/type/${eqType}/${dispatchDate}/${
         dayShift ? 'dayShift' : 'nightShift'
@@ -1036,86 +1053,198 @@ export default function Workdata() {
   }
 
   function download() {
+    let _siteWorkDetails = workList
+      .filter((w) => w.siteWork && w.dailyWork?.length >= 1)
+      .map((w) => {
+        return w?.dailyWork?.map((d) => {
+          if (canViewRenues) {
+            return {
+              'Dispatch date': Date.parse(d.date)?.toString('d-MMM-yyyy'),
+              'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+              'Site work': w.siteWork ? 'YES' : 'NO',
+              'Project Description': w.project.prjDescription,
+              'Equipment-PlateNumber': w.equipment?.plateNumber,
+              'Equipment Type': w.equipment?.eqDescription,
+              Rate: w.equipment?.rate,
+              'Unit of measurement': w.equipment?.uom,
+              'Duration (HRS)':
+                w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+              'Duration (DAYS)':
+                w.equipment?.uom === 'day'
+                  ? Math.round(w.duration * 100) / 100
+                  : 0,
+              'Work done': w?.workDone?.jobDescription,
+              'Other work description': w.dispatch?.otherJobType,
+              'Projected Revenue': w?.projectedRevenue,
+              'Actual Revenue': d.totalRevenue,
+              'Vendor payment': d.totalExpenditure,
+              'Driver Names': w.driver
+                ? w.driver.firstName + ' ' + w.driver.lastName
+                : w.equipment?.eqOwner,
+              'Driver contacts': w.driver?.phone,
+              'Target trips': w.dispatch?.targetTrips,
+              'Trips done': w.tripsDone,
+              Reason: d.comment,
+              "Driver's/Operator's more Comment": d.moreComment,
+              Customer: w.project?.customer,
+              Status: w.status,
+            }
+          } else if (isVendor) {
+            return {
+              'Dispatch date': Date.parse(d.date)?.toString('d-MMM-yyyy'),
+              'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+              'Site work': w.siteWork ? 'YES' : 'NO',
+              'Project Description': w.project.prjDescription,
+              'Equipment-PlateNumber': w.equipment?.plateNumber,
+              'Equipment Type': w.equipment?.eqDescription,
+              Rate: w.equipment?.supplierRate,
+              'Unit of measurement': w.equipment?.uom,
+              'Duration (HRS)':
+                w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+              'Duration (DAYS)':
+                w.equipment?.uom === 'day'
+                  ? Math.round(w.duration * 100) / 100
+                  : 0,
+              'Work done': w?.workDone?.jobDescription,
+              'Other work description': w.dispatch?.otherJobType,
+              'Revenue from CTK': d.totalExpenditure,
+              'Driver Names': w.driver
+                ? w?.driver?.firstName + ' ' + w?.driver?.lastName
+                : w.equipment?.eqOwner,
+              'Driver contacts': w.driver?.phone,
+              'Target trips': w.dispatch?.targetTrips,
+              'Trips done': w?.tripsDone,
+              Reason: d.comment,
+              "Driver's/Operator's more Comment": d.moreComment,
+              Customer: w.project?.customer,
+              Status: w.status,
+            }
+          } else {
+            return {
+              'Dispatch date': Date.parse(d.date)?.toString('d-MMM-yyyy'),
+              'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+              'Site work': w.siteWork ? 'YES' : 'NO',
+              'Project Description': w.project.prjDescription,
+              'Equipment-PlateNumber': w.equipment?.plateNumber,
+              'Equipment Type': w.equipment?.eqDescription,
+              'Duration (HRS)':
+                w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+              'Duration (DAYS)':
+                w.equipment?.uom === 'day'
+                  ? Math.round(w.duration * 100) / 100
+                  : 0,
+              'Work done': w?.workDone?.jobDescription,
+              'Other work description': w.dispatch?.otherJobType,
+              'Driver Names': w.driver
+                ? w?.driver?.firstName + ' ' + w?.driver?.lastName
+                : w.equipment?.eqOwner,
+              'Driver contacts': w.driver?.phone,
+              'Target trips': w.dispatch?.targetTrips,
+              'Trips done': w?.tripsDone,
+              Reason: d.comment,
+              "Driver's/Operator's more Comment": d.moreComment,
+              Customer: w.project?.customer,
+              Status: w.status,
+            }
+          }
+        })
+      })
+
+    // console.log(_siteWorkDetails)
     let _workList = workList.map((w) => {
-      if (canViewRenues) {
-        return {
-          'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-          'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
-          'Site work': w.siteWork ? 'YES' : 'NO',
-          'Project Description': w.project.prjDescription,
-          'Equipment-PlateNumber': w.equipment?.plateNumber,
-          'Equipment Type': w.equipment?.eqDescription,
-          Rate: w.equipment?.rate,
-          'Unit of measurement': w.equipment?.uom,
-          'Duration (HRS)':
-            w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
-          'Duration (DAYS)':
-            w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
-          'Work done': w?.workDone?.jobDescription,
-          'Other work description': w.dispatch?.otherJobType,
-          'Projected Revenue': w?.projectedRevenue,
-          'Actual Revenue': w.totalRevenue,
-          'Vendor payment': w.totalExpenditure,
-          'Driver Names': w.driver
-            ? w.driver.firstName + ' ' + w.driver.lastName
-            : w.equipment?.eqOwner,
-          'Driver contacts': w.driver?.phone,
-          'Target trips': w.dispatch?.targetTrips,
-          'Trips done': w.tripsDone,
-          "Driver's/Operator's Comment": w.comment,
-          Customer: w.project?.customer,
-          Status: w.status,
-        }
-      } else if (isVendor) {
-        return {
-          'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-          'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
-          'Site work': w.siteWork ? 'YES' : 'NO',
-          'Project Description': w.project.prjDescription,
-          'Equipment-PlateNumber': w.equipment?.plateNumber,
-          'Equipment Type': w.equipment?.eqDescription,
-          Rate: w.equipment?.supplierRate,
-          'Unit of measurement': w.equipment?.uom,
-          'Duration (HRS)':
-            w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
-          'Duration (DAYS)':
-            w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
-          'Work done': w?.workDone?.jobDescription,
-          'Other work description': w.dispatch?.otherJobType,
-          'Revenue from CTK': w.totalExpenditure,
-          'Driver Names': w.driver
-            ? w?.driver?.firstName + ' ' + w?.driver?.lastName
-            : w.equipment?.eqOwner,
-          'Driver contacts': w.driver?.phone,
-          'Target trips': w.dispatch?.targetTrips,
-          'Trips done': w?.tripsDone,
-          "Driver's/Operator's Comment": w.comment,
-          Customer: w.project?.customer,
-          Status: w.status,
-        }
-      } else {
-        return {
-          'Dispatch date': Date.parse(w.dispatch?.date)?.toString('d-MMM-yyyy'),
-          'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
-          'Site work': w.siteWork ? 'YES' : 'NO',
-          'Project Description': w.project.prjDescription,
-          'Equipment-PlateNumber': w.equipment?.plateNumber,
-          'Equipment Type': w.equipment?.eqDescription,
-          'Duration (HRS)':
-            w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
-          'Duration (DAYS)':
-            w.equipment?.uom === 'day' ? Math.round(w.duration * 100) / 100 : 0,
-          'Work done': w?.workDone?.jobDescription,
-          'Other work description': w.dispatch?.otherJobType,
-          'Driver Names': w.driver
-            ? w?.driver?.firstName + ' ' + w?.driver?.lastName
-            : w.equipment?.eqOwner,
-          'Driver contacts': w.driver?.phone,
-          'Target trips': w.dispatch?.targetTrips,
-          'Trips done': w?.tripsDone,
-          "Driver's/Operator's Comment": w.comment,
-          Customer: w.project?.customer,
-          Status: w.status,
+      {
+        if (canViewRenues) {
+          return {
+            'Dispatch date': Date.parse(w.dispatch?.date)?.toString(
+              'd-MMM-yyyy'
+            ),
+            'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+            'Site work': w.siteWork ? 'YES' : 'NO',
+            'Project Description': w.project.prjDescription,
+            'Equipment-PlateNumber': w.equipment?.plateNumber,
+            'Equipment Type': w.equipment?.eqDescription,
+            Rate: w.equipment?.rate,
+            'Unit of measurement': w.equipment?.uom,
+            'Duration (HRS)':
+              w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+            'Duration (DAYS)':
+              w.equipment?.uom === 'day'
+                ? Math.round(w.duration * 100) / 100
+                : 0,
+            'Work done': w?.workDone?.jobDescription,
+            'Other work description': w.dispatch?.otherJobType,
+            'Projected Revenue': w?.projectedRevenue,
+            'Actual Revenue': w.totalRevenue,
+            'Vendor payment': w.totalExpenditure,
+            'Driver Names': w.driver
+              ? w.driver.firstName + ' ' + w.driver.lastName
+              : w.equipment?.eqOwner,
+            'Driver contacts': w.driver?.phone,
+            'Target trips': w.dispatch?.targetTrips,
+            'Trips done': w.tripsDone,
+            "Driver's/Operator's Comment": w.comment,
+            Customer: w.project?.customer,
+            Status: w.status,
+          }
+        } else if (isVendor) {
+          return {
+            'Dispatch date': Date.parse(w.dispatch?.date)?.toString(
+              'd-MMM-yyyy'
+            ),
+            'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+            'Site work': w.siteWork ? 'YES' : 'NO',
+            'Project Description': w.project.prjDescription,
+            'Equipment-PlateNumber': w.equipment?.plateNumber,
+            'Equipment Type': w.equipment?.eqDescription,
+            Rate: w.equipment?.supplierRate,
+            'Unit of measurement': w.equipment?.uom,
+            'Duration (HRS)':
+              w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+            'Duration (DAYS)':
+              w.equipment?.uom === 'day'
+                ? Math.round(w.duration * 100) / 100
+                : 0,
+            'Work done': w?.workDone?.jobDescription,
+            'Other work description': w.dispatch?.otherJobType,
+            'Revenue from CTK': w.totalExpenditure,
+            'Driver Names': w.driver
+              ? w?.driver?.firstName + ' ' + w?.driver?.lastName
+              : w.equipment?.eqOwner,
+            'Driver contacts': w.driver?.phone,
+            'Target trips': w.dispatch?.targetTrips,
+            'Trips done': w?.tripsDone,
+            "Driver's/Operator's Comment": w.comment,
+            Customer: w.project?.customer,
+            Status: w.status,
+          }
+        } else {
+          return {
+            'Dispatch date': Date.parse(w.dispatch?.date)?.toString(
+              'd-MMM-yyyy'
+            ),
+            'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
+            'Site work': w.siteWork ? 'YES' : 'NO',
+            'Project Description': w.project.prjDescription,
+            'Equipment-PlateNumber': w.equipment?.plateNumber,
+            'Equipment Type': w.equipment?.eqDescription,
+            'Duration (HRS)':
+              w.equipment?.uom === 'hour' ? msToTime(w.duration) : 0,
+            'Duration (DAYS)':
+              w.equipment?.uom === 'day'
+                ? Math.round(w.duration * 100) / 100
+                : 0,
+            'Work done': w?.workDone?.jobDescription,
+            'Other work description': w.dispatch?.otherJobType,
+            'Driver Names': w.driver
+              ? w?.driver?.firstName + ' ' + w?.driver?.lastName
+              : w.equipment?.eqOwner,
+            'Driver contacts': w.driver?.phone,
+            'Target trips': w.dispatch?.targetTrips,
+            'Trips done': w?.tripsDone,
+            "Driver's/Operator's Comment": w.comment,
+            Customer: w.project?.customer,
+            Status: w.status,
+          }
         }
       }
     })
@@ -1132,7 +1261,14 @@ export default function Workdata() {
       FileSaver.saveAs(data, fileName + fileExtension)
     }
 
-    exportToCSV(_workList, `Dispatch report ${Date.now()}`)
+    exportToCSV(
+      _workList,
+      `Dispatch report ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    )
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
   }
 
   return (
