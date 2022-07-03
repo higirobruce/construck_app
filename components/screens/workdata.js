@@ -1315,7 +1315,9 @@ export default function Workdata() {
               {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} />
             <TextInputV placeholder="Project" setValue={setSearchProject} />*/}
 
-              <TextInputV placeholder="Driver" setValue={setSearchDriver} />
+              <div className="hidden md:block">
+                <TextInputV placeholder="Driver" setValue={setSearchDriver} />
+              </div>
               <div className="w-4/5">
                 <Dropdown
                   options={[

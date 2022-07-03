@@ -290,9 +290,20 @@ export default function WorkListTable({
                           }
                         />
                         {row?.siteWork && (
-                          <div className="rounded text-xs font-bold text-red-600">
-                            sw
-                          </div>
+                          <Tooltip
+                            title={
+                              <>
+                                <div>Date(s) posted</div>
+                                {row?.dailyWork.map((d) => {
+                                  return <div>{d.date}</div>
+                                })}
+                              </>
+                            }
+                          >
+                            <div className="rounded text-xs font-bold text-red-600">
+                              sw
+                            </div>
+                          </Tooltip>
                         )}
                       </div>
                     </Table.Cell>
