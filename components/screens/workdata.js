@@ -1177,9 +1177,7 @@ export default function Workdata() {
       {
         if (canViewRenues) {
           return {
-            'Dispatch date': Date.parse(w.dispatch?.date)?.toString(
-              'd-MMM-yyyy'
-            ),
+            'Dispatch date': Date.parse(w.dispatch?.date),
             'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
             'Site work': w.siteWork ? 'YES' : 'NO',
             'Project Description': w.project.prjDescription,
@@ -1210,9 +1208,7 @@ export default function Workdata() {
           }
         } else if (isVendor) {
           return {
-            'Dispatch date': Date.parse(w.dispatch?.date)?.toString(
-              'd-MMM-yyyy'
-            ),
+            'Dispatch date': Date.parse(w.dispatch?.date),
             'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
             'Site work': w.siteWork ? 'YES' : 'NO',
             'Project Description': w.project.prjDescription,
@@ -1241,9 +1237,7 @@ export default function Workdata() {
           }
         } else {
           return {
-            'Dispatch date': Date.parse(w.dispatch?.date)?.toString(
-              'd-MMM-yyyy'
-            ),
+            'Dispatch date': Date.parse(w.dispatch?.date),
             'Dispatch Shift': w.dispatch?.shift?.toLocaleUpperCase(),
             'Site work': w.siteWork ? 'YES' : 'NO',
             'Project Description': w.project.prjDescription,
