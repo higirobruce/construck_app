@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
+import { DatePicker } from 'antd'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import MTextView from './mTextView'
 import TextInput from './TextIput'
 import TextInputLogin from './TextIputLogin'
 import TextInputV from './TextIputV'
+
+import { toast, ToastContainer } from 'react-toastify'
 
 export default function Modal({
   isShown,
@@ -20,6 +24,7 @@ export default function Modal({
   handleSetComment,
   handleSetMoreComment,
   handleSetReason,
+  handleSetPostingDate,
   reasons,
   rowData,
   showReasonField = false,
@@ -28,10 +33,31 @@ export default function Modal({
   startIndexErrorMessage = 'Invalid value!',
   endIndexErrorMessage = 'Invalid value!',
   reasonSelected = false,
+  isSiteWork,
+  dailyWorks,
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
   let uom = rowData?.equipment?.uom
   let [startIndexNotApplicable, setStartIndxNotApp] = useState(false)
+  let [pDate, setPDate] = useState(moment().format('DD-MMM-YYYY'))
+  let [siteWorkPosted, setSiteWPosted] = useState(null)
+  let [postLive, setPostLive] = useState(false)
+
+  useEffect(() => {
+    let _siteWorkPosted = _.find(dailyWorks, {
+      date: pDate,
+    })
+    setSiteWPosted(_siteWorkPosted)
+    if (_siteWorkPosted) {
+      toast.error('Already posted for the selected date!')
+    }
+    if (moment(pDate).diff(moment('01-07-2022', 'DD-MM-YYYY')) < 0) {
+      setPostLive(true)
+      toast.error("Date can't be before 01 JUL 2022!")
+    } else {
+      setPostLive(false)
+    }
+  }, [pDate])
 
   return (
     <div>
@@ -119,6 +145,19 @@ export default function Modal({
             {type === 'stop' && (
               <div className="grid grid-cols-2 gap-x-2">
                 <div className="mb-3 flex flex-col space-y-4">
+                  {isSiteWork && (
+                    <div className="flex w-1/2 flex-col space-y-4">
+                      <MTextView content="Posting date" />
+                      <DatePicker
+                        defaultValue={moment()}
+                        onChange={(d, dateString) => {
+                          setPDate(moment(dateString).format('DD-MMM-YYYY'))
+                          handleSetPostingDate(dateString)
+                        }}
+                      />
+                    </div>
+                  )}
+
                   {parseInt(rowData?.startIndex) > 0 && (
                     <TextInputLogin
                       label={`End Index [from ${rowData?.startIndex}]`}
@@ -194,7 +233,21 @@ export default function Modal({
             )}
 
             {type === 'start' && (
-              <div className="flex flex-col space-y-2">
+              <div className="flex flex-col space-y-3">
+                {isSiteWork && (
+                  <div className="flex w-1/2 flex-col space-y-4">
+                    <MTextView content="Posting date" />
+                    <DatePicker
+                      defaultValue={moment()}
+                      disabledDate={(current) => !current.isBefore(moment())}
+                      onChange={(d, dateString) => {
+                        setPDate(moment(dateString).format('DD-MMM-YYYY'))
+                        handleSetPostingDate(dateString)
+                      }}
+                    />
+                  </div>
+                )}
+
                 <div class="form-check">
                   <input
                     class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
@@ -209,12 +262,12 @@ export default function Modal({
                     class="form-check-label inline-block text-zinc-800"
                     for="checkNoIndex"
                   >
-                    Not applicable
+                    Start Index not applicable
                   </label>
                 </div>
 
                 {!startIndexNotApplicable && (
-                  <div className="mb-3 flex w-1/2 flex-col space-y-4">
+                  <div className="flex w-1/2 flex-col space-y-4">
                     <TextInputLogin
                       label={`Start Index `}
                       placeholder={
@@ -248,19 +301,23 @@ export default function Modal({
               {((!startIndexInvalid && !endIndexInvalid) ||
                 startIndexNotApplicable ||
                 !rowData?.startIndex ||
-                (type === 'stop' && reasonSelected)) && (
-                <button
-                  onClick={() => {
-                    handleConfirm()
-                    setIsShown(false)
-                  }}
-                  type="button"
-                  className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
-                >
-                  Ok
-                </button>
-              )}
+                (type === 'stop' && reasonSelected)) &&
+                !siteWorkPosted &&
+                !postLive && (
+                  <button
+                    onClick={() => {
+                      handleConfirm()
+                      setIsShown(false)
+                    }}
+                    type="button"
+                    className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
+                  >
+                    Ok
+                  </button>
+                )}
             </div>
+
+            {/* <ToastContainer /> */}
           </div>
         </div>
       </div>

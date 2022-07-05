@@ -9,7 +9,6 @@ import {
   DownloadIcon,
   TrashIcon,
   CheckIcon,
-  UploadIcon,
   AdjustmentsIcon,
 } from '@heroicons/react/outline'
 import MTitle from '../common/mTitle'
@@ -22,15 +21,11 @@ import { UserContext } from '../../contexts/UserContext'
 import { DatePicker, Descriptions } from 'antd'
 import Modal from '../common/modal'
 // import XlsExport from 'xlsexport'
-import { saveAs } from 'file-saver'
-import DownloadForms from '../common/downloadForms'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import TextInputV from '../common/TextIputV'
 import 'datejs'
 import moment from 'moment'
-import MLable from '../common/mLabel'
-import { isNull } from 'util'
 
 const { RangePicker } = DatePicker
 
@@ -144,6 +139,8 @@ export default function Workdata() {
   let [startIndex, setStartIndex] = useState(0)
   let [tripsDone, setTripsDone] = useState(0)
   let [comment, setComment] = useState(null)
+
+  let [postingDate, setPostingDate] = useState(moment())
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
@@ -769,6 +766,7 @@ export default function Workdata() {
         comment,
         moreComment,
         stoppedBy: user._id,
+        postingDate,
       }),
     })
       .then((resp) => resp.json())
@@ -812,6 +810,7 @@ export default function Workdata() {
       body: JSON.stringify({
         startIndex,
         startedBy: user._id,
+        postingDate,
       }),
     })
       .then((resp) => resp.json())
@@ -2403,6 +2402,8 @@ export default function Workdata() {
               : 'End Index should not be lesser than the Start Index!'
           }
           reasonSelected={(duration < 5 && comment) || duration > 5}
+          isSiteWork={workList[rowIndex]?.siteWork}
+          handleSetPostingDate={setPostingDate}
         />
       )}
 
@@ -2428,6 +2429,7 @@ export default function Workdata() {
           handleSetStartIndex={setStartIndex}
           rowData={workList[rowIndex]}
           type="start"
+          isSiteWork={workList[rowIndex]?.siteWork}
           endIndexInvalid={false}
           startIndexInvalid={
             !startIndex ||
@@ -2439,6 +2441,8 @@ export default function Workdata() {
               ? 'Start Index can not be empty or zero!'
               : 'Start Index should not be lesser that the last index!'
           }
+          handleSetPostingDate={setPostingDate}
+          dailyWorks={workList[rowIndex]?.dailyWork}
         />
       )}
 

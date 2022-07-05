@@ -281,9 +281,11 @@ export default function WorkListTable({
             <Table.Body>
               {pData.map((row, index) => {
                 let dailWorks = row.siteWork ? row.dailyWork : []
-                let siteWorkPostedToday = _.find(dailWorks, {
-                  date: moment().format('DD-MMM-YYYY'),
-                })
+                let siteWorkPostedToday = false
+
+                // let siteWorkPostedToday = _.find(dailWorks, {
+                //   date: moment().format('DD-MMM-YYYY'),
+                // })
 
                 return (
                   <Table.Row key={row._id}>
