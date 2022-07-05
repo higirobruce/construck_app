@@ -209,6 +209,13 @@ export default function WorkListTable({
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
+
+                <Table.HeaderCell>
+                  <div>Start Date</div>
+                </Table.HeaderCell>
+                <Table.HeaderCell>
+                  <div>End Date</div>
+                </Table.HeaderCell>
                 <Table.HeaderCell>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
@@ -306,6 +313,28 @@ export default function WorkListTable({
                           </Tooltip>
                         )}
                       </div>
+                    </Table.Cell>
+                    <Table.Cell>
+                      {row.siteWork ? (
+                        <MTextView
+                          content={new Date(
+                            row?.workStartDate
+                          ).toLocaleDateString()}
+                        />
+                      ) : (
+                        ''
+                      )}
+                    </Table.Cell>
+                    <Table.Cell>
+                      {row.siteWork ? (
+                        <MTextView
+                          content={new Date(
+                            row?.workEndDate
+                          ).toLocaleDateString()}
+                        />
+                      ) : (
+                        ''
+                      )}
                     </Table.Cell>
                     <Table.Cell singleLine>
                       <MTextView content={row.project?.prjDescription} />
