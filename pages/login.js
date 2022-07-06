@@ -109,7 +109,7 @@ export default function Login() {
               method: 'POST',
               body: JSON.stringify({
                 to: email,
-                from: 'info@construck.rw',
+                from: 'appinfo@construck.rw',
                 subject: 'Password has been reset.',
                 messageType: 'passwordReset',
                 password: newPassword,
@@ -117,6 +117,7 @@ export default function Login() {
             })
               .then((res) => res.json())
               .then((res) => {
+                console.log(res)
                 setSubmitting(false)
                 setPassword('')
                 setViewPort('login')
