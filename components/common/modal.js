@@ -41,13 +41,17 @@ export default function Modal({
   let [startIndexNotApplicable, setStartIndxNotApp] = useState(false)
   let [pDate, setPDate] = useState(moment().format('DD-MMM-YYYY'))
   let [siteWorkPosted, setSiteWPosted] = useState(null)
+  let [pendingRecord, setPedingRecord] = useState(null)
   let [postLive, setPostLive] = useState(false)
 
   useEffect(() => {
     let _siteWorkPosted = _.find(dailyWorks, {
       date: pDate,
+      pending: false,
     })
+
     setSiteWPosted(_siteWorkPosted)
+
     if (_siteWorkPosted) {
       toast.error('Already posted for the selected date!')
     }
@@ -58,6 +62,14 @@ export default function Modal({
       setPostLive(false)
     }
   }, [pDate])
+
+  useEffect(() => {
+    let _pendingRecord = _.find(dailyWorks, {
+      pending: true,
+    })
+    setPedingRecord(_pendingRecord)
+    setPDate(moment(_pendingRecord?.date).format('DD-MMM-YYYY'))
+  }, [])
 
   return (
     <div>
@@ -149,11 +161,13 @@ export default function Modal({
                     <div className="flex w-1/2 flex-col space-y-4">
                       <MTextView content="Posting date" />
                       <DatePicker
-                        defaultValue={moment()}
-                        onChange={(d, dateString) => {
-                          setPDate(moment(dateString).format('DD-MMM-YYYY'))
-                          handleSetPostingDate(dateString)
-                        }}
+                        defaultValue={moment(pendingRecord?.date)}
+                        value={moment(pendingRecord?.date)}
+                        disabled
+                        // onChange={(d, dateString) => {
+                        //   setPDate(moment(dateString).format('DD-MMM-YYYY'))
+                        //   handleSetPostingDate(dateString)
+                        // }}
                       />
                     </div>
                   )}

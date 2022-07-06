@@ -15,13 +15,14 @@ import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
 import { MapIcon } from '@heroicons/react/solid'
 import 'datejs'
+import moment from 'moment'
+
+const CUT_OVER_DATE = new Date('01-JUL-2022')
 
 const { RangePicker } = DatePicker
 
 export default function Dashboard() {
-  let [startDate, setStartDate] = useState(
-    Date.today().clearTime().moveToFirstDayOfMonth()
-  )
+  let [startDate, setStartDate] = useState(CUT_OVER_DATE)
   let [endDate, setEndDate] = useState(
     Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
   )

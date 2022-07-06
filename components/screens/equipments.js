@@ -7,6 +7,8 @@ import {
   DownloadIcon,
   PlusIcon,
   RefreshIcon,
+  ShieldCheckIcon,
+  TruckIcon,
   UploadIcon,
 } from '@heroicons/react/outline'
 import React, { useContext, useEffect, useState } from 'react'
@@ -19,6 +21,7 @@ import { Tooltip } from 'antd'
 import { ExclamationIcon, LockClosedIcon } from '@heroicons/react/solid'
 import Modal from '../common/modal'
 import { UserContext } from '../../contexts/UserContext'
+import EqStatusCard from '../common/eqStatusCard'
 
 export default function Equipments() {
   let { user, setUser } = useContext(UserContext)
@@ -29,14 +32,16 @@ export default function Equipments() {
   let [equipments, setEquipments] = useState([])
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
+  let [nStandby, setNStandby] = useState(0)
   let [nInWorkshop, setNInWorkshop] = useState(0)
+  let [nInTechnicalInsp, setNInTechnicalInsp] = useState(0)
   let [nDispatched, setNDispatched] = useState(0)
   let [ogEquipmentList, setOgEquipmentList] = useState([])
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
   let [loading, setLoading] = useState(false)
   let [statusFilter, setStatusFilter] = useState('')
-  let [filterBy, setFilterBy] = useState('')
+  let [filterBy, setFilterBy] = useState('all')
   let [dataFound, setDataFound] = useState(false)
   let [nRecords, setNRecords] = useState(-1)
 
@@ -78,19 +83,24 @@ export default function Equipments() {
     fetch(`${url}/equipments/`)
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         let eqs = res?.equipments
         let nEqs = res.nrecords
         setNRecords(nEqs)
 
-        let availableEq = eqs.filter((e) => e.eqStatus === 'available')
-        let assignedEq = eqs.filter((e) => e.eqStatus === 'assigned to job')
-        let dispatchedEq = eqs.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = eqs.filter((e) => e.eqStatus === 'workshop')
+        let availableEq = res?.available
+        let assignedEq = 0
+        let dispatchedEq = res?.dispatched
+        let inWorkshopEq = res?.workshop
+        let onStandby = res?.standby
+        let inCT = res?.ct
 
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
+        setNAssigned(assignedEq)
+        setNAvailable(availableEq)
+        setNDispatched(dispatchedEq)
+        setNInWorkshop(inWorkshopEq)
+        setNStandby(onStandby)
+        setNInTechnicalInsp(inCT)
         setOgEquipmentList(eqs)
         setEquipments(eqs)
 
@@ -113,7 +123,7 @@ export default function Equipments() {
             body: JSON.stringify({
               plateNumber: row[2],
               eqtype: row[5],
-              eqStatus: 'available',
+              eqStatus: 'standby',
               rate: row[6],
               uom: row[7],
               eqOwner: row[8],
@@ -145,7 +155,11 @@ export default function Equipments() {
     let _eqList = [...ogEquipmentList]
     setEquipments(
       statusFilter !== 'all'
-        ? _eqList.filter((e) => e.eqStatus === statusFilter)
+        ? statusFilter !== 'available'
+          ? _eqList.filter((e) => e.eqStatus === statusFilter)
+          : _eqList.filter(
+              (e) => e.eqStatus === 'standby' || e.eqStatus === 'dispatched'
+            )
         : ogEquipmentList
     )
   }, [statusFilter])
@@ -184,10 +198,8 @@ export default function Equipments() {
         setEquipments(_eqs)
         // setOgEquipmentList(_eqs)
 
-        let availableEq = equipments.filter((e) => e.eqStatus === 'available')
-        let assignedEq = equipments.filter(
-          (e) => e.eqStatus === 'assigned to job'
-        )
+        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
         let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
         let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
 
@@ -221,7 +233,7 @@ export default function Equipments() {
           indexToUpdate = index
           return e._id == rowId
         })
-        eqToUpdate.eqStatus = 'available'
+        eqToUpdate.eqStatus = 'standby'
         _eqs[indexToUpdate] = eqToUpdate
         setEquipments(_eqs)
         // setOgEquipmentList(_eqs)
@@ -260,7 +272,7 @@ export default function Equipments() {
         />
       )}
       <div className="my-5 flex flex-col space-y-5 px-10">
-        <div className="text-2xl font-semibold">Equipments</div>
+        <div className="text-2xl font-semibold">Equipment</div>
         <div className="flex w-full flex-row items-center justify-between space-x-4">
           {viewPort === 'list' && canCreateData && (
             <MSubmitButton
@@ -272,7 +284,7 @@ export default function Equipments() {
           )}
 
           {viewPort === 'list' && (
-            <div className="mx-auto flex flex-grow flex-col px-40">
+            <div className="mx-auto flex flex-grow flex-col">
               <TextInput placeholder="Search..." setValue={setSearch} />
             </div>
           )}
@@ -291,7 +303,79 @@ export default function Equipments() {
 
           {viewPort === 'list' && (
             <div className="flex flex-row items-center space-x-5">
-              <div
+              <EqStatusCard
+                data={{ title: 'Available', content: nAvailable }}
+                intent={
+                  filterBy === 'available' || filterBy === 'all'
+                    ? 'available'
+                    : ''
+                }
+                icon={<CheckIcon className="h-5 w-5" />}
+                onClick={() =>
+                  filterBy === 'available'
+                    ? setFilterBy('all')
+                    : setFilterBy('available')
+                }
+              />
+
+              <EqStatusCard
+                data={{ title: 'Dispatched', content: nDispatched }}
+                intent={
+                  filterBy === 'dispatched' || filterBy === 'all'
+                    ? 'dispatched'
+                    : ''
+                }
+                icon={<ExclamationIcon className="h-5 w-5" />}
+                onClick={() =>
+                  filterBy === 'dispatched'
+                    ? setFilterBy('all')
+                    : setFilterBy('dispatched')
+                }
+              />
+
+              <EqStatusCard
+                data={{ title: 'Standby', content: nStandby }}
+                intent={
+                  filterBy === 'standby' || filterBy === 'all' ? 'standby' : ''
+                }
+                icon={<TruckIcon className="h-5 w-5" />}
+                onClick={() =>
+                  filterBy === 'standby'
+                    ? setFilterBy('all')
+                    : setFilterBy('standby')
+                }
+              />
+
+              <EqStatusCard
+                data={{ title: 'Workshop', content: nInWorkshop }}
+                intent={
+                  filterBy === 'workshop' || filterBy === 'all'
+                    ? 'workshop'
+                    : ''
+                }
+                icon={<CogIcon className="h-5 w-5" />}
+                onClick={() =>
+                  filterBy === 'workshop'
+                    ? setFilterBy('all')
+                    : setFilterBy('workshop')
+                }
+              />
+
+              <EqStatusCard
+                data={{ title: 'Technical Insp.', content: nInTechnicalInsp }}
+                intent={
+                  filterBy === 'technicalInsp' || filterBy === 'all'
+                    ? 'technicalInsp'
+                    : ''
+                }
+                icon={<ShieldCheckIcon className="h-5 w-5" />}
+                onClick={() =>
+                  filterBy === 'ct' ? setFilterBy('all') : setFilterBy('ct')
+                }
+              />
+
+              {/* Available */}
+              {/* <div
                 className={
                   filterBy === 'available'
                     ? 'cursor-pointer rounded-lg p-1 font-normal'
@@ -306,7 +390,7 @@ export default function Equipments() {
                 <Tooltip title="Available">
                   <div
                     className={
-                      filterBy !== 'available'
+                      filterBy !== 'standby'
                         ? 'flex flex-row items-center rounded-lg p-1 text-green-400 shadow-md ring-1 ring-green-100'
                         : 'flex flex-row items-center rounded-lg bg-green-50 p-1 text-green-600 ring-1 ring-green-400'
                     }
@@ -315,9 +399,10 @@ export default function Equipments() {
                     <div>({nAvailable})</div>
                   </div>
                 </Tooltip>
-              </div>
+              </div> */}
 
-              <div
+              {/* Dispatched */}
+              {/* <div
                 className={
                   filterBy === 'dispatched'
                     ? 'cursor-pointer rounded-lg p-1 font-normal'
@@ -341,35 +426,37 @@ export default function Equipments() {
                     <div>({nDispatched})</div>
                   </div>
                 </Tooltip>
-              </div>
+              </div> */}
 
-              <div
+              {/* Standby */}
+              {/* <div
                 className={
-                  filterBy === 'assigned to job'
+                  filterBy === 'standby'
                     ? 'cursor-pointer rounded-lg p-1 font-normal'
                     : 'cursor-pointer rounded-lg p-1 font-normal'
                 }
                 onClick={() =>
-                  filterBy === 'assigned to job'
+                  filterBy === 'standby'
                     ? setFilterBy('all')
-                    : setFilterBy('assigned to job')
+                    : setFilterBy('standby')
                 }
               >
-                <Tooltip title="Busy">
+                <Tooltip title="Stand by">
                   <div
                     className={
-                      filterBy !== 'assigned to job'
+                      filterBy !== 'standby'
                         ? 'flex flex-row items-center rounded-lg p-1 text-orange-300 shadow-md ring-1 ring-orange-100'
                         : 'flex flex-row items-center rounded-lg bg-orange-50 p-1 text-orange-400 ring-1 ring-orange-300'
                     }
                   >
                     <LockClosedIcon className="h-5 w-5" />
-                    <div>({nAssigned})</div>
+                    <div>({nStandby})</div>
                   </div>
                 </Tooltip>
-              </div>
+              </div> */}
 
-              <div
+              {/* Workshop */}
+              {/* <div
                 className={
                   filterBy === 'workshop'
                     ? 'cursor-pointer rounded-lg p-1 font-normal'
@@ -393,7 +480,7 @@ export default function Equipments() {
                     <div>({nInWorkshop})</div>
                   </div>
                 </Tooltip>
-              </div>
+              </div> */}
 
               {/* <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" /> */}
 

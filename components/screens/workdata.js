@@ -2404,6 +2404,7 @@ export default function Workdata() {
           reasonSelected={(duration < 5 && comment) || duration > 5}
           isSiteWork={workList[rowIndex]?.siteWork}
           handleSetPostingDate={setPostingDate}
+          dailyWorks={workList[rowIndex]?.dailyWork}
         />
       )}
 
