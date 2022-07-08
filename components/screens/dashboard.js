@@ -17,15 +17,15 @@ import { MapIcon } from '@heroicons/react/solid'
 import 'datejs'
 import moment from 'moment'
 
-const CUT_OVER_DATE = new Date('01-JUL-2022')
+const CUT_OVER_DATE = new Date('01-JUN-2022')
 
 const { RangePicker } = DatePicker
 
 export default function Dashboard() {
-  let [startDate, setStartDate] = useState(CUT_OVER_DATE)
-  let [endDate, setEndDate] = useState(
-    Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
+  let [startDate, setStartDate] = useState(
+    Date.today().clearTime().moveToFirstDayOfMonth()
   )
+  let [endDate, setEndDate] = useState(Date.today())
   let [customer, setCustomer] = useState()
   let [project, setProject] = useState()
   let [equipment, setEquipment] = useState()
@@ -41,6 +41,7 @@ export default function Dashboard() {
   let [loadingProvisionalRev, setLoadingProvisionalRev] = useState(true)
   let [loadingTotalDays, setLoadingTotalDays] = useState(true)
   let [loadingAvailability, setLoadingAvailability] = useState(true)
+  let [loadingAssetUtilization, setLoadingAssetUtilization] = useState(true)
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
   let [nInWorkshop, setNInWorkshop] = useState(0)
@@ -106,7 +107,7 @@ export default function Dashboard() {
           : Date.today().clearTime().moveToFirstDayOfMonth(),
         endDate: endDate
           ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today().clearTime().moveToLastDayOfMonth(),
+          : Date.today(),
         status: 'projected',
         customer,
         project,
@@ -118,6 +119,8 @@ export default function Dashboard() {
       .then((res) => {
         setLoadingAvailability(false)
         setAssetAvailability(res?.assetAvailability)
+        setLoadingAssetUtilization(false)
+        setAssetUtilization(res.assetUtilization)
         console.log(res)
       })
       .catch((err) => console.log(err))
@@ -128,6 +131,7 @@ export default function Dashboard() {
     setLoadingProvisionalRev(true)
     setLoadingTotalDays(true)
     setLoadingAvailability(true)
+    setAssetUtilization(true)
 
     fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
@@ -140,7 +144,7 @@ export default function Dashboard() {
           : Date.today().clearTime().moveToFirstDayOfMonth(),
         endDate: endDate
           ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today().clearTime().moveToLastDayOfMonth(),
+          : Date.today(),
         status: 'final',
         customer,
         project,
@@ -168,7 +172,7 @@ export default function Dashboard() {
           : Date.today().clearTime().moveToFirstDayOfMonth(),
         endDate: endDate
           ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today().clearTime().moveToLastDayOfMonth(),
+          : Date.today(),
         status: 'projected',
         customer,
         project,
@@ -195,7 +199,7 @@ export default function Dashboard() {
           : Date.today().clearTime().moveToFirstDayOfMonth(),
         endDate: endDate
           ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today().clearTime().moveToLastDayOfMonth(),
+          : Date.today(),
         status: 'projected',
         customer,
         project,
@@ -207,6 +211,8 @@ export default function Dashboard() {
       .then((res) => {
         setLoadingAvailability(false)
         setAssetAvailability(res?.assetAvailability)
+        setLoadingAssetUtilization(false)
+        setAssetUtilization(res?.assetUtilization)
       })
       .catch((err) => console.log(err))
   }, [startDate, endDate, customer, project, equipment, owner])
@@ -303,7 +309,6 @@ export default function Dashboard() {
           <MSubmitButton label="Go" submit={() => go()} />
         </div>
       </div>
-
       <div className="mt-5 sm:mr-5">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
           <StatisticCard
@@ -331,10 +336,10 @@ export default function Dashboard() {
           <StatisticCard
             data={{
               title: 'Asset utilization',
-              content: loadingTotalDays ? (
+              content: loadingAssetUtilization ? (
                 <Loader active inline size="mini" />
               ) : (
-                totalDays + '%'
+                assetUtilization + '%'
               ),
             }}
             icon={<TrendingUpIcon className="h-5 w-5 text-green-600" />}
