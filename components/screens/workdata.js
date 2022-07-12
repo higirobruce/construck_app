@@ -572,9 +572,9 @@ export default function Workdata() {
         let driver =
           w?.driver?.firstName?.toLocaleLowerCase() +
           w?.driver?.lastName?.toLocaleLowerCase()
-        let owner = w?.equipment?.eqOwner.toLocaleLowerCase()
+        let _owner = w?.equipment?.eqOwner.toLocaleLowerCase()
 
-        if (!driver) driver = owner
+        if (!driver) driver = _owner
         return (
           desc.includes(_search) ||
           plateNumber.includes(_search) ||
@@ -583,31 +583,39 @@ export default function Workdata() {
           driver?.includes(_search)
         )
       })
+
+      if (owner === 'All') {
+        setWorkList(_workList)
+        setLoadingData(false)
+      } else {
+        let _wList = _workList.filter((w) => {
+          return owner === 'Construck'
+            ? w?.equipment.eqOwner === 'Construck'
+            : w?.equipment.eqOwner !== 'Construck'
+        })
+        _workList = _wList
+      }
       setWorkList(_workList)
       setLoadingData(false)
-    }
-
-    if (search.length < 3 && searchDriver.length < 3) {
-      setWorkList(ogWorkList)
-      setLoadingData(false)
-    }
-  }, [search, searchDriver])
-
-  useEffect(() => {
-    setLoadingData(true)
-    if (owner === 'All') {
-      setWorkList(ogWorkList)
-      setLoadingData(false)
     } else {
-      let _wList = workList.filter((w) => {
-        return owner === 'Construck'
-          ? w?.equipment.eqOwner === 'Construck'
-          : w?.equipment.eqOwner !== 'Construck'
-      })
-      setWorkList(_wList)
-      setLoadingData(false)
+      if (owner === 'All') {
+        setWorkList(ogWorkList)
+        setLoadingData(false)
+      } else {
+        let _wList = ogWorkList.filter((w) => {
+          return owner === 'Construck'
+            ? w?.equipment.eqOwner === 'Construck'
+            : w?.equipment.eqOwner !== 'Construck'
+        })
+        setWorkList(_wList)
+      }
     }
-  }, [owner])
+
+    // if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
+    //   setWorkList(ogWorkList)
+    //   setLoadingData(false)
+    // }
+  }, [search, owner])
 
   useEffect(() => {
     if (startDate && endDate && workList) {
@@ -1320,13 +1328,17 @@ export default function Workdata() {
 
           {viewPort === 'list' && (
             <div className="flex flex-1 flex-row items-center space-x-5 py-5">
-              <TextInput placeholder="Search..." setValue={setSearch} />
+              <TextInput
+                placeholder="Search Project, Driver, Plate Number"
+                setValue={setSearch}
+              />
               {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} />
             <TextInputV placeholder="Project" setValue={setSearchProject} />*/}
 
-              <div className="hidden md:block">
+              {/* <div className="hidden md:block">
                 <TextInputV placeholder="Driver" setValue={setSearchDriver} />
-              </div>
+              </div> */}
+
               <div className="w-4/5">
                 <Dropdown
                   options={[
