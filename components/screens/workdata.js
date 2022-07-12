@@ -1316,22 +1316,26 @@ export default function Workdata() {
         <div className="text-2xl font-semibold">
           Dispatch Forms ({workList ? workList?.length : 0})
         </div>
-        <div className="flex w-full flex-row items-center justify-between space-x-10">
+        <div className="grid w-full grid-cols-1 gap-1 md:flex md:flex-row md:items-center md:justify-between md:space-x-10">
           {viewPort === 'list' && canDispatch && (
-            <MSubmitButton
-              submit={() => setViewPort('new')}
-              intent="primary"
-              icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
-              label="New"
-            />
+            <div className="hidden md:block">
+              <MSubmitButton
+                submit={() => setViewPort('new')}
+                intent="primary"
+                icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
+                label="New"
+              />
+            </div>
           )}
 
           {viewPort === 'list' && (
-            <div className="flex flex-1 flex-row items-center space-x-5 py-5">
-              <TextInput
-                placeholder="Search Project, Driver, Plate Number"
-                setValue={setSearch}
-              />
+            <div className="grid grid-cols-1 gap-2 md:flex md:flex-1 md:flex-row md:items-center md:space-x-5 md:py-5">
+              <div className="md:w-1/2">
+                <TextInput
+                  placeholder="Search Project, Driver, Plate Number"
+                  setValue={setSearch}
+                />
+              </div>
               {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} />
             <TextInputV placeholder="Project" setValue={setSearchProject} />*/}
 
@@ -1339,7 +1343,7 @@ export default function Workdata() {
                 <TextInputV placeholder="Driver" setValue={setSearchDriver} />
               </div> */}
 
-              <div className="w-4/5">
+              <div className="md:w-1/3">
                 <Dropdown
                   options={[
                     {
@@ -1368,7 +1372,7 @@ export default function Workdata() {
                 />
               </div>
 
-              <div className="w-3/5">
+              <div className="md:w-1/3">
                 <RangePicker
                   onChange={(values, dateStrings) => {
                     setStartDate(dateStrings[0])
