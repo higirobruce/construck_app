@@ -591,7 +591,23 @@ export default function Workdata() {
       setWorkList(ogWorkList)
       setLoadingData(false)
     }
-  }, [search, owner, searchDriver, owner])
+  }, [search, searchDriver])
+
+  useEffect(() => {
+    setLoadingData(true)
+    if (owner === 'All') {
+      setWorkList(ogWorkList)
+      setLoadingData(false)
+    } else {
+      let _wList = workList.filter((w) => {
+        return owner === 'Construck'
+          ? w?.equipment.eqOwner === 'Construck'
+          : w?.equipment.eqOwner !== 'Construck'
+      })
+      setWorkList(_wList)
+      setLoadingData(false)
+    }
+  }, [owner])
 
   useEffect(() => {
     if (startDate && endDate && workList) {
