@@ -68,30 +68,10 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         setFinalRevenues(res.totalRevenue)
-        setLoadingFinalRev(false)
         setTotalDays(res.totalDays)
-        setLoadingTotalDays(false)
-      })
-      .catch((err) => {})
-
-    fetch(`${url}/works/getAnalytics`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        startDate: startDate,
-        endDate: endDate,
-        status: 'projected',
-        customer,
-        project,
-        equipment,
-        owner,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
         setProvisionalRevenues(res.projectedRevenue)
+        setLoadingFinalRev(false)
+        setLoadingTotalDays(false)
         setLoadingProvisionalRev(false)
       })
       .catch((err) => {})
@@ -126,12 +106,13 @@ export default function Dashboard() {
       .catch((err) => console.log(err))
   }, [])
 
+  //Date range changed
   useEffect(() => {
     setLoadingFinalRev(true)
     setLoadingProvisionalRev(true)
     setLoadingTotalDays(true)
     setLoadingAvailability(true)
-    setAssetUtilization(true)
+    setLoadingAssetUtilization(true)
 
     fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
@@ -155,36 +136,11 @@ export default function Dashboard() {
       .then((res) => res.json())
       .then((res) => {
         setFinalRevenues(res.totalRevenue)
-        setLoadingFinalRev(false)
         setTotalDays(res.totalDays)
-        setLoadingTotalDays(false)
-      })
-      .catch((err) => {})
-
-    fetch(`${url}/works/getAnalytics`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        startDate: startDate
-          ? Date.parse(startDate)
-          : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
-        status: 'projected',
-        customer,
-        project,
-        equipment,
-        owner,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
         setProvisionalRevenues(res.projectedRevenue)
+        setLoadingFinalRev(false)
+        setLoadingTotalDays(false)
         setLoadingProvisionalRev(false)
-        setTotalDays(res.totalDays)
       })
       .catch((err) => {})
 
@@ -215,7 +171,154 @@ export default function Dashboard() {
         setAssetUtilization(res?.assetUtilization)
       })
       .catch((err) => console.log(err))
-  }, [startDate, endDate, customer, project, equipment, owner])
+  }, [startDate, endDate])
+
+  //Customer changed
+  useEffect(() => {
+    setLoadingFinalRev(true)
+    setLoadingProvisionalRev(true)
+    setLoadingTotalDays(true)
+
+    fetch(`${url}/works/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today(),
+        status: 'final',
+        customer,
+        project,
+        equipment,
+        owner,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setFinalRevenues(res.totalRevenue)
+        setTotalDays(res.totalDays)
+        setProvisionalRevenues(res.projectedRevenue)
+        setLoadingFinalRev(false)
+        setLoadingTotalDays(false)
+        setLoadingProvisionalRev(false)
+      })
+      .catch((err) => {})
+  }, [customer])
+
+  //project changed
+  useEffect(() => {
+    setLoadingFinalRev(true)
+    setLoadingProvisionalRev(true)
+    setLoadingTotalDays(true)
+
+    fetch(`${url}/works/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today(),
+        status: 'final',
+        customer,
+        project,
+        equipment,
+        owner,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setFinalRevenues(res.totalRevenue)
+        setProvisionalRevenues(res.projectedRevenue)
+        setTotalDays(res.totalDays)
+        setLoadingFinalRev(false)
+        setLoadingTotalDays(false)
+        setLoadingProvisionalRev(false)
+      })
+      .catch((err) => {})
+  }, [project])
+
+  //equipment changed
+  useEffect(() => {
+    setLoadingFinalRev(true)
+    setLoadingProvisionalRev(true)
+    setLoadingTotalDays(true)
+
+    fetch(`${url}/works/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today(),
+        status: 'final',
+        customer,
+        project,
+        equipment,
+        owner,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setFinalRevenues(res.totalRevenue)
+        setProvisionalRevenues(res.projectedRevenue)
+        setTotalDays(res.totalDays)
+        setLoadingFinalRev(false)
+        setLoadingTotalDays(false)
+        setLoadingProvisionalRev(false)
+      })
+      .catch((err) => {})
+  }, [equipment])
+
+  //owner changed
+  useEffect(() => {
+    setLoadingFinalRev(true)
+    setLoadingProvisionalRev(true)
+    setLoadingTotalDays(true)
+
+    fetch(`${url}/works/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today(),
+        customer,
+        project,
+        equipment,
+        owner,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setFinalRevenues(res.totalRevenue)
+        setTotalDays(res.totalDays)
+        setProvisionalRevenues(res.projectedRevenue)
+        setLoadingTotalDays(false)
+        setLoadingFinalRev(false)
+        setLoadingProvisionalRev(false)
+      })
+      .catch((err) => {})
+  }, [owner])
 
   function go() {
     fetch(`${url}/works/getAnalytics`, {
