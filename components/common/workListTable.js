@@ -171,11 +171,13 @@ export default function WorkListTable({
   let pageStartIndex = pagesObj.startIndex
 
   if (user.userType === 'customer') {
+    console.log(data)
     let _pData = data.filter((p) => {
       return p.project?.customer === user.company?.name
     })
     data = _pData
     pData = paginate(_pData, pageNumber, pageSize).pagedData
+    console.log(user)
     pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'driver') {
     let _pData = data.filter((p) => {

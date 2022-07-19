@@ -27,6 +27,7 @@ export default function Users() {
     { key: '3', value: 'revenue', text: 'Revenue officer' },
     { key: '4', value: 'dispatch', text: 'Dispatch officer' },
     { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
+    { key: '5', value: 'customer', text: 'Customer' },
   ]
 
   useEffect(() => {
@@ -50,8 +51,6 @@ export default function Users() {
   }
 
   function submit() {
-    console.log()
-
     fetch(`${url}/users/`, {
       headers: {
         'Content-Type': 'application/json',
