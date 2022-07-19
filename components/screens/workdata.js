@@ -494,12 +494,6 @@ export default function Workdata() {
     )
       .then((resp) => resp.json())
       .then((resp) => {
-        console.log(
-          `${url}/equipments/${dispatchDate}/${
-            dayShift ? 'dayShift' : 'nightShift'
-          }`
-        )
-        console.log(resp)
         let list = resp
         let listLowbeds = resp
 
@@ -954,7 +948,7 @@ export default function Workdata() {
                   startTime: Date.now(),
                   status: 'created',
                   createdOn: Date.now(),
-                  siteWork: true,
+                  siteWork,
                   workStartDate: new Date(dispatchDates[i][0]),
                   workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
@@ -998,8 +992,16 @@ export default function Workdata() {
                   status: 'created',
                   createdOn: Date.now(),
                   siteWork,
-                  workStartDate,
-                  workEndDate,
+                  workStartDate: siteWork
+                    ? workStartDate
+                    : dispatchDates
+                    ? new Date(dispatchDates[i][0])
+                    : dispatchDate,
+                  workEndDate: siteWork
+                    ? workEndDate
+                    : dispatchDates
+                    ? new Date(dispatchDates[i][0])
+                    : dispatchDate,
                   workDurationDays: siteWork
                     ? moment(workEndDate).diff(moment(workStartDate), 'days') +
                       1
@@ -1040,8 +1042,16 @@ export default function Workdata() {
               status: 'created',
               createdOn: Date.now(),
               siteWork,
-              workStartDate,
-              workEndDate,
+              workStartDate: siteWork
+                ? workStartDate
+                : dispatchDates
+                ? new Date(dispatchDates[i][0])
+                : dispatchDate,
+              workEndDate: siteWork
+                ? workEndDate
+                : dispatchDates
+                ? new Date(dispatchDates[i][0])
+                : dispatchDate,
               workDurationDays:
                 moment(workEndDate).diff(moment(workStartDate), 'days') + 1,
               dispatch: {
@@ -1195,7 +1205,6 @@ export default function Workdata() {
         })
       })
 
-    // console.log(_siteWorkDetails)
     let _workList = workList.map((w) => {
       {
         if (canViewRenues) {
@@ -2332,7 +2341,7 @@ export default function Workdata() {
                           className="h-5 w-5 cursor-pointer text-teal-600"
                           onClick={() => {
                             let nSelEq = selEquipments.length
-                            console.log(nSelEq + 'vs' + nMachinesToMove)
+
                             if (nSelEq == nMachinesToMove) {
                               setNMachinesToMove(nMachinesToMove + 1)
                             }
