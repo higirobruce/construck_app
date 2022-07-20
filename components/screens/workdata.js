@@ -63,6 +63,7 @@ export default function Workdata() {
   let [dispatchDates, setDispatchDates] = useState(null)
   let [siteWork, setSiteWork] = useState(false)
   let [lowbedWork, setLowbedWork] = useState(false)
+  let [loadingEquipments, setLoadingEquipments] = useState(false)
 
   let [projects, setProjects] = useState(null)
 
@@ -149,6 +150,7 @@ export default function Workdata() {
     fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
+        console.log(resp)
         let data = !isVendor
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
@@ -241,6 +243,7 @@ export default function Workdata() {
     )
       .then((resp) => resp.json())
       .then((resp) => {
+        setLoadingEquipments(false)
         let list = resp
         let listLowbeds = resp
 
@@ -249,9 +252,9 @@ export default function Workdata() {
             key: l._id,
             value: l._id,
             text:
-              l.eqOwner == 'Construck'
+              l.eqOwner === 'Construck'
                 ? l.plateNumber
-                : l.plateNumber + '-' + l.eqOwner,
+                : l.plateNumber + ' - ' + l.eqOwner,
           }
         })
 
@@ -273,7 +276,9 @@ export default function Workdata() {
           setLowbedList([])
         }
       })
-      .catch((err) => {})
+      .catch((err) => {
+        setLoadingEquipments(false)
+      })
 
     fetch(`${url}/jobTypes/`)
       .then((resp) => resp.json())
@@ -434,6 +439,7 @@ export default function Workdata() {
   }, [viewPort])
 
   useEffect(() => {
+    setLoadingEquipments(true)
     fetch(
       `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
     )
@@ -494,6 +500,7 @@ export default function Workdata() {
     )
       .then((resp) => resp.json())
       .then((resp) => {
+        setLoadingEquipments(false)
         let list = resp
         let listLowbeds = resp
 
@@ -526,7 +533,9 @@ export default function Workdata() {
           setLowbedList([])
         }
       })
-      .catch((err) => {})
+      .catch((err) => {
+        setLoadingEquipments(false)
+      })
 
     fetch(`${url}/jobtypes/eqType/` + eqType)
       .then((resp) => resp.json())
@@ -1755,7 +1764,14 @@ export default function Workdata() {
 
                   {/* Equipment Data */}
                   <div className="mt-5 flex w-3/5 flex-col space-y-5">
-                    <MTitle content="Equipment & Driver data" />
+                    <div className="flex flex-row items-center space-x-5">
+                      <MTitle content="Equipment & Driver data" />
+                      {loadingEquipments && (
+                        <div className="mb-2">
+                          <Loader active size="tiny" inline />
+                        </div>
+                      )}
+                    </div>
                     {[...Array(nJobs)].map((e, i) => (
                       <div className="bg-zinc-100 p-3">
                         <div className="mb-2 grid grid-cols-3 gap-2">

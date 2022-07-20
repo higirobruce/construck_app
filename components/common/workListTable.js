@@ -177,7 +177,6 @@ export default function WorkListTable({
     })
     data = _pData
     pData = paginate(_pData, pageNumber, pageSize).pagedData
-    console.log(user)
     pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'driver') {
     let _pData = data.filter((p) => {
