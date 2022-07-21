@@ -258,9 +258,7 @@ export default function Login() {
       {viewPort === 'login' && (
         <>
           <div className="mb-5 flex flex-row items-center space-x-5">
-            <div className="text-4xl font-bold text-zinc-800">
-              Construck App.
-            </div>
+            <div className="text-4xl font-bold text-zinc-800">Shabika App.</div>
           </div>
           <div className="sm:w-full md:w-1/5">
             <form action="#">
@@ -484,7 +482,7 @@ export default function Login() {
         <div className="pt-14">
           <div className="mb-5 flex flex-row items-center space-x-5">
             <div className="text-4xl font-bold text-zinc-800">
-              Construck App.
+              Shabika App.
             </div>
             <div
               className="mt-1 cursor-pointer text-lg font-semibold text-blue-400"
