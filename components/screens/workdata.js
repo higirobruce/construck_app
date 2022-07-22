@@ -957,7 +957,12 @@ export default function Workdata() {
                   startTime: Date.now(),
                   status: 'created',
                   createdOn: Date.now(),
-                  siteWork,
+                  siteWork:
+                    moment(dispatchDates[i][1]).diff(
+                      moment(dispatchDates[i][0])
+                    ) > 1
+                      ? true
+                      : false,
                   workStartDate: new Date(dispatchDates[i][0]),
                   workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
@@ -1051,16 +1056,8 @@ export default function Workdata() {
               status: 'created',
               createdOn: Date.now(),
               siteWork,
-              workStartDate: siteWork
-                ? workStartDate
-                : dispatchDates
-                ? new Date(dispatchDates[i][0])
-                : dispatchDate,
-              workEndDate: siteWork
-                ? workEndDate
-                : dispatchDates
-                ? new Date(dispatchDates[i][0])
-                : dispatchDate,
+              workStartDate: dispatchDate,
+              workEndDate: dispatchDate,
               workDurationDays:
                 moment(workEndDate).diff(moment(workStartDate), 'days') + 1,
               dispatch: {
