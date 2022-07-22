@@ -16,12 +16,16 @@ import EquipmentCard from '../common/equipmentCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
-import { Loader } from 'semantic-ui-react'
+import { Dropdown, Loader } from 'semantic-ui-react'
 import { Tooltip } from 'antd'
 import { ExclamationIcon, LockClosedIcon } from '@heroicons/react/solid'
 import Modal from '../common/modal'
 import { UserContext } from '../../contexts/UserContext'
 import EqStatusCard from '../common/eqStatusCard'
+import TextInputV from '../common/TextIputV'
+import TextInputLogin from '../common/TextIputLogin'
+import MTextView from '../common/mTextView'
+import { toast, ToastContainer } from 'react-toastify'
 
 export default function Equipments() {
   let { user, setUser } = useContext(UserContext)
@@ -29,6 +33,7 @@ export default function Equipments() {
   let canCreateData = user.userType === 'admin'
   let canMoveAssets = user.userType === 'dispatch' || user.userType === 'admin'
 
+  let [submitting, setSubmitting] = useState(false)
   let [equipments, setEquipments] = useState([])
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
@@ -45,17 +50,78 @@ export default function Equipments() {
   let [dataFound, setDataFound] = useState(false)
   let [nRecords, setNRecords] = useState(-1)
 
+  let [plateNumber, setPlateNumber] = useState('')
+  let [eqDescription, setEqDescription] = useState('')
+
+  let [assetClass, setAsseClass] = useState('')
+  let [eqtype, setEqType] = useState('')
+  let [eqOwner, setEqOwner] = useState('')
+  let [eqStatus, setEqStatus] = useState('')
+  let [rate, setRate] = useState(0)
+  let [supplierRate, setSupplierRate] = useState(0)
+  let [uom, setUom] = useState('')
+
   let [rowId, setRowId] = useState()
   let [sendToWorkshopModalIsShown, setSendToWorkshopModalIsShown] =
     useState(false)
   let [makeAvailableModalIsShown, setMakeAvailableModalIsShown] =
     useState(false)
 
+  let [vendorOptions, setVendorOptions] = useState([])
+
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+
+  let assetClassOptions = [
+    { key: 1, text: 'OTHER MACHINES', value: 'OTHER MACHINES' },
+    { key: 2, text: 'CONSTRUCTION MACHINE', value: 'CONSTRUCTION MACHINE' },
+    { key: 3, text: 'SPECIALIZED TRUCK', value: 'SPECIALIZED TRUCK' },
+    { key: 4, text: 'TRUCKS', value: 'TRUCKS' },
+    { key: 5, text: 'JAC', value: 'JAC' },
+    { key: 6, text: 'DUMP TRUCK', value: 'DUMP TRUCK' },
+    { key: 7, text: 'TRAILER TRUCK', value: 'TRAILER TRUCK' },
+    { key: 8, text: 'HOWO TRAILER TRUCKS', value: 'HOWO TRAILER TRUCKS' },
+  ]
+
+  let equipmentTypeOptions = [
+    { key: 1, text: 'AIR COMPRESSOR', value: 'AIR COMPRESSOR' },
+    { key: 2, text: 'ASPHALT PAVER MACHINE', value: 'ASPHALT PAVER MACHINE' },
+    { key: 3, text: 'BACKHOE LOADER', value: 'BACKHOE LOADER' },
+    { key: 4, text: 'BITUMEN SPRAYER', value: 'BITUMEN SPRAYER' },
+    { key: 5, text: 'BULLDOZER', value: 'BULLDOZER' },
+    { key: 6, text: 'CONCRETE MIXER TRUCK', value: 'CONCRETE MIXER TRUCK' },
+    { key: 7, text: 'CRANE TRUCKS', value: 'CRANE TRUCKS' },
+    { key: 8, text: 'DRILLING MACHINE', value: 'DRILLING MACHINE' },
+    { key: 9, text: 'DUMPER', value: 'DUMPER' },
+    { key: 10, text: 'EXCAVATOR', value: 'EXCAVATOR' },
+    { key: 11, text: 'FOLK LIFT', value: 'FOLK LIFT' },
+    { key: 12, text: 'FOOT SMALL ROLLER', value: 'FOOT SMALL ROLLER' },
+    { key: 13, text: 'FUEL TANK TRUCK', value: 'FUEL TANK TRUCK' },
+    { key: 14, text: 'IVECO', value: 'IVECO' },
+    { key: 15, text: 'MILLING MACHINE', value: 'MILLING MACHINE' },
+    { key: 16, text: 'MOTOR GRADER', value: 'MOTOR GRADER' },
+    {
+      key: 17,
+      text: 'PNEUMATIC ASPHALT COMPACTOR',
+      value: 'PNEUMATIC ASPHALT COMPACTOR',
+    },
+    { key: 18, text: 'SOIL COMPACTOR', value: 'SOIL COMPACTOR' },
+    { key: 19, text: 'STUMPER', value: 'STUMPER' },
+    { key: 20, text: 'TIPPER TRUCK', value: 'TIPPER TRUCK' },
+    { key: 21, text: 'LOWBED', value: 'LOWBED' },
+    { key: 22, text: 'WALK-BEHIND', value: 'WALK-BEHIND' },
+    { key: 23, text: 'WATER TANK TRUCK', value: 'WATER TANK TRUCK' },
+    { key: 24, text: 'WHEEL LOADER', value: 'WHEEL LOADER' },
+  ]
+
+  let assetTypeOptions = [
+    { key: 1, text: 'Machine', value: 'Machine' },
+    { key: 2, text: 'Truck', value: 'Truck' },
+  ]
 
   useEffect(() => {
     setLoading(true)
     refresh()
+    getListOfOwners()
   }, [])
 
   useEffect(() => {
@@ -78,8 +144,51 @@ export default function Equipments() {
     }
   }, [search])
 
+  useEffect(() => {
+    setPlateNumber('')
+    setEqDescription('')
+    setAsseClass('')
+    setEqType('')
+    setEqOwner('')
+    setRate(0)
+    setSupplierRate(0)
+    setUom('')
+  }, [viewPort])
+
+  function getListOfOwners() {
+    let construckEntry = [
+      {
+        key: 111,
+        text: 'Construck',
+        value: 'Construck',
+      },
+    ]
+    fetch(`${url}/vendors`)
+      .then((res) => res.json())
+      .then((res) => {
+        let _vOptions = res.map((vendor) => {
+          return {
+            key: vendor._id,
+            text: vendor.name,
+            value: vendor.name,
+          }
+        })
+
+        setVendorOptions(construckEntry.concat(_vOptions))
+      })
+      .catch((err) => {})
+  }
+
   function refresh() {
     setLoading(true)
+    setPlateNumber('')
+    setEqDescription('')
+    setAsseClass('')
+    setEqType('')
+    setEqOwner('')
+    setRate(0)
+    setSupplierRate(0)
+    setUom('')
     fetch(`${url}/equipments/`)
       .then((res) => res.json())
       .then((res) => {
@@ -208,6 +317,7 @@ export default function Equipments() {
         setNDispatched(dispatchedEq.length)
         setNInWorkshop(inWorkshopEq.length)
       })
+      .catch((err) => {})
   }
 
   function makeAvailable() {
@@ -248,6 +358,40 @@ export default function Equipments() {
   function _setMakeAvailableRow(id) {
     setRowId(id)
     setMakeAvailableModalIsShown(true)
+  }
+
+  function createEquipment() {
+    setSubmitting(true)
+    fetch(`${url}/equipments/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plateNumber,
+        eqDescription,
+        assetClass,
+        eqtype,
+        eqOwner,
+        eqStatus: 'standby',
+        rate,
+        supplierRate,
+        uom,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error)
+          setSubmitting(false)
+        } else {
+          refresh()
+          setSubmitting(false)
+          setViewPort('list')
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false)
+        console.log(er)
+      })
   }
 
   return (
@@ -540,7 +684,156 @@ export default function Equipments() {
             )}
           </>
         )}
+
+        {viewPort === 'new' && (
+          <div className="flex items-start">
+            <div className="flex flex-col space-y-5">
+              <div className="grid-col grid grid-cols-2 gap-5">
+                {/* Inputs col1 */}
+                <div className="flex flex-col items-start space-y-5">
+                  {/* Plate number */}
+                  <TextInputLogin
+                    label="Plate number"
+                    placeholder="RAA 000 D"
+                    type="text"
+                    setValue={setPlateNumber}
+                    isRequired
+                  />
+
+                  {/* Eq Description */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Equipment Type" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={equipmentTypeOptions}
+                      placeholder="Select equipment type"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setEqDescription(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Asset Class */}
+
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Asset Class" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={assetClassOptions}
+                      placeholder="Select asset class"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setAsseClass(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Eq Type */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Asset Type" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={assetTypeOptions}
+                      placeholder="Select asset type"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setEqType(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Eq Owner */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Equipment Owner" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={vendorOptions}
+                      placeholder="Select Owner"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setEqOwner(data.value)
+                      }}
+                    />
+                  </div>
+                </div>
+                {/* Inputs col2*/}
+                <div className="flex flex-col space-y-5">
+                  {/* Rate */}
+                  <TextInputLogin
+                    label="Rate"
+                    placeholder="rate"
+                    type="number"
+                    setValue={setRate}
+                    isRequired
+                  />
+
+                  {/* Supplier rate */}
+                  <TextInputLogin
+                    label="Supplier Rate"
+                    placeholder="supplier rate"
+                    type="number"
+                    setValue={setSupplierRate}
+                  />
+
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Unit of measurement" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={[
+                        { key: 1, text: 'Hour', value: 'hour' },
+                        { key: 1, text: 'Day', value: 'day' },
+                      ]}
+                      placeholder="Select UoM"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setUom(data.value)
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {plateNumber.length > 1 &&
+                eqtype.length > 1 &&
+                assetClass.length > 1 &&
+                eqDescription.length > 1 &&
+                eqOwner.length > 1 &&
+                rate >= 1 &&
+                uom.length > 1 && (
+                  <div>
+                    {submitting ? (
+                      <Loader inline size="small" active />
+                    ) : (
+                      <MSubmitButton submit={createEquipment} />
+                    )}
+                  </div>
+                )}
+            </div>
+          </div>
+        )}
       </div>
+      <ToastContainer />
     </>
   )
 }

@@ -22,7 +22,7 @@ export default function MSubmitButton({
     } else if (intent === 'disabled') {
       return 'flex items-center justify-center space-x-1 bg-gray-100 rounded  ring-1 ring-zinc-300 shadow-sm cursor-not-allowed px-3 py-2 w-20 text-zinc-800'
     } else {
-      return 'flex items-center justify-center space-x-1 bg-zinc-600 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-zinc-500 text-white'
+      return 'flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'
     }
   }
   return (
