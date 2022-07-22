@@ -1,10 +1,12 @@
 import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
 import React, { useContext, useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
 import { Loader } from 'semantic-ui-react'
 import { UserContext } from '../../contexts/UserContext'
 import CustomerCard from '../common/customerCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
+import TextInputLogin from '../common/TextIputLogin'
 
 export default function Customers() {
   let { user, setUser } = useContext(UserContext)
@@ -16,10 +18,26 @@ export default function Customers() {
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
 
+  let [name, setName] = useState('')
+  let [phone, setPhone] = useState('')
+  let [email, setEmail] = useState('')
+  let [tinNumber, setTinNumber] = useState('')
+  let [submitting, setSubmitting] = useState(false)
+
   let [loadingCustomers, setLoadingCustomers] = useState(true)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   useEffect(() => {
+    loadCustomers()
+  }, [])
+
+  function loadCustomers() {
+    setLoadingCustomers(true)
+    setSubmitting(false)
+    setPhone('')
+    setName('')
+    setEmail('')
+    setTinNumber('')
     fetch(`${url}/customers/`)
       .then((res) => res.json())
       .then((resp) => {
@@ -27,7 +45,33 @@ export default function Customers() {
         setOgCustomerList(resp)
         setLoadingCustomers(false)
       })
-  }, [])
+  }
+
+  function createCustomer() {
+    setSubmitting(true)
+    fetch(`${url}/customers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        tinNumber,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error)
+          setSubmitting(false)
+        } else {
+          setSubmitting(false)
+          setViewPort('list')
+          loadCustomers()
+        }
+      })
+      .catch((err) => {})
+  }
 
   useEffect(() => {
     if (search.length >= 3) {
@@ -48,7 +92,6 @@ export default function Customers() {
     }
   }, [search])
 
-  function refresh(row) {}
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Customers</div>
@@ -72,7 +115,7 @@ export default function Customers() {
           <MSubmitButton
             submit={() => {
               setViewPort('list')
-              refresh()
+              loadCustomers()
             }}
             intent="primary"
             icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
@@ -82,7 +125,7 @@ export default function Customers() {
 
         {viewPort === 'list' && (
           <MSubmitButton
-            submit={refresh}
+            submit={loadCustomers}
             intent="neutral"
             icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
             label="Refresh"
@@ -111,6 +154,52 @@ export default function Customers() {
             <Loader active />
           </div>
         ))}
+
+      {viewPort === 'new' && (
+        <div className="flex items-start">
+          <div className="flex flex-col space-y-5">
+            <TextInputLogin
+              label="Name"
+              type="text"
+              placeholder="Names"
+              isRequired
+              setValue={setName}
+            />
+
+            <TextInputLogin
+              label="Contact number"
+              type="text"
+              placeholder="phone"
+              isRequired
+              setValue={setPhone}
+            />
+
+            <TextInputLogin
+              label="Email"
+              type="email"
+              placeholder="email@example.com"
+              setValue={setEmail}
+            />
+            <TextInputLogin
+              label="TIN"
+              type="number"
+              placeholder="999999999"
+              setValue={setTinNumber}
+            />
+
+            {name.length > 1 && phone.length > 1 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={createCustomer} />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      <ToastContainer />
     </div>
   )
 }
