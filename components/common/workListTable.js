@@ -211,7 +211,7 @@ export default function WorkListTable({
                   </div>
                 </Table.HeaderCell>
 
-                <Table.HeaderCell>
+                <Table.HeaderCell singleLine>
                   <div>Start Date</div>
                 </Table.HeaderCell>
                 <Table.HeaderCell>
@@ -257,7 +257,7 @@ export default function WorkListTable({
                     <SwitchVerticalIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
-                <Table.HeaderCell>
+                <Table.HeaderCell singleLine>
                   {isVendor ? "Vendor's Contact" : " Driver's contact"}
                 </Table.HeaderCell>
 
@@ -412,7 +412,7 @@ export default function WorkListTable({
                     <Table.Cell>
                       <MStatusIndicator status={row.status} />
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell singleLine>
                       <MTextView
                         content={
                           row.driver
