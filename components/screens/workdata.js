@@ -579,10 +579,10 @@ export default function Workdata() {
 
         if (!driver) driver = _owner
         return (
-          desc.includes(_search) ||
-          plateNumber.includes(_search) ||
-          customer.includes(_search) ||
-          equipmentType.includes(_search) ||
+          desc?.includes(_search) ||
+          plateNumber?.includes(_search) ||
+          customer?.includes(_search) ||
+          equipmentType?.includes(_search) ||
           driver?.includes(_search)
         )
       })
