@@ -1078,7 +1078,8 @@ export default function Workdata() {
               project: toProjects[0],
               equipment: lowbed[0],
               workDone: '62690b97cf45ad62aa6144e2',
-              driver: null,
+              driver:
+                lowbed[0]?.eqOwner === 'Construck' ? lowbedOperator : null,
               startTime: Date.now(),
               status: 'created',
               createdOn: Date.now(),
