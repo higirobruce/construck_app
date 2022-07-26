@@ -403,21 +403,24 @@ export default function Workdata() {
     )
       .then((resp) => resp.json())
       .then((resp) => {
-        let list = resp
-        let listLowbeds = resp
+        setLoadingEquipments(false)
+        let list = resp?.filter((r) => r.eqDescription !== 'LOWBED')
+        let listLowbeds = resp?.filter((r) => r.eqDescription === 'LOWBED')
 
-        let equipmentsFullOptions = list.map((l) => {
-          return {
-            key: l._id,
-            value: l._id,
-            text:
-              l.eqOwner == 'Construck'
-                ? l.plateNumber
-                : l.plateNumber + '-' + l.eqOwner,
-          }
-        })
+        let equipmentsFullOptions = list
+          .filter((r) => r.eqDescription !== 'LOWBED')
+          .map((l) => {
+            return {
+              key: l._id,
+              value: l._id,
+              text:
+                l.eqOwner === 'Construck'
+                  ? l.plateNumber
+                  : l.plateNumber + ' - ' + l.eqOwner,
+            }
+          })
 
-        if (resp && listLowbeds.length > 0) {
+        if (resp && list.length > 0) {
           let equipmentsOptions = listLowbeds.map((l) => {
             return {
               key: l._id,
@@ -425,7 +428,17 @@ export default function Workdata() {
               text: l.plateNumber,
             }
           })
-          setLowbedList(equipmentsOptions)
+
+          let lowbedsOptions = listLowbeds
+            .filter((r) => r.eqDescription === 'LOWBED')
+            .map((l) => {
+              return {
+                key: l._id,
+                value: l._id,
+                text: l.plateNumber,
+              }
+            })
+          setLowbedList(lowbedsOptions)
           setOgLowbedList(listLowbeds)
           setEquipmentsOgFull(list)
           setEquipmentFullList(equipmentsFullOptions)
@@ -435,7 +448,9 @@ export default function Workdata() {
           setLowbedList([])
         }
       })
-      .catch((err) => {})
+      .catch((err) => {
+        setLoadingEquipments(false)
+      })
   }, [viewPort])
 
   useEffect(() => {
@@ -501,21 +516,23 @@ export default function Workdata() {
       .then((resp) => resp.json())
       .then((resp) => {
         setLoadingEquipments(false)
-        let list = resp
-        let listLowbeds = resp
+        let list = resp?.filter((r) => r.eqDescription !== 'LOWBED')
+        let listLowbeds = resp?.filter((r) => r.eqDescription === 'LOWBED')
 
-        let equipmentsFullOptions = list.map((l) => {
-          return {
-            key: l._id,
-            value: l._id,
-            text:
-              l.eqOwner === 'Construck'
-                ? l.plateNumber
-                : l.plateNumber + ' - ' + l.eqOwner,
-          }
-        })
+        let equipmentsFullOptions = list
+          .filter((r) => r.eqDescription !== 'LOWBED')
+          .map((l) => {
+            return {
+              key: l._id,
+              value: l._id,
+              text:
+                l.eqOwner === 'Construck'
+                  ? l.plateNumber
+                  : l.plateNumber + ' - ' + l.eqOwner,
+            }
+          })
 
-        if (resp && listLowbeds.length > 0) {
+        if (resp && list.length > 0) {
           let equipmentsOptions = listLowbeds.map((l) => {
             return {
               key: l._id,
@@ -523,7 +540,17 @@ export default function Workdata() {
               text: l.plateNumber,
             }
           })
-          setLowbedList(equipmentsOptions)
+
+          let lowbedsOptions = listLowbeds
+            .filter((r) => r.eqDescription === 'LOWBED')
+            .map((l) => {
+              return {
+                key: l._id,
+                value: l._id,
+                text: l.plateNumber,
+              }
+            })
+          setLowbedList(lowbedsOptions)
           setOgLowbedList(listLowbeds)
           setEquipmentsOgFull(list)
           setEquipmentFullList(equipmentsFullOptions)
@@ -1051,7 +1078,7 @@ export default function Workdata() {
               project: toProjects[0],
               equipment: lowbed[0],
               workDone: '62690b97cf45ad62aa6144e2',
-              driver: lowbedOperator,
+              driver: null,
               startTime: Date.now(),
               status: 'created',
               createdOn: Date.now(),
@@ -1067,7 +1094,7 @@ export default function Workdata() {
                 toSite: toProjects[0],
                 targetTrips,
                 equipments: lowbed,
-                drivers,
+                drivers: [],
                 astDrivers,
                 jobType: '62690b97cf45ad62aa6144e2',
                 shift: dayShift ? 'dayShift' : 'nightShift',
@@ -1582,34 +1609,38 @@ export default function Workdata() {
                           setLowbed(
                             ogLowbedList.filter((l) => l._id == data.value)
                           )
+
+                          console.log(lowbed)
                         }}
                       />
                     </div>
                   </div>
 
-                  <div className="flex flex-row items-center justify-between">
-                    <div className="items-cente flex flex-1 flex-row">
-                      <MTextView content="Lowbed Driver" />
-                      {<div className="text-sm text-red-600">*</div>}
+                  {lowbed[0]?.eqOwner === 'Construck' && (
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="items-cente flex flex-1 flex-row">
+                        <MTextView content="Lowbed Driver" />
+                        {<div className="text-sm text-red-600">*</div>}
+                      </div>
+                      <div className="w-4/5">
+                        <Dropdown
+                          options={lowBedDriverList}
+                          placeholder="Select Driver      "
+                          fluid
+                          search
+                          selection
+                          onChange={(e, data) => {
+                            setLowbedOperator(data.value)
+                            let _drList = lowBedDriverList.filter(
+                              (d) => d.value !== data.value
+                            )
+                            setDriverList(_drList)
+                            setDriverLists([_drList])
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-4/5">
-                      <Dropdown
-                        options={lowBedDriverList}
-                        placeholder="Select Driver      "
-                        fluid
-                        search
-                        selection
-                        onChange={(e, data) => {
-                          setLowbedOperator(data.value)
-                          let _drList = lowBedDriverList.filter(
-                            (d) => d.value !== data.value
-                          )
-                          setDriverList(_drList)
-                          setDriverLists([_drList])
-                        }}
-                      />
-                    </div>
-                  </div>
+                  )}
 
                   <div className="flex flex-row items-center justify-between">
                     <div className="flex flex-row items-center">
