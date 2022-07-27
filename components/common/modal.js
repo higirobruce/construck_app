@@ -52,10 +52,13 @@ export default function Modal({
 
     setSiteWPosted(_siteWorkPosted)
 
-    if (_siteWorkPosted) {
+    if (_siteWorkPosted && type === 'start') {
       toast.error('Already posted for the selected date!')
     }
-    if (moment(pDate).diff(moment('01-07-2022', 'DD-MM-YYYY')) < 0) {
+    if (
+      moment(pDate).diff(moment('01-07-2022', 'DD-MM-YYYY')) < 0 &&
+      type === 'start'
+    ) {
       setPostLive(true)
       toast.error("Date can't be before 01 JUL 2022!")
     } else {
