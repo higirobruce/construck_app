@@ -150,18 +150,19 @@ export default function Workdata() {
     fetch(`${url}/works/v3/`)
       .then((resp) => resp.json())
       .then((resp) => {
-        console.log(resp)
         let data = !isVendor
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
 
-        let _workList = data?.filter((w) => {
-          return (
-            Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-            Date.parse(endDate).addHours(23).addMinutes(59) >=
-              Date.parse(w?.dispatch?.date)
-          )
-        })
+        let _workList = data
+
+        // ?.filter((w) => {
+        //   return (
+        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+        //       Date.parse(w?.dispatch?.date)
+        //   )
+        // })
         setWorkList(_workList)
         setOgWorkList(data)
         setLoadingData(false)
@@ -334,13 +335,14 @@ export default function Workdata() {
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
 
-        let _workList = data?.filter((w) => {
-          return (
-            Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-            Date.parse(endDate).addHours(23).addMinutes(59) >=
-              Date.parse(w?.dispatch?.date)
-          )
-        })
+        let _workList = data
+        // ?.filter((w) => {
+        //   return (
+        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+        //       Date.parse(w?.dispatch?.date)
+        //   )
+        // })
         setWorkList(_workList)
         setOgWorkList(data)
 
@@ -685,13 +687,15 @@ export default function Workdata() {
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
 
-        let _workList = data?.filter((w) => {
-          return (
-            Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-            Date.parse(endDate).addHours(23).addMinutes(59) >=
-              Date.parse(w?.dispatch?.date)
-          )
-        })
+        let _workList = data
+
+        // ?.filter((w) => {
+        //   return (
+        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+        //       Date.parse(w?.dispatch?.date)
+        //   )
+        // })
         setWorkList(_workList)
         setOgWorkList(data)
 
@@ -1353,6 +1357,35 @@ export default function Workdata() {
     // )
   }
 
+  function _Newdownload() {
+    fetch(`${url}/works/detailed`)
+      .then((res) => res.json())
+      .then((res) => {
+        exportToCSV(
+          res,
+          `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+        )
+      })
+      .catch((err) => console.log(err))
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _workList,
+    //   `Dispatch report ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+    // )
+  }
+
   return (
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
@@ -1610,8 +1643,6 @@ export default function Workdata() {
                           setLowbed(
                             ogLowbedList.filter((l) => l._id == data.value)
                           )
-
-                          console.log(lowbed)
                         }}
                       />
                     </div>
