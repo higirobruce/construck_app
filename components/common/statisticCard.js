@@ -17,7 +17,7 @@ export default function StatisticCard({ intent, data, icon }) {
     } else if (intent == 'warning') {
       return 'flex flex-col space-y-10 p-2 rounded bg-red-200  w-full'
     } else if (intent == 'danger') {
-      return 'flex flex-col space-y-10 p-2 rounded bg-red-400  w-full'
+      return 'flex flex-col space-y-10 p-2 rounded bg-red-100 shadow-lg w-full'
     } else if (intent == 'normal') {
       return 'flex flex-col space-y-10 p-2 rounded bg-green-200  w-full'
     } else {
