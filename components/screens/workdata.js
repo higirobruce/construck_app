@@ -334,7 +334,6 @@ export default function Workdata() {
         let data = !isVendor
           ? resp
           : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-
         let _workList = data
         // ?.filter((w) => {
         //   return (
