@@ -145,178 +145,178 @@ export default function Workdata() {
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
-  useEffect(() => {
-    setLoadingData(true)
-    fetch(`${url}/works/v3/`)
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let data = !isVendor
-          ? resp
-          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+  // useEffect(() => {
+  //   setLoadingData(true)
+  //   fetch(`${url}/works/v3/`)
+  //     .then((resp) => resp.json())
+  //     .then((resp) => {
+  //       let data = !isVendor
+  //         ? resp
+  //         : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
 
-        let _workList = data
+  //       let _workList = data
 
-        // ?.filter((w) => {
-        //   return (
-        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
-        //       Date.parse(w?.dispatch?.date)
-        //   )
-        // })
-        setWorkList(_workList)
-        setOgWorkList(data)
-        setLoadingData(false)
-      })
-      .catch((err) => {
-        setLoadingData(false)
-        toast.error('Connection issue!!!')
-      })
-    fetch(`${url}/projects/v2`)
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let list = resp
-        let projectOptions = list.map((p) => {
-          return {
-            key: p._id,
-            value: p._id,
-            text: p.prjDescription,
-            customer: p.customer,
-          }
-        })
-        setProjectList(projectOptions)
-        setProjects(list)
-      })
-      .catch((err) => {
-        toast.error(err)
-        setLoadingData(false)
-      })
+  //       // ?.filter((w) => {
+  //       //   return (
+  //       //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+  //       //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+  //       //       Date.parse(w?.dispatch?.date)
+  //       //   )
+  //       // })
+  //       setWorkList(_workList)
+  //       setOgWorkList(data)
+  //       setLoadingData(false)
+  //     })
+  //     .catch((err) => {
+  //       setLoadingData(false)
+  //       toast.error('Connection issue!!!')
+  //     })
+  //   fetch(`${url}/projects/v2`)
+  //     .then((resp) => resp.json())
+  //     .then((resp) => {
+  //       let list = resp
+  //       let projectOptions = list.map((p) => {
+  //         return {
+  //           key: p._id,
+  //           value: p._id,
+  //           text: p.prjDescription,
+  //           customer: p.customer,
+  //         }
+  //       })
+  //       setProjectList(projectOptions)
+  //       setProjects(list)
+  //     })
+  //     .catch((err) => {
+  //       toast.error(err)
+  //       setLoadingData(false)
+  //     })
 
-    fetch(`${url}/reasons`)
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let list = resp
-        let reasonOptions = list.map((p) => {
-          return {
-            key: p._id,
-            value: p.descriptionRw,
-            text: p.description,
-          }
-        })
-        setReasonList(reasonOptions)
-      })
-      .catch((err) => {
-        toast.error(err)
-        setLoadingData(false)
-      })
+  //   fetch(`${url}/reasons`)
+  //     .then((resp) => resp.json())
+  //     .then((resp) => {
+  //       let list = resp
+  //       let reasonOptions = list.map((p) => {
+  //         return {
+  //           key: p._id,
+  //           value: p.descriptionRw,
+  //           text: p.description,
+  //         }
+  //       })
+  //       setReasonList(reasonOptions)
+  //     })
+  //     .catch((err) => {
+  //       toast.error(err)
+  //       setLoadingData(false)
+  //     })
 
-    fetch(
-      `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
-    )
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let list = resp
-        let userOptions = list.map((l) => {
-          return {
-            key: l._id,
-            value: l._id,
-            text: l.firstName + ' ' + l.lastName,
-          }
-        })
-        // userOptions.push({
-        //   key: 'NA',
-        //   value: 'NA',
-        //   text: 'Not applicable',
-        // })
-        setDriverList(userOptions)
-        seLowBedDriverList(userOptions)
-        let _drLists = [userOptions]
-        setDriverLists(_drLists)
-      })
-      .catch((err) => {
-        toast.error(err)
-        setLoadingData(false)
-      })
+  //   fetch(
+  //     `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+  //   )
+  //     .then((resp) => resp.json())
+  //     .then((resp) => {
+  //       let list = resp
+  //       let userOptions = list.map((l) => {
+  //         return {
+  //           key: l._id,
+  //           value: l._id,
+  //           text: l.firstName + ' ' + l.lastName,
+  //         }
+  //       })
+  //       // userOptions.push({
+  //       //   key: 'NA',
+  //       //   value: 'NA',
+  //       //   text: 'Not applicable',
+  //       // })
+  //       setDriverList(userOptions)
+  //       seLowBedDriverList(userOptions)
+  //       let _drLists = [userOptions]
+  //       setDriverLists(_drLists)
+  //     })
+  //     .catch((err) => {
+  //       toast.error(err)
+  //       setLoadingData(false)
+  //     })
 
-    fetch(
-      `${url}/equipments/${dispatchDate}/${
-        dayShift ? 'dayShift' : 'nightShift'
-      }`
-    )
-      .then((resp) => resp.json())
-      .then((resp) => {
-        setLoadingEquipments(false)
-        let list = resp
-        let listLowbeds = resp
+  //   fetch(
+  //     `${url}/equipments/${dispatchDate}/${
+  //       dayShift ? 'dayShift' : 'nightShift'
+  //     }`
+  //   )
+  //     .then((resp) => resp.json())
+  //     .then((resp) => {
+  //       setLoadingEquipments(false)
+  //       let list = resp
+  //       let listLowbeds = resp
 
-        let equipmentsFullOptions = list.map((l) => {
-          return {
-            key: l._id,
-            value: l._id,
-            text:
-              l.eqOwner === 'Construck'
-                ? l.plateNumber
-                : l.plateNumber + ' - ' + l.eqOwner,
-          }
-        })
+  //       let equipmentsFullOptions = list.map((l) => {
+  //         return {
+  //           key: l._id,
+  //           value: l._id,
+  //           text:
+  //             l.eqOwner === 'Construck'
+  //               ? l.plateNumber
+  //               : l.plateNumber + ' - ' + l.eqOwner,
+  //         }
+  //       })
 
-        if (resp && listLowbeds.length > 0) {
-          let equipmentsOptions = listLowbeds.map((l) => {
-            return {
-              key: l._id,
-              value: l._id,
-              text: l.plateNumber,
-            }
-          })
-          setLowbedList(equipmentsOptions)
-          setOgLowbedList(listLowbeds)
-          setEquipmentsOgFull(list)
-          setEquipmentFullList(equipmentsFullOptions)
-          let _eqLists = [equipmentsFullOptions]
-          setEquipmentFullLists(_eqLists)
-        } else {
-          setLowbedList([])
-        }
-      })
-      .catch((err) => {
-        setLoadingEquipments(false)
-      })
+  //       if (resp && listLowbeds.length > 0) {
+  //         let equipmentsOptions = listLowbeds.map((l) => {
+  //           return {
+  //             key: l._id,
+  //             value: l._id,
+  //             text: l.plateNumber,
+  //           }
+  //         })
+  //         setLowbedList(equipmentsOptions)
+  //         setOgLowbedList(listLowbeds)
+  //         setEquipmentsOgFull(list)
+  //         setEquipmentFullList(equipmentsFullOptions)
+  //         let _eqLists = [equipmentsFullOptions]
+  //         setEquipmentFullLists(_eqLists)
+  //       } else {
+  //         setLowbedList([])
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       setLoadingEquipments(false)
+  //     })
 
-    fetch(`${url}/jobTypes/`)
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let jobsForTrucks = resp.filter(
-          (eq) =>
-            eq.eqType === 'Truck' &&
-            eq._id !== '62690b97cf45ad62aa6144e2' &&
-            eq._id !== '62a70a7197ee8984c1be6c9f'
-        )
-        let jobsForMachines = resp.filter(
-          (eq) =>
-            eq.eqType === 'Machine' &&
-            eq._id !== '62690b97cf45ad62aa6144e2' &&
-            eq._id !== '62a70a7197ee8984c1be6c9f'
-        )
-        setJobTypeListTrucks(
-          jobsForTrucks.map((j) => {
-            return {
-              key: j._id,
-              value: j._id,
-              text: j.jobDescription,
-            }
-          })
-        )
-        setJobTypeListMachines(
-          jobsForMachines.map((j) => {
-            return {
-              key: j._id,
-              value: j._id,
-              text: j.jobDescription,
-            }
-          })
-        )
-      })
-      .catch((err) => {})
-  }, [])
+  //   fetch(`${url}/jobTypes/`)
+  //     .then((resp) => resp.json())
+  //     .then((resp) => {
+  //       let jobsForTrucks = resp.filter(
+  //         (eq) =>
+  //           eq.eqType === 'Truck' &&
+  //           eq._id !== '62690b97cf45ad62aa6144e2' &&
+  //           eq._id !== '62a70a7197ee8984c1be6c9f'
+  //       )
+  //       let jobsForMachines = resp.filter(
+  //         (eq) =>
+  //           eq.eqType === 'Machine' &&
+  //           eq._id !== '62690b97cf45ad62aa6144e2' &&
+  //           eq._id !== '62a70a7197ee8984c1be6c9f'
+  //       )
+  //       setJobTypeListTrucks(
+  //         jobsForTrucks.map((j) => {
+  //           return {
+  //             key: j._id,
+  //             value: j._id,
+  //             text: j.jobDescription,
+  //           }
+  //         })
+  //       )
+  //       setJobTypeListMachines(
+  //         jobsForMachines.map((j) => {
+  //           return {
+  //             key: j._id,
+  //             value: j._id,
+  //             text: j.jobDescription,
+  //           }
+  //         })
+  //       )
+  //     })
+  //     .catch((err) => {})
+  // }, [])
 
   useEffect(() => {
     let targetTrips = parseInt(workList?.rowIndex?.dispatch?.targetTrips)
@@ -366,6 +366,24 @@ export default function Workdata() {
         })
         setProjectList(projectOptions)
         setProjects(list)
+      })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+      })
+
+    fetch(`${url}/reasons`)
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let list = resp
+        let reasonOptions = list.map((p) => {
+          return {
+            key: p._id,
+            value: p.descriptionRw,
+            text: p.description,
+          }
+        })
+        setReasonList(reasonOptions)
       })
       .catch((err) => {
         toast.error(err)
@@ -452,6 +470,42 @@ export default function Workdata() {
       .catch((err) => {
         setLoadingEquipments(false)
       })
+
+    fetch(`${url}/jobTypes/`)
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let jobsForTrucks = resp.filter(
+          (eq) =>
+            eq.eqType === 'Truck' &&
+            eq._id !== '62690b97cf45ad62aa6144e2' &&
+            eq._id !== '62a70a7197ee8984c1be6c9f'
+        )
+        let jobsForMachines = resp.filter(
+          (eq) =>
+            eq.eqType === 'Machine' &&
+            eq._id !== '62690b97cf45ad62aa6144e2' &&
+            eq._id !== '62a70a7197ee8984c1be6c9f'
+        )
+        setJobTypeListTrucks(
+          jobsForTrucks.map((j) => {
+            return {
+              key: j._id,
+              value: j._id,
+              text: j.jobDescription,
+            }
+          })
+        )
+        setJobTypeListMachines(
+          jobsForMachines.map((j) => {
+            return {
+              key: j._id,
+              value: j._id,
+              text: j.jobDescription,
+            }
+          })
+        )
+      })
+      .catch((err) => {})
   }, [viewPort])
 
   useEffect(() => {
