@@ -510,7 +510,7 @@ export default function Workdata() {
 
   useEffect(() => {
     setLoadingEquipments(true)
-    let dispDate = siteWork ? workStartDate : dispatchDate
+    let dispDate = siteWork === true ? workStartDate : dispatchDate
     fetch(
       `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`
     )
