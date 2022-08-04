@@ -1,6 +1,7 @@
 import {
   CashIcon,
   ClockIcon,
+  DownloadIcon,
   ExclamationIcon,
   SwitchVerticalIcon,
   TrendingUpIcon,
@@ -14,7 +15,7 @@ import { DatePicker, Space } from 'antd'
 import TextInputV from '../common/TextIputV'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
-import { MapIcon } from '@heroicons/react/solid'
+import { DocumentDownloadIcon, MapIcon } from '@heroicons/react/solid'
 import 'datejs'
 import moment from 'moment'
 
@@ -45,6 +46,7 @@ export default function Dashboard() {
   let [loadingAvailability, setLoadingAvailability] = useState(true)
   let [loadingAssetUtilization, setLoadingAssetUtilization] = useState(true)
   let [loadingAverageDownTime, setLoadingAverageDownTime] = useState(true)
+  let [downloadingDrivers, setDownloadingDrivers] = useState(false)
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
   let [nInWorkshop, setNInWorkshop] = useState(0)
@@ -410,6 +412,20 @@ export default function Dashboard() {
       .catch((err) => {})
   }
 
+  async function downloadDrivers() {
+    setDownloadingDrivers(true)
+    fetch(`${url}/works/gethoursperdriver`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setDownloadingDrivers(false)
+      })
+      .catch((err) => console.log(err))
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Dashboard</div>
@@ -457,7 +473,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="mt-5 sm:mr-5">
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
           <StatisticCard
             data={{
               title: 'Projected Revenues',
@@ -504,7 +520,7 @@ export default function Dashboard() {
             icon={<TruckIcon className="h-5 w-5 text-yellow-500" />}
           />
 
-          <StatisticCard
+          {/* <StatisticCard
             // intent="danger"
             data={{
               title: 'Average Downtime',
@@ -515,9 +531,20 @@ export default function Dashboard() {
               ),
             }}
             icon={<ClockIcon className="h-5 w-5 text-red-500" />}
-          />
+          /> */}
         </div>
       </div>
+
+      {/* <div className="mb-5 flex flex-row space-x-5 py-5">
+        <div className="flex cursor-pointer flex-row items-center space-x-2 text-sm font-semibold hover:underline">
+          {downloadingDrivers ? (
+            <Loader active size="mini" inline />
+          ) : (
+            <DocumentDownloadIcon className="h-5 w-5" />
+          )}
+          <div onClick={() => downloadDrivers()}>Get Driver's report</div>
+        </div>
+      </div> */}
     </div>
   )
 }
