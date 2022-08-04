@@ -1,6 +1,7 @@
 import {
   CashIcon,
   ClockIcon,
+  ExclamationIcon,
   SwitchVerticalIcon,
   TrendingUpIcon,
   TruckIcon,
@@ -36,12 +37,14 @@ export default function Dashboard() {
   let [totalDays, setTotalDays] = useState(0)
   let [assetUtilization, setAssetUtilization] = useState(0)
   let [assetAvailability, setAssetAvailability] = useState(0)
+  let [averageDownTime, setAverageDowntime] = useState(0)
 
   let [loadingFinalRev, setLoadingFinalRev] = useState(true)
   let [loadingProvisionalRev, setLoadingProvisionalRev] = useState(true)
   let [loadingTotalDays, setLoadingTotalDays] = useState(true)
   let [loadingAvailability, setLoadingAvailability] = useState(true)
   let [loadingAssetUtilization, setLoadingAssetUtilization] = useState(true)
+  let [loadingAverageDownTime, setLoadingAverageDownTime] = useState(true)
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
   let [nInWorkshop, setNInWorkshop] = useState(0)
@@ -104,6 +107,26 @@ export default function Dashboard() {
         console.log(res)
       })
       .catch((err) => console.log(err))
+
+    fetch(`${url}/downtimes/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today(),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setLoadingAverageDownTime(false)
+        setAverageDowntime(res.avgHours)
+      })
   }, [])
 
   //Date range changed
@@ -113,6 +136,7 @@ export default function Dashboard() {
     setLoadingTotalDays(true)
     setLoadingAvailability(true)
     setLoadingAssetUtilization(true)
+    setLoadingAverageDownTime(true)
 
     fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
@@ -171,6 +195,26 @@ export default function Dashboard() {
         setAssetUtilization(res?.assetUtilization)
       })
       .catch((err) => console.log(err))
+
+    fetch(`${url}/downtimes/getAnalytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? Date.parse(startDate)
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate
+          ? Date.parse(endDate).addHours(23).addMinutes(59)
+          : Date.today(),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setLoadingAverageDownTime(false)
+        setAverageDowntime(res.avgHours)
+      })
   }, [startDate, endDate])
 
   //Customer changed
@@ -413,7 +457,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="mt-5 sm:mr-5">
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
           <StatisticCard
             data={{
               title: 'Projected Revenues',
@@ -447,7 +491,7 @@ export default function Dashboard() {
             }}
             icon={<TrendingUpIcon className="h-5 w-5 text-green-600" />}
           />
-          {/* TODO */}
+
           <StatisticCard
             data={{
               title: 'Asset availability',
@@ -457,7 +501,20 @@ export default function Dashboard() {
                 assetAvailability + '%'
               ),
             }}
-            icon={<TruckIcon className="h-5 w-5 text-orange-500" />}
+            icon={<TruckIcon className="h-5 w-5 text-yellow-500" />}
+          />
+
+          <StatisticCard
+            // intent="danger"
+            data={{
+              title: 'Average Downtime',
+              content: loadingAverageDownTime ? (
+                <Loader active inline size="mini" />
+              ) : (
+                averageDownTime + ' hours'
+              ),
+            }}
+            icon={<ClockIcon className="h-5 w-5 text-red-500" />}
           />
         </div>
       </div>
