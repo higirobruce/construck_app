@@ -510,8 +510,9 @@ export default function Workdata() {
 
   useEffect(() => {
     setLoadingEquipments(true)
+    let dispDate = siteWork ? workStartDate : dispatchDate
     fetch(
-      `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -536,7 +537,7 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/type/${eqType}/${dispatchDate}/${
+      `${url}/equipments/type/${eqType}/${dispDate}/${
         dayShift ? 'dayShift' : 'nightShift'
       }`
     )
@@ -564,9 +565,7 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/${dispatchDate}/${
-        dayShift ? 'dayShift' : 'nightShift'
-      }`
+      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -643,7 +642,7 @@ export default function Workdata() {
         }
       })
       .catch((err) => {})
-  }, [eqType, dispatchDate, dayShift])
+  }, [eqType, dispatchDate, dayShift, workStartDate])
 
   useEffect(() => {
     if (search.length >= 3) {
