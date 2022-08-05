@@ -171,7 +171,6 @@ export default function WorkListTable({
   let pageStartIndex = pagesObj.startIndex
 
   if (user.userType === 'customer') {
-    console.log(data)
     let _pData = data.filter((p) => {
       return p.project?.customer === user.company?.name
     })

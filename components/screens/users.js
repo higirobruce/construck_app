@@ -44,7 +44,6 @@ export default function Users() {
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         setUsers(res)
         setLoading(false)
       })
@@ -70,7 +69,6 @@ export default function Users() {
     })
       .then((res) => res.json())
       .then((res) => {
-        // console.log(res)
         if (res.error) {
           toast.error(res.error)
         } else {
@@ -78,7 +76,7 @@ export default function Users() {
           refresh()
         }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {})
   }
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">

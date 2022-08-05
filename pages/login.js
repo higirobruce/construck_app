@@ -117,7 +117,6 @@ export default function Login() {
             })
               .then((res) => res.json())
               .then((res) => {
-                console.log(res)
                 setSubmitting(false)
                 setPassword('')
                 setViewPort('login')
