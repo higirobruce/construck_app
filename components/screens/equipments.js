@@ -192,7 +192,6 @@ export default function Equipments() {
     fetch(`${url}/equipments/`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         let eqs = res?.equipments
         let nEqs = res.nrecords
         setNRecords(nEqs)
@@ -390,7 +389,6 @@ export default function Equipments() {
       })
       .catch((err) => {
         setSubmitting(false)
-        console.log(er)
       })
   }
 

@@ -18,6 +18,8 @@ import MSubmitButton from '../common/mSubmitButton'
 import { DocumentDownloadIcon, MapIcon } from '@heroicons/react/solid'
 import 'datejs'
 import moment from 'moment'
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
 
 const CUT_OVER_DATE = new Date('01-JUN-2022')
 
@@ -106,9 +108,8 @@ export default function Dashboard() {
         setAssetAvailability(res?.assetAvailability)
         setLoadingAssetUtilization(false)
         setAssetUtilization(res.assetUtilization)
-        console.log(res)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {})
 
     fetch(`${url}/downtimes/getAnalytics`, {
       method: 'POST',
@@ -196,7 +197,7 @@ export default function Dashboard() {
         setLoadingAssetUtilization(false)
         setAssetUtilization(res?.assetUtilization)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {})
 
     fetch(`${url}/downtimes/getAnalytics`, {
       method: 'POST',
@@ -414,16 +415,64 @@ export default function Dashboard() {
 
   async function downloadDrivers() {
     setDownloadingDrivers(true)
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
     fetch(`${url}/works/gethoursperdriver`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
+        let data = res?.map((d) => {
+          let myAssistants = d['Drivers']
+          let nAssistants = myAssistants.length
+
+          return {
+            'Main Driver': d['Main Driver'],
+            // Assistants: myAssistants,
+            'Assistant 1':
+              nAssistants >= 1
+                ? myAssistants[0]?.firstName + ' ' + myAssistants[0]?.lastName
+                : '',
+            'Assistant 2':
+              nAssistants >= 2
+                ? myAssistants[1]?.firstName + ' ' + myAssistants[1]?.lastName
+                : '',
+            'Assistant 3':
+              nAssistants >= 3
+                ? myAssistants[2]?.firstName + ' ' + myAssistants[2]?.lastName
+                : '',
+            'Assistant 4':
+              nAssistants >= 4
+                ? myAssistants[3]?.firstName + ' ' + myAssistants[3]?.lastName
+                : '',
+            'Assistant 5':
+              nAssistants >= 5
+                ? myAssistants[4]?.firstName + ' ' + myAssistants[4]?.lastName
+                : '',
+            Phone: d['Phone'],
+            'Total Duration': d['Total Duration'],
+            'Unit of measurement': d['Unit of measurement'],
+          }
+        })
+
+        exportToCSV(
+          data,
+          'Hours per driver' + moment().format('DD-MMM-YYYY hh:mm:ss')
+        )
         setDownloadingDrivers(false)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {})
   }
 
   return (
@@ -535,16 +584,16 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* <div className="mb-5 flex flex-row space-x-5 py-5">
+      <div className="mb-5 flex flex-row space-x-5 py-5">
         <div className="flex cursor-pointer flex-row items-center space-x-2 text-sm font-semibold hover:underline">
           {downloadingDrivers ? (
             <Loader active size="mini" inline />
           ) : (
             <DocumentDownloadIcon className="h-5 w-5" />
           )}
-          <div onClick={() => downloadDrivers()}>Get Driver's report</div>
+          <div onClick={() => downloadDrivers()}>Get Hours/Driver report</div>
         </div>
-      </div> */}
+      </div>
     </div>
   )
 }

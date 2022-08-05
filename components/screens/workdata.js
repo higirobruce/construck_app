@@ -64,6 +64,7 @@ export default function Workdata() {
   let [siteWork, setSiteWork] = useState(false)
   let [lowbedWork, setLowbedWork] = useState(false)
   let [loadingEquipments, setLoadingEquipments] = useState(false)
+  let [downloadingData, setDownloadingData] = useState(false)
 
   let [projects, setProjects] = useState(null)
 
@@ -78,7 +79,7 @@ export default function Workdata() {
   let [equipmentsOg, setEquipmentsOg] = useState(null)
   let [equipmentsOgFull, setEquipmentsOgFull] = useState(null)
   let [drivers, setDrivers] = useState([])
-  let [astDrivers, setAstDrivers] = useState([])
+  let [astDrivers, setAstDrivers] = useState([[]])
   let [reasonForRejection, setReasonForRejection] = useState('')
   let [moreComment, setMoreComment] = useState('')
 
@@ -1061,7 +1062,7 @@ export default function Workdata() {
                     targetTrips: selTargetTrips[i],
                     equipments: selEquipments,
                     drivers,
-                    astDrivers,
+                    astDrivers: astDrivers ? astDrivers : [],
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
@@ -1152,7 +1153,7 @@ export default function Workdata() {
                 targetTrips,
                 equipments: lowbed,
                 drivers: [],
-                astDrivers,
+                astDrivers: [],
                 jobType: '62690b97cf45ad62aa6144e2',
                 shift: dayShift ? 'dayShift' : 'nightShift',
                 createdOn: new Date().toISOString(),
@@ -1197,7 +1198,7 @@ export default function Workdata() {
     return hours
   }
 
-  function download() {
+  function __download() {
     let _siteWorkDetails = workList
       .filter((w) => w.siteWork && w.dailyWork?.length >= 1)
       .map((w) => {
@@ -1409,7 +1410,8 @@ export default function Workdata() {
     // )
   }
 
-  function _Newdownload() {
+  function download() {
+    setDownloadingData(true)
     fetch(`${url}/works/detailed`)
       .then((res) => res.json())
       .then((res) => {
@@ -1417,8 +1419,12 @@ export default function Workdata() {
           res,
           `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
         )
+        setDownloadingData(false)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        toast.error('Error occured!')
+        setDownloadingData(false)
+      })
 
     const fileType =
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
@@ -1534,10 +1540,16 @@ export default function Workdata() {
                 </div>
               )}
               <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
-              <DownloadIcon
-                className="h-5 w-5 cursor-pointer"
-                onClick={() => download()}
-              />
+              {downloadingData ? (
+                <div>
+                  <Loader active size="tiny" inline className="ml-5" />
+                </div>
+              ) : (
+                <DownloadIcon
+                  className="h-5 w-5 cursor-pointer"
+                  onClick={() => download()}
+                />
+              )}
               <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
 
               <MSubmitButton
@@ -1621,7 +1633,7 @@ export default function Workdata() {
                   onChange={() => {
                     setSelEquipments([])
                     setSelJobTypes([])
-                    setAstDrivers([])
+                    setAstDrivers([[]])
                     setDispatchDates(null)
                     setFromProjects([])
                     settoProjects([])
