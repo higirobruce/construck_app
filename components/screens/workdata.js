@@ -1415,14 +1415,19 @@ export default function Workdata() {
     fetch(`${url}/works/detailed`)
       .then((res) => res.json())
       .then((res) => {
+        let data = res.map((r) => {
+          r['Dispatch date'] = Date.parse(r['Dispatch date'])
+          return r
+        })
         exportToCSV(
-          res,
+          data,
           `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
         )
         setDownloadingData(false)
       })
       .catch((err) => {
         toast.error('Error occured!')
+        console.log(err)
         setDownloadingData(false)
       })
 
