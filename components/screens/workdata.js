@@ -1412,7 +1412,7 @@ export default function Workdata() {
 
   function download() {
     setDownloadingData(true)
-    fetch(`${url}/works/detailed`)
+    fetch(`${url}/works/detailed/${canViewRenues}`)
       .then((res) => res.json())
       .then((res) => {
         let data = res.map((r) => {
@@ -1545,15 +1545,18 @@ export default function Workdata() {
                 </div>
               )}
               <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
+
               {downloadingData ? (
                 <div>
                   <Loader active size="tiny" inline className="ml-5" />
                 </div>
               ) : (
-                <DownloadIcon
-                  className="h-5 w-5 cursor-pointer"
-                  onClick={() => download()}
-                />
+                canViewRenues && (
+                  <DownloadIcon
+                    className="h-5 w-5 cursor-pointer"
+                    onClick={() => download()}
+                  />
+                )
               )}
               <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
 
