@@ -572,11 +572,12 @@ export default function Workdata() {
       .then((resp) => resp.json())
       .then((resp) => {
         setLoadingEquipments(false)
-        let list = resp?.filter((r) => r.eqDescription !== 'LOWBED')
+        let list = resp
+        // ?.filter((r) => r.eqDescription !== 'LOWBED')
         let listLowbeds = resp?.filter((r) => r.eqDescription === 'LOWBED')
 
         let equipmentsFullOptions = list
-          .filter((r) => r.eqDescription !== 'LOWBED')
+          // .filter((r) => r.eqDescription !== 'LOWBED')
           .map((l) => {
             return {
               key: l._id,
