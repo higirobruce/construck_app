@@ -20,6 +20,7 @@ import 'datejs'
 import moment from 'moment'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
+import { toast, ToastContainer } from 'react-toastify'
 
 const CUT_OVER_DATE = new Date('01-JUN-2022')
 
@@ -74,14 +75,14 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
         setTotalDays(res.totalDays)
-        setProvisionalRevenues(res.projectedRevenue)
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setLoadingFinalRev(false)
         setLoadingTotalDays(false)
         setLoadingProvisionalRev(false)
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error Occured!'))
 
     fetch(`${url}/assetAvailability/getAnalytics`, {
       method: 'POST',
@@ -109,7 +110,7 @@ export default function Dashboard() {
         setLoadingAssetUtilization(false)
         setAssetUtilization(res.assetUtilization)
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error Occured!'))
 
     fetch(`${url}/downtimes/getAnalytics`, {
       method: 'POST',
@@ -130,6 +131,7 @@ export default function Dashboard() {
         setLoadingAverageDownTime(false)
         setAverageDowntime(res.avgHours)
       })
+      .catch((err) => toast.error('Error Occured!'))
   }, [])
 
   //Date range changed
@@ -162,14 +164,14 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
         setTotalDays(res.totalDays)
-        setProvisionalRevenues(res.projectedRevenue)
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setLoadingFinalRev(false)
         setLoadingTotalDays(false)
         setLoadingProvisionalRev(false)
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error Occured!'))
 
     fetch(`${url}/assetAvailability/getAnalytics`, {
       method: 'POST',
@@ -197,7 +199,7 @@ export default function Dashboard() {
         setLoadingAssetUtilization(false)
         setAssetUtilization(res?.assetUtilization)
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error Occured!'))
 
     fetch(`${url}/downtimes/getAnalytics`, {
       method: 'POST',
@@ -218,6 +220,7 @@ export default function Dashboard() {
         setLoadingAverageDownTime(false)
         setAverageDowntime(res.avgHours)
       })
+      .catch((err) => toast.error('Error Occured!'))
   }, [startDate, endDate])
 
   //Customer changed
@@ -247,14 +250,14 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
         setTotalDays(res.totalDays)
-        setProvisionalRevenues(res.projectedRevenue)
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setLoadingFinalRev(false)
         setLoadingTotalDays(false)
         setLoadingProvisionalRev(false)
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error Occured!'))
   }, [customer])
 
   //project changed
@@ -284,8 +287,8 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
-        setProvisionalRevenues(res.projectedRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setTotalDays(res.totalDays)
         setLoadingFinalRev(false)
         setLoadingTotalDays(false)
@@ -321,8 +324,8 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
-        setProvisionalRevenues(res.projectedRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setTotalDays(res.totalDays)
         setLoadingFinalRev(false)
         setLoadingTotalDays(false)
@@ -357,9 +360,9 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
         setTotalDays(res.totalDays)
-        setProvisionalRevenues(res.projectedRevenue)
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setLoadingTotalDays(false)
         setLoadingFinalRev(false)
         setLoadingProvisionalRev(false)
@@ -385,7 +388,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setFinalRevenues(res.totalRevenue)
+        setFinalRevenues(parseFloat(res.totalRevenue))
         setTotalDays(res.totalDays)
       })
       .catch((err) => {})
@@ -407,7 +410,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setProvisionalRevenues(res.projectedRevenue)
+        setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setTotalDays(res.totalDays)
       })
       .catch((err) => {})
@@ -594,6 +597,7 @@ export default function Dashboard() {
           <div onClick={() => downloadDrivers()}>Get Hours/Driver report</div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   )
 }
