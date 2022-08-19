@@ -85,7 +85,6 @@ export default function Reversals() {
       )
         .then((res) => res.json())
         .then((res) => {
-          console.log(res)
           refresh()
         })
         .catch((err) => setLoading(false))
