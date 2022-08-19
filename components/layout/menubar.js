@@ -11,6 +11,7 @@ import {
   LogoutIcon,
   BellIcon,
   UserCircleIcon,
+  RefreshIcon,
 } from '@heroicons/react/outline'
 
 import React, { useContext } from 'react'
@@ -32,6 +33,7 @@ export default function MenuBar() {
     role === 'customer'
   let canSeeUsers = role === 'admin'
   let canSeeSettings = role === 'admin'
+  let canReverseTransactions = role === 'admin'
   let isVendor = role === 'vendor'
 
   function logout() {
@@ -160,6 +162,20 @@ export default function MenuBar() {
           >
             <CogIcon className="h-5 w-5" />
             <div className="hidden w-1/2 font-semibold md:block">Settings</div>
+          </div>
+        )}
+
+        {canReverseTransactions && (
+          <div
+            className={
+              screen === 'reversals'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-red-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-red-700'
+            }
+            onClick={() => setScreen('reversals')}
+          >
+            <RefreshIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Reversals</div>
           </div>
         )}
       </div>
