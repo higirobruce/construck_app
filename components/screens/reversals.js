@@ -24,6 +24,7 @@ export default function Reversals() {
   let { user, setUser } = useContext(UserContext)
 
   function getTransactions() {
+    setLoading(true)
     fetch(
       `${url}/works/v3/toreverse/${plateNumber}?startDate=${startDate}&endDate=${endDate}`
     )
