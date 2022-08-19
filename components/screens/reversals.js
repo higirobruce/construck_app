@@ -24,6 +24,7 @@ export default function Reversals() {
   let { user, setUser } = useContext(UserContext)
 
   function getTransactions() {
+    setLoading(true)
     fetch(
       `${url}/works/v3/toreverse/${plateNumber}?startDate=${startDate}&endDate=${endDate}`
     )
@@ -144,9 +145,11 @@ export default function Reversals() {
         ) : (
           transactions && (
             <>
-              <div className="grid grid-cols-8 px-2">
+              <div className="grid grid-cols-10 px-2">
                 {/* Plate NUmber */}
                 <MTitle content="Plate Number" />
+                <MTitle content="Driver" />
+                <MTitle content="Owner" />
                 <MTitle content="Dispatch date" />
                 <MTitle content="Project" />
                 <MTitle content="Customer" />
@@ -158,9 +161,11 @@ export default function Reversals() {
 
               {transactions.map((t) => {
                 return (
-                  <div className="round-sm grid grid-cols-8 items-center bg-white p-2 shadow-sm">
+                  <div className="round-sm grid grid-cols-10 items-center bg-white p-2 shadow-sm">
                     {/* Plate NUmber */}
                     <MTextView content={t?.equipment?.plateNumber} />
+                    <MTextView content={t?.driverName ? t?.driverName : '-'} />
+                    <MTextView content={t?.owner} />
                     <MTextView
                       content={moment(t?.dispatchDate).format('DD-MMM-YYYY')}
                     />
