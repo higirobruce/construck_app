@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
 import UsersTable from '../common/usersTable'
@@ -8,6 +8,7 @@ import TextInput from '../common/TextIput'
 import TextInputV from '../common/TextIputV'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
+import { UserContext } from '../../contexts/UserContext'
 
 export default function Users() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -21,20 +22,30 @@ export default function Users() {
   let [email, setEmail] = useState('')
   let [role, setRole] = useState('display')
 
+  let { user, setUser } = useContext(UserContext)
+  let myRole = user?.userType
+  let isCustomer =
+    myRole === 'customer-admin' || myRole === 'customer-project-manager'
   var rolesOptions = [
     { key: '1', value: 'display', text: 'Display only' },
     { key: '2', value: 'admin', text: 'Administrator' },
     { key: '3', value: 'revenue', text: 'Revenue officer' },
     { key: '4', value: 'dispatch', text: 'Dispatch officer' },
     { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
-    { key: '5', value: 'customer', text: 'Customer' },
+    { key: '5', value: 'customer-admin', text: 'Customer' },
   ]
 
   useEffect(() => {
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
-        setUsers(res)
+        isCustomer
+          ? setUsers(
+              res.filter((r) => {
+                return r.company === user?.company?._id
+              })
+            )
+          : setUsers(res)
         setLoading(false)
       })
   }, [])
@@ -44,7 +55,13 @@ export default function Users() {
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
-        setUsers(res)
+        isCustomer
+          ? setUsers(
+              res.filter((r) => {
+                return r.company === user?.company?._id
+              })
+            )
+          : setUsers(res)
         setLoading(false)
       })
   }
