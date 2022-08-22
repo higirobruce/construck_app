@@ -1434,6 +1434,9 @@ export default function Workdata() {
       .then((res) => {
         let data = res.map((r) => {
           r['Dispatch date'] = Date.parse(r['Dispatch date'])
+          r['Posted On'] = Date.parse(r['Posted On'])
+            ? Date.parse(r['Posted On'])
+            : ''
           return r
         })
         exportToCSV(
