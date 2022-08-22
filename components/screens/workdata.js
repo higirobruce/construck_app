@@ -12,7 +12,7 @@ import {
   AdjustmentsIcon,
 } from '@heroicons/react/outline'
 import MTitle from '../common/mTitle'
-import { Dropdown, Loader } from 'semantic-ui-react'
+import { Dimmer, Dropdown, Loader } from 'semantic-ui-react'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import _ from 'lodash'
@@ -729,7 +729,6 @@ export default function Workdata() {
   }, [duration])
 
   function refresh() {
-    setLoadingData(true)
     setSearch('')
     setSiteWork(false)
     setLowbedWork(false)
@@ -770,6 +769,7 @@ export default function Workdata() {
       .catch((err) => {
         toast.error(err)
         setLoadingData(false)
+        setSubmitting(false)
       })
   }
 
@@ -777,6 +777,7 @@ export default function Workdata() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
+    setSubmitting(true)
     fetch(`${url}/works/approve/${row._id}`, {
       method: 'PUT',
     })
@@ -784,6 +785,7 @@ export default function Workdata() {
       .then((resp) => {
         refresh()
       })
+      .catch((err) => setSubmitting(false))
   }
 
   function bulkApprove() {
@@ -850,6 +852,7 @@ export default function Workdata() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
+    setSubmitting(true)
     fetch(`${url}/works/recall/${row._id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -861,12 +864,14 @@ export default function Workdata() {
       .then((resp) => {
         refresh()
       })
+      .catch((err) => setSubmitting(false))
   }
 
   function stop() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
+    setSubmitting(true)
 
     // duration, endIndex, tripsDone, comment
     fetch(`${url}/works/stop/${row._id}`, {
@@ -886,12 +891,14 @@ export default function Workdata() {
       .then((resp) => {
         refresh()
       })
+      .catch((err) => setSubmitting(false))
   }
 
   function end() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
+    setSubmitting(true)
 
     // duration, endIndex, tripsDone, comment
     fetch(`${url}/works/end/${row._id}`, {
@@ -909,12 +916,14 @@ export default function Workdata() {
       .then((resp) => {
         refresh()
       })
+      .catch((err) => setSubmitting(false))
   }
 
   function start() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
+    setSubmitting(true)
 
     // duration, endIndex, tripsDone, comment
     fetch(`${url}/works/start/${row._id}`, {
@@ -930,12 +939,14 @@ export default function Workdata() {
       .then((resp) => {
         refresh()
       })
+      .catch((err) => setSubmitting(false))
   }
 
   function reject() {
     let _workList = workList ? [...workList] : []
     _workList[rowIndex].status = 'updating'
     setWorkList(_workList)
+    setSubmitting(true)
     fetch(`${url}/works/reject/${row._id}`, {
       method: 'PUT',
       headers: {
@@ -949,6 +960,7 @@ export default function Workdata() {
       .then((resp) => {
         refresh()
       })
+      .catch((err) => setSubmitting(false))
   }
 
   function select(row) {
@@ -1575,21 +1587,27 @@ export default function Workdata() {
         {viewPort === 'list' && (
           <>
             {(!workList || loadingData) && <Loader active />}
-            {workList && !loadingData && (
-              <WorkListTable
-                data={workList}
-                handelApprove={_setApproveRow}
-                handelReject={_setRejectRow}
-                handelRecall={_setRecallRow}
-                handelStop={_setStopRow}
-                handelStart={_setStartRow}
-                handleOrder={order}
-                handleSelect={select}
-                handleDeselect={deselect}
-                handelEnd={_setEndRow}
-                loading
-              />
-            )}
+            {workList &&
+              !loadingData &&
+              (submitting ? (
+                <Dimmer active>
+                  <Loader active />
+                </Dimmer>
+              ) : (
+                <WorkListTable
+                  data={workList}
+                  handelApprove={_setApproveRow}
+                  handelReject={_setRejectRow}
+                  handelRecall={_setRecallRow}
+                  handelStop={_setStopRow}
+                  handelStart={_setStartRow}
+                  handleOrder={order}
+                  handleSelect={select}
+                  handleDeselect={deselect}
+                  handelEnd={_setEndRow}
+                  loading
+                />
+              ))}
           </>
         )}
 
