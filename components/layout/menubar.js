@@ -30,11 +30,15 @@ export default function MenuBar() {
     role === 'dispatch' ||
     role === 'revenue' ||
     role === 'vendor' ||
-    role === 'customer'
-  let canSeeUsers = role === 'admin'
+    role === 'customer-admin'
+  let canSeeUsers = role === 'admin' || role === 'customer-admin'
   let canSeeSettings = role === 'admin'
   let canReverseTransactions = role === 'admin'
   let isVendor = role === 'vendor'
+  let isCustomer =
+    role === 'customer-admin' ||
+    role === 'customer-project-manager' ||
+    role === 'customer-site-manager'
 
   function logout() {
     localStorage.removeItem('user')
@@ -79,7 +83,7 @@ export default function MenuBar() {
           </div>
         )}
 
-        {!isVendor && (
+        {!isVendor && !isCustomer && (
           <>
             <div
               className={

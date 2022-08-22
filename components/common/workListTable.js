@@ -149,6 +149,7 @@ export default function WorkListTable({
   handelStop,
   handelStart,
   handelEnd,
+  handleSetDataSize,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
@@ -170,7 +171,7 @@ export default function WorkListTable({
   let pData = pagesObj.pagedData
   let pageStartIndex = pagesObj.startIndex
 
-  if (user.userType === 'customer') {
+  if (user.userType === 'customer-admin') {
     let _pData = data.filter((p) => {
       return p.project?.customer === user.company?.name
     })
@@ -192,6 +193,8 @@ export default function WorkListTable({
     pData = paginate(_pData, pageNumber, pageSize).pagedData
     pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   }
+
+  handleSetDataSize(data.length)
 
   return (
     <div className="block">
@@ -453,7 +456,7 @@ export default function WorkListTable({
 
                     <Table.Cell>
                       <div className="mr-2 flex flex-row">
-                        {user.userType === 'customer' &&
+                        {user.userType === 'customer-admin' &&
                           row.status === 'stopped' && (
                             <>
                               <div

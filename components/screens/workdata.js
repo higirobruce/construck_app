@@ -38,6 +38,8 @@ export default function Workdata() {
   let canViewRenues = user.userType === 'revenue' || user.userType === 'admin'
   let isVendor = user.userType === 'vendor'
 
+  let [dataSize, setDataSize] = useState(0)
+
   let [workList, setWorkList] = useState(null)
   let [ogWorkList, setOgWorkList] = useState(null)
   let [projectList, setProjectList] = useState(null)
@@ -732,6 +734,7 @@ export default function Workdata() {
     setSearch('')
     setSiteWork(false)
     setLowbedWork(false)
+    setLoadingData(true)
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(`${url}/works/v3/`)
@@ -1467,7 +1470,7 @@ export default function Workdata() {
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
         <div className="text-2xl font-semibold">
-          Dispatch Forms ({workList ? workList?.length : 0})
+          Dispatch Forms ({workList ? dataSize : 0})
         </div>
         <div className="grid w-full grid-cols-1 gap-1 md:flex md:flex-row md:items-center md:justify-between md:space-x-10">
           {viewPort === 'list' && canDispatch && (
@@ -1605,6 +1608,7 @@ export default function Workdata() {
                   handleSelect={select}
                   handleDeselect={deselect}
                   handelEnd={_setEndRow}
+                  handleSetDataSize={setDataSize}
                   loading
                 />
               ))}
