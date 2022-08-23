@@ -267,8 +267,7 @@ export default function Drivers() {
         email,
         phone,
         userType: title,
-        company: user?.company?._id,
-        assignedProject: projectAssigned,
+        title,
         status: 'active',
       }),
     })
