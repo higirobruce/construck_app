@@ -57,7 +57,7 @@ const MStatusIndicator = ({ status }) => {
   }
 }
 
-export default function DriversTable({
+export default function VendorsTable({
   data,
   handelOpen,
   handelShowMessages,
@@ -88,10 +88,8 @@ export default function DriversTable({
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Full Names</Table.HeaderCell>
-            <Table.HeaderCell>Username</Table.HeaderCell>
 
             <Table.HeaderCell>Phone</Table.HeaderCell>
-            <Table.HeaderCell>Title</Table.HeaderCell>
 
             <Table.HeaderCell>Actions</Table.HeaderCell>
             {/* <Table.HeaderCell>Created on</Table.HeaderCell>
@@ -106,17 +104,11 @@ export default function DriversTable({
             return (
               <Table.Row key={row._id}>
                 <Table.Cell>
-                  <MTextView content={row.firstName + ' ' + row.lastName} />
+                  <MTextView content={row.name} />
                 </Table.Cell>
 
                 <Table.Cell>
-                  <MTextView content={row.username} />
-                </Table.Cell>
-                <Table.Cell>
                   <MTextView content={row.phone} />
-                </Table.Cell>
-                <Table.Cell>
-                  <MTextView content={row.title} />
                 </Table.Cell>
 
                 <Table.Cell>

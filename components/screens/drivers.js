@@ -207,6 +207,7 @@ export default function Drivers() {
         setDrivers(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
 
     fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
@@ -237,6 +238,7 @@ export default function Drivers() {
         setDrivers(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function resetPassword(driver) {
