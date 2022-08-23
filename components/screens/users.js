@@ -21,32 +21,64 @@ export default function Users() {
   let [phone, setPhone] = useState('')
   let [email, setEmail] = useState('')
   let [role, setRole] = useState('display')
+  let [loadingProjects, setLoadingProjects] = useState(false)
+  let [projectList, setProjectList] = useState([])
+  let [projects, setProjects] = useState([])
+  let [projectAssigned, setProjectAssigned] = useState(null)
 
   let { user, setUser } = useContext(UserContext)
   let myRole = user?.userType
   let isCustomer =
     myRole === 'customer-admin' || myRole === 'customer-project-manager'
-  var rolesOptions = [
-    { key: '1', value: 'display', text: 'Display only' },
-    { key: '2', value: 'admin', text: 'Administrator' },
-    { key: '3', value: 'revenue', text: 'Revenue officer' },
-    { key: '4', value: 'dispatch', text: 'Dispatch officer' },
-    { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
-    { key: '5', value: 'customer-admin', text: 'Customer' },
-  ]
+
+  var rolesOptions = isCustomer
+    ? [
+        { key: '1', value: 'customer-display', text: 'Display only' },
+        { key: '2', value: 'customer-site-manager', text: 'Site Manager' },
+      ]
+    : [
+        { key: '1', value: 'display', text: 'Display only' },
+        { key: '2', value: 'admin', text: 'Administrator' },
+        { key: '3', value: 'revenue', text: 'Revenue officer' },
+        { key: '4', value: 'dispatch', text: 'Dispatch officer' },
+        { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
+        { key: '5', value: 'customer-admin', text: 'Customer' },
+      ]
 
   useEffect(() => {
+    setLoadingProjects(true)
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         isCustomer
           ? setUsers(
               res.filter((r) => {
-                return r.company === user?.company?._id
+                return r?.company?._id === user?.company?._id
               })
             )
           : setUsers(res)
         setLoading(false)
+      })
+
+    fetch(`${url}/projects/v2`)
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let list = resp
+        let projectOptions = list.map((p) => {
+          return {
+            key: p._id,
+            value: p._id,
+            text: p.prjDescription,
+            customer: p.customer,
+          }
+        })
+        setProjectList(projectOptions)
+        setProjects(list)
+      })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingProjects(false)
       })
   }, [])
 
@@ -58,12 +90,26 @@ export default function Users() {
         isCustomer
           ? setUsers(
               res.filter((r) => {
-                return r.company === user?.company?._id
+                return r?.company?._id === user?.company?._id
               })
             )
           : setUsers(res)
         setLoading(false)
       })
+  }
+
+  function resetPassword(user) {
+    //TODO
+    fetch(`${url}/users/resetPassword/${user._id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((res) => res.json)
+      .then((res) => {
+        toast.success('Password reset successfully!')
+        refresh()
+      })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function submit() {
@@ -80,7 +126,8 @@ export default function Users() {
         email,
         phone,
         userType: role,
-        company: null,
+        company: user?.company?._id,
+        assignedProject: projectAssigned,
         status: 'active',
       }),
     })
@@ -139,8 +186,8 @@ export default function Users() {
       {viewPort === 'list' && (
         <>
           {!loading && users?.length > 0 && (
-            <div className="flex justify-center">
-              <UsersTable data={users} />
+            <div className="flex w-full">
+              <UsersTable data={users} handleResetPassword={resetPassword} />
             </div>
           )}
           {(loading || !users) && (
@@ -219,6 +266,29 @@ export default function Users() {
                   />
                 </div>
               </div>
+
+              {isCustomer && (
+                <div className="flex flex-col">
+                  <div className="flex flex-row items-center">
+                    <MTextView content="Assign to Project" />
+                    {<div className="text-sm text-red-600">*</div>}
+                  </div>
+                  <div>
+                    <Dropdown
+                      options={projectList}
+                      placeholder="Assigned to Project...."
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setProjectAssigned(
+                          projects.filter((p) => p._id === data.value)[0]
+                        )
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <div className="">
               <MSubmitButton submit={submit} />

@@ -16,6 +16,7 @@ import MLable from './mLabel'
 import MPagination from './pagination'
 import { paginate } from '../../utils/paginate'
 import { UserContext } from '../../contexts/UserContext'
+import { RefreshIcon } from '@heroicons/react/outline'
 
 const MStatusIndicator = ({ status }) => {
   if (status === 'approved')
@@ -61,11 +62,15 @@ export default function UsersTable({
   handelOpen,
   handelShowMessages,
   handelUpdateStatus,
+  handleResetPassword,
 }) {
   const { user, setUSer } = useContext(UserContext)
   const [pageSize, setPageSize] = useState(10)
   const [pageNumber, setPageNumber] = useState(1)
   let filteredData = data
+  let isCustomer =
+    user.userType === 'customer-admin' ||
+    user.userType === 'customer-project-manager'
 
   // if (user.role === 'agent-admin')
   //   filteredData = data.filter(
@@ -78,7 +83,7 @@ export default function UsersTable({
 
   const pData = paginate(filteredData, pageNumber, pageSize).pagedData
   return (
-    <div className="hidden md:block">
+    <div className="hidden w-full md:block">
       <Table size="tiny" compact>
         <Table.Header>
           <Table.Row>
@@ -87,6 +92,8 @@ export default function UsersTable({
             <Table.HeaderCell>Email</Table.HeaderCell>
             <Table.HeaderCell>Phone</Table.HeaderCell>
             <Table.HeaderCell>Role</Table.HeaderCell>
+            {isCustomer && <Table.HeaderCell>Project</Table.HeaderCell>}
+
             <Table.HeaderCell>Status</Table.HeaderCell>
             <Table.HeaderCell>Actions</Table.HeaderCell>
             {/* <Table.HeaderCell>Created on</Table.HeaderCell>
@@ -115,6 +122,11 @@ export default function UsersTable({
                 <Table.Cell>
                   <MTextView content={row.userType} />
                 </Table.Cell>
+                {isCustomer && (
+                  <Table.Cell>
+                    <MTextView content={row.assignedProject?.prjDescription} />
+                  </Table.Cell>
+                )}
                 <Table.Cell>
                   <MTextView content={row.status} />
                 </Table.Cell>
@@ -122,24 +134,24 @@ export default function UsersTable({
                 <Table.Cell>
                   <div className="mr-2 flex flex-row">
                     <div
-                      onClick={() => handelOpen(row)}
+                      onClick={() => handleResetPassword(row)}
                       className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
-                      <DotsHorizontalIcon className="h-5 w-5 text-blue-400" />
+                      <RefreshIcon className="h-5 w-5 text-blue-400" />
                     </div>
-                    <div
+                    {/* <div
                       onClick={() => handelUpdateStatus(row, 'active')}
                       className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
                       <CheckIcon className="h-5 w-5 text-green-400" />
-                    </div>
+                    </div> */}
 
-                    <div
+                    {/* <div
                       onClick={() => handelUpdateStatus(row, 'suspended')}
                       className="flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
                       <XIcon className="h-5 w-5 text-red-400" />
-                    </div>
+                    </div> */}
                   </div>
                 </Table.Cell>
                 {/* <Table.Cell>{row.createdOn}</Table.Cell>
