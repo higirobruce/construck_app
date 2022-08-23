@@ -2,7 +2,7 @@ import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
-import UsersTable from '../common/usersTable'
+import DriversTable from '../common/driversTable'
 import ProjectCard from '../common/projectCard'
 import TextInput from '../common/TextIput'
 import TextInputV from '../common/TextIputV'
@@ -10,9 +10,9 @@ import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import { UserContext } from '../../contexts/UserContext'
 
-export default function Users() {
+export default function Drivers() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
-  let [users, setUsers] = useState(null)
+  let [drivers, setDrivers] = useState(null)
   let [loading, setLoading] = useState(false)
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
@@ -20,7 +20,7 @@ export default function Users() {
   let [lastName, setLastName] = useState('')
   let [phone, setPhone] = useState('')
   let [email, setEmail] = useState('')
-  let [role, setRole] = useState('display')
+  let [title, setTitle] = useState('display')
   let [loadingProjects, setLoadingProjects] = useState(false)
   let [projectList, setProjectList] = useState([])
   let [projects, setProjects] = useState([])
@@ -45,19 +45,166 @@ export default function Users() {
         { key: '5', value: 'customer-admin', text: 'Customer' },
       ]
 
+  var titleOptions = [
+    {
+      key: '1',
+      value: 'CRANE OPERATOR &TRUCK DRIVER',
+      text: 'CRANE OPERATOR &TRUCK DRIVER',
+    },
+    {
+      key: '3',
+      value: 'DRIVER-BITUMEN SPRAYER TRUCK',
+      text: 'DRIVER-BITUMEN SPRAYER TRUCK',
+    },
+    {
+      key: '4',
+      value: 'DRIVER-SMALL TRUCK',
+      text: 'DRIVER-SMALL TRUCK',
+    },
+    {
+      key: '5',
+      value: 'DRIVER-TRAILER TRUCK',
+      text: 'DRIVER-TRAILER TRUCK',
+    },
+    {
+      key: '6',
+      value: 'MECHANIC& OPERATOR-ASPHALT PAVER',
+      text: 'MECHANIC& OPERATOR-ASPHALT PAVER',
+    },
+    {
+      key: '7',
+      value: 'OPERATOR-ASPHALT CUTTER',
+      text: 'OPERATOR-ASPHALT CUTTER',
+    },
+    {
+      key: '8',
+      value: 'OPERATOR-BACHOE LOADER',
+      text: 'OPERATOR-BACHOE LOADER',
+    },
+    {
+      key: '9',
+      value: 'OPERATOR-BITUMEN SPAYER',
+      text: 'OPERATOR-BITUMEN SPAYER',
+    },
+    {
+      key: '10',
+      value: 'OPERATOR-BULLDOZER',
+      text: 'OPERATOR-BULLDOZER',
+    },
+    {
+      key: '11',
+      value: 'OPERATOR-EXCAVATOR',
+      text: 'OPERATOR-EXCAVATOR',
+    },
+    {
+      key: '12',
+      value: 'OPERATOR-FOLKLIFT',
+      text: 'OPERATOR-FOLKLIFT',
+    },
+    {
+      key: '13',
+      value: 'OPERATOR-GRADER',
+      text: 'OPERATOR-GRADER',
+    },
+    {
+      key: '14',
+      value: 'OPERATOR-PAVER MACHINE',
+      text: 'OPERATOR-PAVER MACHINE',
+    },
+    {
+      key: '15',
+      value: 'OPERATOR-SCREED',
+      text: 'OPERATOR-SCREED',
+    },
+    {
+      key: '16',
+      value: 'OPERATOR-WHEEL LOADER',
+      text: 'OPERATOR-WHEEL LOADER',
+    },
+    {
+      key: '17',
+      value: 'OPERATOR-ASPHALT COMPACTOR',
+      text: 'OPERATOR-ASPHALT COMPACTOR',
+    },
+    {
+      key: '18',
+      value: 'OPERATOR-BULDOZER',
+      text: 'OPERATOR-BULDOZER',
+    },
+    {
+      key: '19',
+      value: 'OPERATOR-COMPACTOR',
+      text: 'OPERATOR-COMPACTOR',
+    },
+    {
+      key: '20',
+      value: 'OPERATOR-COMPRESSOR',
+      text: 'OPERATOR-COMPRESSOR',
+    },
+    {
+      key: '21',
+      value: 'OPERATOR-CONCRETE MIXER',
+      text: 'OPERATOR-CONCRETE MIXER',
+    },
+    {
+      key: '22',
+      value: 'OPERATOR-DRILLING MACHINE',
+      text: 'OPERATOR-DRILLING MACHINE',
+    },
+    {
+      key: '23',
+      value: 'OPERATOR-DUMPER',
+      text: 'OPERATOR-DUMPER',
+    },
+    {
+      key: '24',
+      value: 'OPERATOR-GRADER',
+      text: 'OPERATOR-GRADER',
+    },
+    {
+      key: '25',
+      value: 'OPERATOR-MILLING MACHINE',
+      text: 'OPERATOR-MILLING MACHINE',
+    },
+    {
+      key: '26',
+      value: 'OPERATOR-SMALL COMPACTOR',
+      text: 'OPERATOR-SMALL COMPACTOR',
+    },
+    {
+      key: '27',
+      value: 'OPERATOR-TYRE ROLLER',
+      text: 'OPERATOR-TYRE ROLLER',
+    },
+    {
+      key: '29',
+      value: 'OPERATOR-WORK BEHIND',
+      text: 'OPERATOR-WORK BEHIND',
+    },
+    {
+      key: '30',
+      value: 'SCREED & BITUMEN SPRAYER',
+      text: 'SCREED & BITUMEN SPRAYER',
+    },
+    {
+      key: '31',
+      value: 'TRUCK DRIVER',
+      text: 'TRUCK DRIVER',
+    },
+
+    {
+      key: '32',
+      value: 'TURNBOY',
+      text: 'TURNBOY',
+    },
+  ]
+
   useEffect(() => {
     setLoadingProjects(true)
-    fetch(`${url}/users/`)
+    fetch(`${url}/employees/`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
-        isCustomer
-          ? setUsers(
-              res.filter((r) => {
-                return r?.company?._id === user?.company?._id
-              })
-            )
-          : setUsers(res)
+        setDrivers(res)
         setLoading(false)
       })
 
@@ -84,23 +231,17 @@ export default function Users() {
 
   function refresh() {
     setLoading(true)
-    fetch(`${url}/users/`)
+    fetch(`${url}/employees/`)
       .then((res) => res.json())
       .then((res) => {
-        isCustomer
-          ? setUsers(
-              res.filter((r) => {
-                return r?.company?._id === user?.company?._id
-              })
-            )
-          : setUsers(res)
+        setDrivers(res)
         setLoading(false)
       })
   }
 
-  function resetPassword(user) {
+  function resetPassword(driver) {
     //TODO
-    fetch(`${url}/users/resetPassword/${user._id}`, {
+    fetch(`${url}/employees/resetPassword/${driver._id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
     })
@@ -113,7 +254,7 @@ export default function Users() {
   }
 
   function submit() {
-    fetch(`${url}/users/`, {
+    fetch(`${url}/employees/`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -125,7 +266,7 @@ export default function Users() {
         password: 'password',
         email,
         phone,
-        userType: role,
+        userType: title,
         company: user?.company?._id,
         assignedProject: projectAssigned,
         status: 'active',
@@ -142,9 +283,10 @@ export default function Users() {
       })
       .catch((err) => {})
   }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
-      <div className="text-2xl font-semibold">Users</div>
+      <div className="text-2xl font-semibold">Drivers</div>
       <div className="flex w-full flex-row items-center justify-between space-x-4">
         {viewPort === 'list' && (
           <MSubmitButton
@@ -185,12 +327,15 @@ export default function Users() {
 
       {viewPort === 'list' && (
         <>
-          {!loading && users?.length > 0 && (
+          {!loading && drivers?.length > 0 && (
             <div className="flex w-full">
-              <UsersTable data={users} handleResetPassword={resetPassword} />
+              <DriversTable
+                data={drivers}
+                handleResetPassword={resetPassword}
+              />
             </div>
           )}
-          {(loading || !users) && (
+          {(loading || !drivers) && (
             <div className="h-fu mx-auto">
               <Loader active />
             </div>
@@ -250,18 +395,18 @@ export default function Users() {
 
               <div className="flex flex-col">
                 <div className="flex flex-row items-center">
-                  <MTextView content="User Role" />
+                  <MTextView content="Title" />
                   {<div className="text-sm text-red-600">*</div>}
                 </div>
                 <div className="">
                   <Dropdown
-                    options={rolesOptions}
-                    placeholder="Role"
+                    options={titleOptions}
+                    placeholder="Select driver's title"
                     fluid
                     search
                     selection
                     onChange={(e, data) => {
-                      setRole(data.value)
+                      setTitle(data.value)
                     }}
                   />
                 </div>

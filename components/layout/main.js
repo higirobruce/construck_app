@@ -8,6 +8,7 @@ import Equipments from '../screens/equipments'
 import Projects from '../screens/projects'
 import Users from '../screens/users'
 import Reversals from '../screens/reversals'
+import Drivers from '../screens/drivers'
 
 export default function Main() {
   let { screen, setScreen } = useContext(ScreenContext)
@@ -22,6 +23,7 @@ export default function Main() {
       {screen === 'projects' && <Projects />}
       {screen === 'users' && <Users />}
       {screen === 'reversals' && <Reversals />}
+      {screen === 'drivers' && <Drivers />}
     </div>
   )
 }

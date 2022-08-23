@@ -12,6 +12,7 @@ import {
   BellIcon,
   UserCircleIcon,
   RefreshIcon,
+  IdentificationIcon,
 } from '@heroicons/react/outline'
 
 import React, { useContext } from 'react'
@@ -33,6 +34,7 @@ export default function MenuBar() {
     role === 'customer-admin'
   let canSeeUsers = role === 'admin' || role === 'customer-admin'
   let canSeeSettings = role === 'admin'
+  let canSeeDrivers = role === 'admin' || role === 'dispatch'
   let canReverseTransactions = role === 'admin'
   let isVendor = role === 'vendor'
   let isCustomer =
@@ -142,16 +144,32 @@ export default function MenuBar() {
         )}
 
         {canSeeUsers && (
+          <>
+            <div
+              className={
+                screen === 'users'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+              }
+              onClick={() => setScreen('users')}
+            >
+              <UsersIcon className="h-5 w-5" />
+              <div className="hidden w-1/2 font-semibold md:block">Users</div>
+            </div>
+          </>
+        )}
+
+        {canSeeDrivers && (
           <div
             className={
-              screen === 'users'
+              screen === 'drivers'
                 ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
-            onClick={() => setScreen('users')}
+            onClick={() => setScreen('drivers')}
           >
-            <UsersIcon className="h-5 w-5" />
-            <div className="hidden w-1/2 font-semibold md:block">Users</div>
+            <IdentificationIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Drivers</div>
           </div>
         )}
 

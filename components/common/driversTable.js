@@ -57,7 +57,7 @@ const MStatusIndicator = ({ status }) => {
   }
 }
 
-export default function UsersTable({
+export default function DriversTabkle({
   data,
   handelOpen,
   handelShowMessages,
@@ -89,12 +89,10 @@ export default function UsersTable({
           <Table.Row>
             <Table.HeaderCell>Full Names</Table.HeaderCell>
             <Table.HeaderCell>Username</Table.HeaderCell>
-            <Table.HeaderCell>Email</Table.HeaderCell>
-            <Table.HeaderCell>Phone</Table.HeaderCell>
-            <Table.HeaderCell>Role</Table.HeaderCell>
-            {isCustomer && <Table.HeaderCell>Project</Table.HeaderCell>}
 
-            <Table.HeaderCell>Status</Table.HeaderCell>
+            <Table.HeaderCell>Phone</Table.HeaderCell>
+            <Table.HeaderCell>Title</Table.HeaderCell>
+
             <Table.HeaderCell>Actions</Table.HeaderCell>
             {/* <Table.HeaderCell>Created on</Table.HeaderCell>
             <Table.HeaderCell>Created by</Table.HeaderCell>
@@ -110,9 +108,7 @@ export default function UsersTable({
                 <Table.Cell>
                   <MTextView content={row.firstName + ' ' + row.lastName} />
                 </Table.Cell>
-                <Table.Cell>
-                  <MTextView content={row.email} />
-                </Table.Cell>
+
                 <Table.Cell>
                   <MTextView content={row.username} />
                 </Table.Cell>
@@ -120,15 +116,7 @@ export default function UsersTable({
                   <MTextView content={row.phone} />
                 </Table.Cell>
                 <Table.Cell>
-                  <MTextView content={row.userType} />
-                </Table.Cell>
-                {isCustomer && (
-                  <Table.Cell>
-                    <MTextView content={row.assignedProject?.prjDescription} />
-                  </Table.Cell>
-                )}
-                <Table.Cell>
-                  <MTextView content={row.status} />
+                  <MTextView content={row.title} />
                 </Table.Cell>
 
                 <Table.Cell>
