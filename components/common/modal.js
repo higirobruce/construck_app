@@ -319,7 +319,6 @@ export default function Modal({
                 startIndexNotApplicable ||
                 !rowData?.startIndex ||
                 (type === 'stop' && reasonSelected)) &&
-                !siteWorkPosted &&
                 !postLive && (
                   <button
                     onClick={() => {
