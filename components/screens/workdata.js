@@ -1447,7 +1447,6 @@ export default function Workdata() {
       })
       .catch((err) => {
         toast.error('Error occured!')
-        console.log(err)
         setDownloadingData(false)
       })
 
