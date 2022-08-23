@@ -50,7 +50,6 @@ export default function Users() {
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         isCustomer
           ? setUsers(
               res.filter((r) => {

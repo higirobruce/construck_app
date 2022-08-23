@@ -31,10 +31,12 @@ export default function MenuBar() {
     role === 'dispatch' ||
     role === 'revenue' ||
     role === 'vendor' ||
-    role === 'customer-admin'
+    role === 'customer-admin' ||
+    role === 'customer-site-manager'
   let canSeeUsers = role === 'admin' || role === 'customer-admin'
   let canSeeSettings = role === 'admin'
-  let canSeeDrivers = role === 'admin' || role === 'dispatch'
+  let canSeeDrivers = role === 'admin'
+  let canSeeVendors = role === 'admin'
   let canReverseTransactions = role === 'admin'
   let isVendor = role === 'vendor'
   let isCustomer =
@@ -170,6 +172,20 @@ export default function MenuBar() {
           >
             <IdentificationIcon className="h-5 w-5" />
             <div className="hidden w-1/2 font-semibold md:block">Drivers</div>
+          </div>
+        )}
+
+        {canSeeVendors && (
+          <div
+            className={
+              screen === 'vendors'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('vendors')}
+          >
+            <UserGroupIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Vendors</div>
           </div>
         )}
 
