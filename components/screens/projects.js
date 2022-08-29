@@ -250,7 +250,7 @@ export default function Projects() {
                   </div>
                   <Dropdown
                     options={customersOptions}
-                    placeholder="Select equipment type"
+                    placeholder="Select customer"
                     fluid
                     search
                     selection
