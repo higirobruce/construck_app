@@ -11,8 +11,10 @@ import ProjectCard from '../common/projectCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
-import { Loader } from 'semantic-ui-react'
+import { Dropdown, Loader } from 'semantic-ui-react'
 import { UserContext } from '../../contexts/UserContext'
+import TextInputLogin from '../common/TextIputLogin'
+import MTextView from '../common/mTextView'
 
 export default function Projects() {
   let { user, setUser } = useContext(UserContext)
@@ -26,6 +28,11 @@ export default function Projects() {
   let [loading, setLoading] = useState(true)
   let [statusFilter, setStatusFilter] = useState('')
   let [filterBy, setFilterBy] = useState('')
+  let [customers, setCustomers] = useState([])
+  let [customersOptions, setCustomersOptions] = useState([])
+  let [selectedCustomer, setSelectedCustomer] = useState(null)
+  let [projectDescription, setProjectDescription] = useState('')
+  let [submitting, setSubmitting] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   useEffect(() => {
@@ -35,6 +42,21 @@ export default function Projects() {
         setProjects(res)
         setOgProjectList(res)
         setLoading(false)
+      })
+
+    fetch(`${url}/customers/`)
+      .then((res) => res.json())
+      .then((resp) => {
+        setCustomers(resp)
+        setCustomersOptions(
+          resp.map((r) => {
+            return {
+              key: r._id,
+              text: r.name,
+              value: r._id,
+            }
+          })
+        )
       })
   }, [])
 
@@ -65,6 +87,27 @@ export default function Projects() {
         setProjects(res)
         setOgProjectList(res)
         setLoading(false)
+      })
+  }
+
+  function submit() {
+    setSubmitting(true)
+    fetch(`${url}/customers/project`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: selectedCustomer,
+        project: {
+          prjDescription: projectDescription,
+          status: 'ongoing',
+        },
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setSubmitting(false)
+        refresh()
+        setViewPort('list')
       })
   }
 
@@ -177,11 +220,59 @@ export default function Projects() {
           )}
 
           {(loading || projects.length === 0) && (
-            <div className="h-fu mx-auto">
+            <div className="mx-auto h-full">
               <Loader active />
             </div>
           )}
         </>
+      )}
+
+      {viewPort === 'new' && (
+        <div className="flex items-start">
+          <div className="flex flex-col space-y-5">
+            <div className="grid-col grid grid-cols-2 gap-5">
+              {/* Inputs col1 */}
+              <div className="flex flex-col items-start space-y-5">
+                {/* Plate number */}
+                <TextInputLogin
+                  label="Project Description"
+                  placeholder="Project description"
+                  type="text"
+                  setValue={setProjectDescription}
+                  isRequired
+                />
+
+                {/* Eq Description */}
+                <div className="flex flex-col space-y-1">
+                  <div className="flex flex-1 flex-row items-center">
+                    <MTextView content="Equipment Type" />
+                    <div className="text-sm text-red-600">*</div>
+                  </div>
+                  <Dropdown
+                    options={customersOptions}
+                    placeholder="Select equipment type"
+                    fluid
+                    search
+                    selection
+                    onChange={(e, data) => {
+                      setSelectedCustomer(data.value)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {projectDescription.length >= 4 && selectedCustomer && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={submit} />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )
