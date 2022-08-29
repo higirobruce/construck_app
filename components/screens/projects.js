@@ -245,7 +245,7 @@ export default function Projects() {
                 {/* Eq Description */}
                 <div className="flex flex-col space-y-1">
                   <div className="flex flex-1 flex-row items-center">
-                    <MTextView content="Equipment Type" />
+                    <MTextView content="Customer" />
                     <div className="text-sm text-red-600">*</div>
                   </div>
                   <Dropdown
