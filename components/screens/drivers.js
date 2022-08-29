@@ -22,6 +22,7 @@ export default function Drivers() {
   let [email, setEmail] = useState('')
   let [title, setTitle] = useState('display')
   let [loadingProjects, setLoadingProjects] = useState(false)
+  let [submitting, setSubmitting] = useState(false)
   let [projectList, setProjectList] = useState([])
   let [projects, setProjects] = useState([])
   let [projectAssigned, setProjectAssigned] = useState(null)
@@ -256,6 +257,7 @@ export default function Drivers() {
   }
 
   function submit() {
+    setSubmitting(true)
     fetch(`${url}/employees/`, {
       headers: {
         'Content-Type': 'application/json',
@@ -279,6 +281,7 @@ export default function Drivers() {
           toast.error(res.error)
         } else {
           setViewPort('list')
+          setSubmitting(false)
           refresh()
         }
       })
@@ -385,7 +388,6 @@ export default function Drivers() {
               <div className="flex flex-col">
                 <div className="flex flex-row items-center">
                   <MTextView content="Email" />
-                  {<div className="text-sm text-red-600">*</div>}
                 </div>
                 <TextInputV
                   placeholder="email"
@@ -436,9 +438,15 @@ export default function Drivers() {
                 </div>
               )}
             </div>
-            <div className="">
-              <MSubmitButton submit={submit} />
-            </div>
+            {firstName.length >= 1 && phone.length === 10 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={submit} />
+                )}
+              </div>
+            )}
           </div>
         </>
       )}

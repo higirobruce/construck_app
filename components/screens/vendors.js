@@ -17,6 +17,7 @@ export default function Vendors() {
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
   let [name, setName] = useState('')
+  let [submitting, setSubmitting] = useState(false)
 
   let [phone, setPhone] = useState('')
   let [mobile, setMobile] = useState('')
@@ -40,10 +41,12 @@ export default function Vendors() {
       .then((res) => {
         setVendors(res)
         setLoading(false)
+        setSubmitting(false)
       })
       .catch((err) => {
         toast.error('Error occured!')
         setLoading(false)
+        setSubmitting(false)
       })
   }
 
@@ -62,6 +65,7 @@ export default function Vendors() {
   }
 
   function submit() {
+    setSubmitting(true)
     fetch(`${url}/vendors/`, {
       headers: {
         'Content-Type': 'application/json',
@@ -79,12 +83,16 @@ export default function Vendors() {
       .then((res) => {
         if (res.error) {
           toast.error(res.error)
+          setSubmitting(false)
         } else {
           setViewPort('list')
+          setSubmitting(false)
           refresh()
         }
       })
-      .catch((err) => {})
+      .catch((err) => {
+        setSubmitting(false)
+      })
   }
 
   return (
@@ -151,11 +159,11 @@ export default function Vendors() {
             <div className="mt-5 flex flex-row items-center space-x-2">
               <div className="flex flex-col">
                 <div className="flex flex-row items-center">
-                  <MTextView content="First Name" />
+                  <MTextView content="Vendor Name" />
                   {<div className="text-sm text-red-600">*</div>}
                 </div>
                 <TextInputV
-                  placeholder="First name"
+                  placeholder="Vendor name"
                   type="text"
                   setValue={setName}
                 />
@@ -184,9 +192,15 @@ export default function Vendors() {
                 />
               </div>
             </div>
-            <div className="">
-              <MSubmitButton submit={submit} />
-            </div>
+            {name.length >= 1 && phone.length === 10 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={submit} />
+                )}
+              </div>
+            )}
           </div>
         </>
       )}
