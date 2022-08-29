@@ -24,6 +24,8 @@ export default function Customers() {
   let [tinNumber, setTinNumber] = useState('')
   let [submitting, setSubmitting] = useState(false)
 
+  let [idToUpdate, setIdToUpdate] = useState('')
+
   let [loadingCustomers, setLoadingCustomers] = useState(true)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
@@ -51,6 +53,41 @@ export default function Customers() {
     setSubmitting(true)
     fetch(`${url}/customers`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        tinNumber,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error)
+          setSubmitting(false)
+        } else {
+          setSubmitting(false)
+          setViewPort('list')
+          loadCustomers()
+        }
+      })
+      .catch((err) => {})
+  }
+
+  function setCustomerToUpdate(data) {
+    setViewPort('change')
+    setName(data.name)
+    setPhone(data.phone)
+    setEmail(data.email)
+    setTinNumber(data.tinNumber)
+    setIdToUpdate(data._id)
+  }
+
+  function updateCustomer() {
+    setSubmitting(true)
+    fetch(`${url}/customers/${idToUpdate}`, {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name,
@@ -111,7 +148,7 @@ export default function Customers() {
           </div>
         )}
 
-        {viewPort === 'new' && (
+        {(viewPort === 'new' || viewPort === 'change') && (
           <MSubmitButton
             submit={() => {
               setViewPort('list')
@@ -139,12 +176,14 @@ export default function Customers() {
               return (
                 <CustomerCard
                   data={{
+                    _id: c._id,
                     name: c.name,
                     email: c.email,
                     phone: c.phone,
                     tinNumber: c.tinNumber,
                     nProjects: c.projects?.length,
                   }}
+                  updateMe={setCustomerToUpdate}
                 />
               )
             })}
@@ -193,6 +232,55 @@ export default function Customers() {
                   <Loader inline size="small" active />
                 ) : (
                   <MSubmitButton submit={createCustomer} />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {viewPort === 'change' && (
+        <div className="flex items-start">
+          <div className="flex flex-col space-y-5">
+            <TextInputLogin
+              label="Name"
+              type="text"
+              placeholder="Names"
+              isRequired
+              value={name}
+              setValue={setName}
+            />
+
+            <TextInputLogin
+              label="Contact number"
+              type="text"
+              placeholder="phone"
+              isRequired
+              value={phone}
+              setValue={setPhone}
+            />
+
+            <TextInputLogin
+              label="Email"
+              type="email"
+              placeholder="email@example.com"
+              setValue={setEmail}
+              value={email}
+            />
+            <TextInputLogin
+              label="TIN"
+              type="number"
+              value={tinNumber}
+              placeholder="999999999"
+              setValue={setTinNumber}
+            />
+
+            {name.length > 1 && phone.length > 1 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={updateCustomer} />
                 )}
               </div>
             )}
