@@ -21,10 +21,14 @@ export default function Users() {
   let [phone, setPhone] = useState('')
   let [email, setEmail] = useState('')
   let [role, setRole] = useState('display')
+  let [userCompany, setUserCompany] = useState(null)
   let [loadingProjects, setLoadingProjects] = useState(false)
   let [projectList, setProjectList] = useState([])
   let [projects, setProjects] = useState([])
   let [projectAssigned, setProjectAssigned] = useState(null)
+  let [submitting, setSubmitting] = useState(false)
+
+  let [idToUpdate, setIdToUpdate] = useState('')
 
   let { user, setUser } = useContext(UserContext)
   let myRole = user?.userType
@@ -42,7 +46,12 @@ export default function Users() {
         { key: '3', value: 'revenue', text: 'Revenue officer' },
         { key: '4', value: 'dispatch', text: 'Dispatch officer' },
         { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
-        { key: '5', value: 'customer-admin', text: 'Customer' },
+        { key: '6', value: 'customer-admin', text: 'Customer' },
+        {
+          key: '7',
+          value: 'customer-project-manager',
+          text: 'Project Manager',
+        },
       ]
 
   useEffect(() => {
@@ -112,6 +121,7 @@ export default function Users() {
   }
 
   function submit() {
+    setSubmitting(true)
     fetch(`${url}/users/`, {
       headers: {
         'Content-Type': 'application/json',
@@ -125,8 +135,10 @@ export default function Users() {
         email,
         phone,
         userType: role,
-        company: user?.company?._id,
-        assignedProject: projectAssigned,
+        company: userCompany ? userCompany : user?.company?._id,
+        assignedProject: projectAssigned
+          ? projectAssigned
+          : user.assignedProject,
         status: 'active',
       }),
     })
@@ -136,10 +148,61 @@ export default function Users() {
           toast.error(res.error)
         } else {
           setViewPort('list')
+          setSubmitting(false)
           refresh()
         }
       })
       .catch((err) => {})
+  }
+
+  function _setUserToUpdate(data) {
+    //ToDO
+
+    setViewPort('change')
+    setIdToUpdate(data._id)
+    setFirstName(data.firstName)
+    setLastName(data.lastName)
+    setPhone(data.phone)
+    setEmail(data.email)
+    setRole(data.userType)
+    console.log(data)
+  }
+
+  function updateUser() {
+    //TODO
+    setSubmitting(true)
+    fetch(`${url}/users/${idToUpdate}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        phone,
+        userType: role,
+        company: userCompany ? userCompany : user?.company?._id,
+        assignedProject: projectAssigned
+          ? projectAssigned
+          : user.assignedProject,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        if (res.error) {
+          toast.error(res.error)
+        } else {
+          setViewPort('list')
+          setSubmitting(false)
+          refresh()
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false)
+        toast.error(err)
+      })
   }
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
@@ -169,7 +232,7 @@ export default function Users() {
           />
         )}
 
-        {viewPort === 'new' && (
+        {(viewPort === 'new' || viewPort === 'change') && (
           <MSubmitButton
             submit={() => {
               setViewPort('list')
@@ -186,7 +249,11 @@ export default function Users() {
         <>
           {!loading && users?.length > 0 && (
             <div className="flex w-full">
-              <UsersTable data={users} handleResetPassword={resetPassword} />
+              <UsersTable
+                data={users}
+                handleResetPassword={resetPassword}
+                handleChange={_setUserToUpdate}
+              />
             </div>
           )}
           {(loading || !users) && (
@@ -266,7 +333,7 @@ export default function Users() {
                 </div>
               </div>
 
-              {isCustomer && (
+              {role == 'customer-project-manager' && (
                 <div className="flex flex-col">
                   <div className="flex flex-row items-center">
                     <MTextView content="Assign to Project" />
@@ -283,15 +350,138 @@ export default function Users() {
                         setProjectAssigned(
                           projects.filter((p) => p._id === data.value)[0]
                         )
+                        setUserCompany(projectAssigned?.customerId)
                       }}
                     />
                   </div>
                 </div>
               )}
             </div>
-            <div className="">
-              <MSubmitButton submit={submit} />
+            {firstName.length >= 1 &&
+              phone.length === 10 &&
+              email.length > 0 && (
+                <div>
+                  {submitting ? (
+                    <Loader inline size="small" active />
+                  ) : (
+                    <MSubmitButton submit={submit} />
+                  )}
+                </div>
+              )}
+          </div>
+        </>
+      )}
+
+      {viewPort === 'change' && (
+        <>
+          <div className="flex flex-col space-y-5">
+            <div className="mt-5 flex flex-row items-center space-x-2">
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="First Name" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="First name"
+                  type="text"
+                  value={firstName}
+                  setValue={setFirstName}
+                />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Last Name" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="Last name"
+                  type="text"
+                  value={lastName}
+                  setValue={setLastName}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Phone" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="Phone"
+                  type="text"
+                  value={phone}
+                  setValue={setPhone}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Email" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="email"
+                  type="email"
+                  value={email}
+                  setValue={setEmail}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="User Role" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <div className="">
+                  <Dropdown
+                    options={rolesOptions}
+                    placeholder="Role"
+                    fluid
+                    search
+                    selection
+                    value={role}
+                    onChange={(e, data) => {
+                      setRole(data.value)
+                    }}
+                  />
+                </div>
+              </div>
+
+              {role == 'customer-project-manager' && (
+                <div className="flex flex-col">
+                  <div className="flex flex-row items-center">
+                    <MTextView content="Assign to Project" />
+                    {<div className="text-sm text-red-600">*</div>}
+                  </div>
+                  <div>
+                    <Dropdown
+                      options={projectList}
+                      placeholder="Assigned to Project...."
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setProjectAssigned(
+                          projects.filter((p) => p._id === data.value)[0]
+                        )
+                        setUserCompany(projectAssigned?.customerId)
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
+            {firstName.length >= 1 &&
+              phone.length === 10 &&
+              email.length > 0 && (
+                <div>
+                  {submitting ? (
+                    <Loader inline size="small" active />
+                  ) : (
+                    <MSubmitButton submit={updateUser} />
+                  )}
+                </div>
+              )}
           </div>
         </>
       )}

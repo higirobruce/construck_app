@@ -18,6 +18,8 @@ export default function EqStatusCard({ intent, data, icon, onClick }) {
       return 'flex flex-col space-y-1 py-1 px-3 rounded shadow-lg ring-1 ring-sky-300 text-zinc-600 w-36 cursor-pointer'
     } else if (intent == 'workshop') {
       return 'flex flex-col space-y-1 py-1 px-3 rounded shadow-lg ring-1 ring-red-300 text-zinc-600 w-36 cursor-pointer'
+    } else if (intent == 'disposed') {
+      return 'flex flex-col space-y-1 py-1 px-3 rounded shadow-lg ring-1 ring-red-300 text-zinc-600 w-36 cursor-pointer'
     } else if (intent == 'technicalInsp') {
       return 'flex flex-col space-y-1 py-1 px-3 rounded shadow-lg ring-1 ring-yellow-300 text-zinc-600 w-36 cursor-pointer'
     } else {

@@ -40,6 +40,7 @@ export default function Equipments() {
   let [nAssigned, setNAssigned] = useState(0)
   let [nStandby, setNStandby] = useState(0)
   let [nInWorkshop, setNInWorkshop] = useState(0)
+  let [nDisposed, setNDisposed] = useState(0)
   let [nInTechnicalInsp, setNInTechnicalInsp] = useState(0)
   let [nDispatched, setNDispatched] = useState(0)
   let [ogEquipmentList, setOgEquipmentList] = useState([])
@@ -62,11 +63,15 @@ export default function Equipments() {
   let [supplierRate, setSupplierRate] = useState(0)
   let [uom, setUom] = useState('')
 
+  let [idToUpdate, setIdToUpdate] = useState('')
+
   let [rowId, setRowId] = useState()
   let [sendToWorkshopModalIsShown, setSendToWorkshopModalIsShown] =
     useState(false)
   let [makeAvailableModalIsShown, setMakeAvailableModalIsShown] =
     useState(false)
+
+  let [disposeModalIsShown, setDisposeModalIsShown] = useState(false)
 
   let [vendorOptions, setVendorOptions] = useState([])
 
@@ -146,14 +151,16 @@ export default function Equipments() {
   }, [search])
 
   useEffect(() => {
-    setPlateNumber('')
-    setEqDescription('')
-    setAsseClass('')
-    setEqType('')
-    setEqOwner('')
-    setRate(0)
-    setSupplierRate(0)
-    setUom('')
+    if (viewPort !== 'change') {
+      setPlateNumber('')
+      setEqDescription('')
+      setAsseClass('')
+      setEqType('')
+      setEqOwner('')
+      setRate(0)
+      setSupplierRate(0)
+      setUom('')
+    }
   }, [viewPort])
 
   function getListOfOwners() {
@@ -202,6 +209,7 @@ export default function Equipments() {
         let dispatchedEq = res?.dispatched
         let inWorkshopEq = res?.workshop
         let onStandby = res?.standby
+        let disposed = res?.disposed
         let inCT = res?.ct
 
         setNAssigned(assignedEq)
@@ -209,6 +217,7 @@ export default function Equipments() {
         setNDispatched(dispatchedEq)
         setNInWorkshop(inWorkshopEq)
         setNStandby(onStandby)
+        setNDisposed(disposed)
         setNInTechnicalInsp(inCT)
         setOgEquipmentList(eqs)
         setEquipments(eqs)
@@ -311,11 +320,13 @@ export default function Equipments() {
         let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
         let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
         let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
 
         setNAssigned(assignedEq.length)
         setNAvailable(availableEq.length)
         setNDispatched(dispatchedEq.length)
         setNInWorkshop(inWorkshopEq.length)
+        setNDisposed(disposed.length)
       })
       .catch((err) => {})
   }
@@ -347,6 +358,58 @@ export default function Equipments() {
         _eqs[indexToUpdate] = eqToUpdate
         setEquipments(_eqs)
         // setOgEquipmentList(_eqs)
+        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
+
+        setNAssigned(assignedEq.length)
+        setNAvailable(availableEq.length)
+        setNDispatched(dispatchedEq.length)
+        setNInWorkshop(inWorkshopEq.length)
+        setNDisposed(disposed.length)
+      })
+  }
+
+  function disposeEquipment() {
+    let _eqs = [...equipments]
+    let indexToUpdate = 0
+    let eqToUpdate = _eqs.find((e, index) => {
+      indexToUpdate = index
+      return e._id == rowId
+    })
+    eqToUpdate.eqStatus = 'updating'
+    _eqs[indexToUpdate] = eqToUpdate
+    setEquipments(_eqs)
+
+    fetch(`${url}/equipments/dispose/${rowId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let _eqs = [...equipments]
+        let indexToUpdate = 0
+        let eqToUpdate = _eqs.find((e, index) => {
+          indexToUpdate = index
+          return e._id == rowId
+        })
+        eqToUpdate.eqStatus = 'disposed'
+        _eqs[indexToUpdate] = eqToUpdate
+        setEquipments(_eqs)
+        // setOgEquipmentList(_eqs)
+        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
+
+        setNAssigned(assignedEq.length)
+        setNAvailable(availableEq.length)
+        setNDispatched(dispatchedEq.length)
+        setNInWorkshop(inWorkshopEq.length)
+        setNDisposed(disposed.length)
       })
   }
 
@@ -358,6 +421,11 @@ export default function Equipments() {
   function _setMakeAvailableRow(id) {
     setRowId(id)
     setMakeAvailableModalIsShown(true)
+  }
+
+  function _setDisposeRow(id) {
+    setRowId(id)
+    setDisposeModalIsShown(true)
   }
 
   function createEquipment() {
@@ -458,6 +526,16 @@ export default function Equipments() {
           handleConfirm={makeAvailable}
         />
       )}
+
+      {disposeModalIsShown && (
+        <Modal
+          title="Dispose asset."
+          body="Are you sure you want to dispose this asset?"
+          isShown={disposeModalIsShown}
+          setIsShown={setDisposeModalIsShown}
+          handleConfirm={disposeEquipment}
+        />
+      )}
       <div className="my-5 flex flex-col space-y-5 px-10">
         <div className="text-2xl font-semibold">Equipment</div>
         <div className="flex w-full flex-row items-center justify-between space-x-4">
@@ -545,6 +623,21 @@ export default function Equipments() {
                   filterBy === 'workshop'
                     ? setFilterBy('all')
                     : setFilterBy('workshop')
+                }
+              />
+
+              <EqStatusCard
+                data={{ title: 'Disposed', content: nDisposed }}
+                intent={
+                  filterBy === 'disposed' || filterBy === 'all'
+                    ? 'disposed'
+                    : ''
+                }
+                icon={<BanIcon className="h-5 w-5" />}
+                onClick={() =>
+                  filterBy === 'disposed'
+                    ? setFilterBy('all')
+                    : setFilterBy('disposed')
                 }
               />
 
@@ -723,6 +816,7 @@ export default function Equipments() {
                       intent={e.eqOwner === 'Construck' ? e.eqStatus : 'hired'}
                       handleSendToWorkshop={_setToWorkshopRow}
                       handleMakeAvailable={_setMakeAvailableRow}
+                      handleDispose={_setDisposeRow}
                       handleChange={_setToChange}
                       canMoveAssets={canMoveAssets}
                     />

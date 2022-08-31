@@ -178,7 +178,10 @@ export default function WorkListTable({
     data = _pData
     pData = paginate(_pData, pageNumber, pageSize).pagedData
     pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
-  } else if (user.userType === 'customer-site-manager') {
+  } else if (
+    user.userType === 'customer-site-manager' ||
+    user.userType === 'customer-project-manager'
+  ) {
     let _pData = data.filter((p) => {
       // console.log(p.project, user.assignedProject?._id)
       return p.project?.prjDescription === user.assignedProject?.prjDescription
