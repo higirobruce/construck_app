@@ -9,6 +9,7 @@ import {
   CogIcon,
   BanIcon,
   DotsHorizontalIcon,
+  TrashIcon,
 } from '@heroicons/react/outline'
 import {
   FolderOpenIcon,
@@ -85,13 +86,17 @@ export default function EquipmentType({
   icon,
   handleSendToWorkshop,
   handleMakeAvailable,
+  handleDispose,
   canMoveAssets,
+  handleChange,
 }) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded  bg-white shadow-lg ring-1 ring-zinc-200 w-full'
     } else if (intent == 'dispatched') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-200 ring-1 ring-zinc-200 w-full'
+    } else if (intent == 'disposed') {
+      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-100 ring-1 ring-red-200 w-full'
     } else if (intent == 'assigned to job') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded bg-orange-50  w-full ring-1 ring-orange-200'
     } else if (intent == 'workshop') {
@@ -109,7 +114,10 @@ export default function EquipmentType({
       <div className="grid grid-cols-3 py-1">
         <div className="col-span-2 flex flex-col">
           <div className="flex flex-row items-center">
-            <div className="text-lg font-semibold text-gray-700">
+            <div
+              className="cursor-pointer text-lg font-semibold text-gray-700"
+              onClick={() => handleChange(data)}
+            >
               {data.plateNumber}
             </div>
             {/* <MStatusIndicator status={data.eqStatus} /> */}
@@ -139,6 +147,7 @@ export default function EquipmentType({
             }
           /> */}
             {data.eqStatus !== 'workshop' &&
+              data.eqStatus !== 'disposed' &&
               data.eqStatus !== 'assigned to job' &&
               data.eqStatus !== 'dispatched' &&
               data.eqOwner === 'Construck' &&
@@ -164,16 +173,29 @@ export default function EquipmentType({
               )}
 
             {data.eqStatus === 'workshop' && canMoveAssets && (
-              <SwitchHorizontalIcon
-                onClick={() => {
-                  handleMakeAvailable(data.id)
-                }}
-                className={
-                  intent === 'workshop'
-                    ? 'h-5 w-5 cursor-pointer text-teal-400'
-                    : 'h-5 w-5 text-teal-300'
-                }
-              />
+              <div className="flex flex-col justify-between">
+                <SwitchHorizontalIcon
+                  onClick={() => {
+                    handleMakeAvailable(data.id)
+                  }}
+                  className={
+                    intent === 'workshop'
+                      ? 'h-5 w-5 cursor-pointer text-teal-400'
+                      : 'h-5 w-5 text-teal-300'
+                  }
+                />
+
+                <TrashIcon
+                  onClick={() => {
+                    handleDispose(data.id)
+                  }}
+                  className={
+                    intent === 'workshop'
+                      ? 'h-5 w-5 cursor-pointer text-red-400'
+                      : 'h-5 w-5 text-red-300'
+                  }
+                />
+              </div>
             )}
           </div>
         )}

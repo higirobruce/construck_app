@@ -32,8 +32,12 @@ export default function MenuBar() {
     role === 'revenue' ||
     role === 'vendor' ||
     role === 'customer-admin' ||
+    role === 'customer-project-manager' ||
     role === 'customer-site-manager'
-  let canSeeUsers = role === 'admin' || role === 'customer-admin'
+  let canSeeUsers =
+    role === 'admin' ||
+    role === 'customer-admin' ||
+    role === 'customer-project-manager'
   let canSeeSettings = role === 'admin'
   let canSeeDrivers = role === 'admin'
   let canSeeVendors = role === 'admin'

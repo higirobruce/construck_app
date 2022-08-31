@@ -137,7 +137,7 @@ export default function Reversals() {
       </div>
 
       {/* List of posted records */}
-      <div className="flex flex-col space-y-1 overflow-y-auto">
+      <div className="flex flex-col space-y-1">
         {loading ? (
           <div className="mx-auto">
             <Loader active />
@@ -145,7 +145,7 @@ export default function Reversals() {
         ) : (
           transactions && (
             <>
-              <div className="grid grid-cols-10 px-2">
+              <div className="grid grid-cols-10 overflow-y-auto px-2">
                 {/* Plate NUmber */}
                 <MTitle content="Plate Number" />
                 <MTitle content="Driver" />

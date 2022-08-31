@@ -91,11 +91,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         status: 'projected',
         customer,
         project,
@@ -119,11 +117,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
       }),
     })
       .then((res) => res.json())
@@ -150,11 +146,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         status: 'final',
         customer,
         project,
@@ -180,11 +174,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         status: 'projected',
         customer,
         project,
@@ -208,11 +200,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
       }),
     })
       .then((res) => res.json())
@@ -236,11 +226,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         status: 'final',
         customer,
         project,
@@ -273,11 +261,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         status: 'final',
         customer,
         project,
@@ -310,11 +296,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         status: 'final',
         customer,
         project,
@@ -347,11 +331,9 @@ export default function Dashboard() {
       },
       body: JSON.stringify({
         startDate: startDate
-          ? Date.parse(startDate)
+          ? startDate
           : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate
-          ? Date.parse(endDate).addHours(23).addMinutes(59)
-          : Date.today(),
+        endDate: endDate ? endDate : Date.today(),
         customer,
         project,
         equipment,
@@ -529,7 +511,7 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="mt-5 sm:mr-5">
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
           <StatisticCard
             data={{
               title: 'Projected Revenues',
@@ -576,7 +558,7 @@ export default function Dashboard() {
             icon={<TruckIcon className="h-5 w-5 text-yellow-500" />}
           />
 
-          {/* <StatisticCard
+          <StatisticCard
             // intent="danger"
             data={{
               title: 'Average Downtime',
@@ -587,7 +569,7 @@ export default function Dashboard() {
               ),
             }}
             icon={<ClockIcon className="h-5 w-5 text-red-500" />}
-          /> */}
+          />
         </div>
       </div>
 
