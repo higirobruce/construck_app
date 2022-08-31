@@ -1,6 +1,7 @@
 import {
   AdjustmentsIcon,
   ArrowLeftIcon,
+  BanIcon,
   CheckIcon,
   CogIcon,
   DocumentDuplicateIcon,
@@ -392,6 +393,50 @@ export default function Equipments() {
       })
   }
 
+  function _setToChange(data) {
+    setIdToUpdate(data.id)
+    setPlateNumber(data.plateNumber)
+    setRate(data.rate)
+    setSupplierRate(data.supplierRate)
+    setEqDescription(data.description)
+    setAsseClass(data.assetClass)
+    setEqType(data.eqType)
+    setUom(data.uom)
+    setViewPort('change')
+  }
+
+  function updateEquipment() {
+    setSubmitting(true)
+    fetch(`${url}/equipments/${idToUpdate}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plateNumber,
+        eqDescription,
+        assetClass,
+        eqtype,
+        eqOwner,
+        rate,
+        supplierRate,
+        uom,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error)
+          setSubmitting(false)
+        } else {
+          refresh()
+          setSubmitting(false)
+          setViewPort('list')
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false)
+      })
+  }
+
   return (
     <>
       {sendToWorkshopModalIsShown && (
@@ -431,7 +476,7 @@ export default function Equipments() {
             </div>
           )}
 
-          {viewPort === 'new' && (
+          {(viewPort === 'new' || viewPort === 'change') && (
             <MSubmitButton
               submit={() => {
                 setViewPort('list')
@@ -670,10 +715,15 @@ export default function Equipments() {
                         eqStatus: e.eqStatus,
                         description: e.eqDescription,
                         id: e._id,
+                        rate: e.rate,
+                        supplierRate: e.supplierRate,
+                        assetClass: e.assetClass,
+                        uom: e.uom,
                       }}
                       intent={e.eqOwner === 'Construck' ? e.eqStatus : 'hired'}
                       handleSendToWorkshop={_setToWorkshopRow}
                       handleMakeAvailable={_setMakeAvailableRow}
+                      handleChange={_setToChange}
                       canMoveAssets={canMoveAssets}
                     />
                   )
@@ -824,6 +874,162 @@ export default function Equipments() {
                       <Loader inline size="small" active />
                     ) : (
                       <MSubmitButton submit={createEquipment} />
+                    )}
+                  </div>
+                )}
+            </div>
+          </div>
+        )}
+
+        {viewPort === 'change' && (
+          <div className="flex items-start">
+            <div className="flex flex-col space-y-5">
+              <div className="grid-col grid grid-cols-2 gap-5">
+                {/* Inputs col1 */}
+                <div className="flex flex-col items-start space-y-5">
+                  {/* Plate number */}
+                  <TextInputLogin
+                    label="Plate number"
+                    placeholder="RAA 000 D"
+                    type="text"
+                    value={plateNumber}
+                    setValue={setPlateNumber}
+                    isRequired
+                  />
+
+                  {/* Eq Description */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Equipment Type" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={equipmentTypeOptions}
+                      placeholder="Select equipment type"
+                      fluid
+                      search
+                      selection
+                      value={eqDescription}
+                      onChange={(e, data) => {
+                        setEqDescription(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Asset Class */}
+
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Asset Class" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={assetClassOptions}
+                      placeholder="Select asset class"
+                      fluid
+                      search
+                      selection
+                      value={assetClass}
+                      onChange={(e, data) => {
+                        setAsseClass(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Eq Type */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Asset Type" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={assetTypeOptions}
+                      placeholder="Select asset type"
+                      fluid
+                      search
+                      selection
+                      value={eqtype}
+                      onChange={(e, data) => {
+                        setEqType(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Eq Owner */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Equipment Owner" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={vendorOptions}
+                      placeholder="Select Owner"
+                      fluid
+                      search
+                      selection
+                      value={eqOwner}
+                      onChange={(e, data) => {
+                        setEqOwner(data.value)
+                      }}
+                    />
+                  </div>
+                </div>
+                {/* Inputs col2*/}
+                <div className="flex flex-col space-y-5">
+                  {/* Rate */}
+                  <TextInputLogin
+                    label="Rate"
+                    placeholder="rate"
+                    type="number"
+                    value={rate}
+                    setValue={setRate}
+                    isRequired
+                  />
+
+                  {/* Supplier rate */}
+                  <TextInputLogin
+                    label="Supplier Rate"
+                    placeholder="supplier rate"
+                    type="number"
+                    setValue={setSupplierRate}
+                    value={supplierRate}
+                  />
+
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Unit of measurement" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={[
+                        { key: 1, text: 'Hour', value: 'hour' },
+                        { key: 1, text: 'Day', value: 'day' },
+                      ]}
+                      placeholder="Select UoM"
+                      fluid
+                      search
+                      selection
+                      value={uom}
+                      onChange={(e, data) => {
+                        setUom(data.value)
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {plateNumber.length > 1 &&
+                eqtype.length > 1 &&
+                assetClass.length > 1 &&
+                eqDescription.length > 1 &&
+                eqOwner.length > 1 &&
+                rate >= 1 &&
+                uom.length > 1 && (
+                  <div>
+                    {submitting ? (
+                      <Loader inline size="small" active />
+                    ) : (
+                      <MSubmitButton submit={updateEquipment} />
                     )}
                   </div>
                 )}

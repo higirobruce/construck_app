@@ -433,6 +433,10 @@ export default function Dashboard() {
     fetch(`${url}/works/gethoursperdriver`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startDate,
+        endDate,
+      }),
     })
       .then((res) => res.json())
       .then((res) => {
