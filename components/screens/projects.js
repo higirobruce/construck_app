@@ -35,6 +35,9 @@ export default function Projects() {
   let [submitting, setSubmitting] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
+  let [idToUpdate, setIdToUpdate] = useState('')
+  let [customerId, setCustomerId] = useState('')
+
   useEffect(() => {
     fetch(`${url}/projects/v2`)
       .then((res) => res.json())
@@ -78,6 +81,21 @@ export default function Projects() {
       setLoading(false)
     }
   }, [search])
+
+  useEffect(() => {
+    let _projList = [...ogProjectList]
+    setProjects(
+      statusFilter !== 'all'
+        ? _projList.filter((e) => e.eqStatus === statusFilter)
+        : ogProjectList
+    )
+  }, [statusFilter])
+
+  useEffect(() => {
+    if (filterBy === statusFilter) {
+      setStatusFilter('all')
+    } else setStatusFilter(filterBy)
+  }, [filterBy])
 
   function refresh() {
     setLoading(true)
@@ -142,20 +160,33 @@ export default function Projects() {
       .catch((err) => {})
   }
 
-  useEffect(() => {
-    let _projList = [...ogProjectList]
-    setProjects(
-      statusFilter !== 'all'
-        ? _projList.filter((e) => e.eqStatus === statusFilter)
-        : ogProjectList
-    )
-  }, [statusFilter])
+  function _setPrjToUpdate(data) {
+    //TODO
+    setViewPort('change')
+    setProjectDescription(data.prjDescription)
+    setIdToUpdate(data.id)
+    setCustomerId(data.customerId)
+  }
 
-  useEffect(() => {
-    if (filterBy === statusFilter) {
-      setStatusFilter('all')
-    } else setStatusFilter(filterBy)
-  }, [filterBy])
+  function updateProject() {
+    //TODO
+    setSubmitting(true)
+    fetch(`${url}/customers/project/${idToUpdate}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId,
+        prjDescription: projectDescription,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setSubmitting(false)
+        refresh()
+        setViewPort('list')
+      })
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Projects</div>
@@ -175,7 +206,7 @@ export default function Projects() {
           </div>
         )}
 
-        {viewPort === 'new' && (
+        {(viewPort === 'new' || viewPort === 'change') && (
           <MSubmitButton
             submit={() => {
               setViewPort('list')
@@ -211,8 +242,10 @@ export default function Projects() {
                       prjDescription: e.prjDescription,
                       status: e.status,
                       customer: e.customer,
+                      id: e._id,
+                      customerId: e.customerId,
                     }}
-                    // intent={e.eqStatus}
+                    handleChange={_setPrjToUpdate}
                   />
                 )
               })}
@@ -268,6 +301,37 @@ export default function Projects() {
                   <Loader inline size="small" active />
                 ) : (
                   <MSubmitButton submit={submit} />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {viewPort === 'change' && (
+        <div className="flex items-start">
+          <div className="flex flex-col space-y-5">
+            <div className="grid-col grid grid-cols-2 gap-5">
+              {/* Inputs col1 */}
+              <div className="flex flex-col items-start space-y-5">
+                {/* Plate number */}
+                <TextInputLogin
+                  label="Project Description"
+                  placeholder="Project description"
+                  type="text"
+                  setValue={setProjectDescription}
+                  value={projectDescription}
+                  isRequired
+                />
+              </div>
+            </div>
+
+            {projectDescription.length >= 4 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={updateProject} />
                 )}
               </div>
             )}

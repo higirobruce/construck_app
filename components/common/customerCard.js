@@ -11,7 +11,7 @@ import {
 import { FolderIcon, FolderOpenIcon } from '@heroicons/react/solid'
 import React from 'react'
 
-export default function CustomerCard({ intent, data, icon }) {
+export default function CustomerCard({ intent, data, icon, updateMe }) {
   function getClassFromIntent(intent) {
     if (intent == 'primary') {
       return 'flex flex-col space-y-10 p-2 rounded bg-blue-200  w-full'
@@ -30,7 +30,10 @@ export default function CustomerCard({ intent, data, icon }) {
   return (
     <div className={getClassFromIntent(intent)}>
       <div className="flex flex-row items-center justify-between">
-        <div className="text-lg font-semibold text-gray-700">
+        <div
+          className="cursor-pointer text-lg font-semibold text-gray-700"
+          onClick={() => updateMe(data)}
+        >
           {data.name + '  (' + data.nProjects + ')'}
         </div>
         {/* <div className="flex flex-row space-x-3">

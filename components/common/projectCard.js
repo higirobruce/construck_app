@@ -72,7 +72,7 @@ const MStatusIndicator = ({ status }) => {
     )
   }
 }
-export default function ProjectCard({ intent, data, icon }) {
+export default function ProjectCard({ intent, data, icon, handleChange }) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
       return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
@@ -93,7 +93,10 @@ export default function ProjectCard({ intent, data, icon }) {
       <div className="flex flex-row items-start justify-between py-1">
         <div className="flex flex-col">
           <div className="flex flex-row items-center space-x-3">
-            <div className="text-lg font-semibold text-gray-700">
+            <div
+              className="cursor-pointer text-lg font-semibold text-gray-700"
+              onClick={() => handleChange(data)}
+            >
               {data.prjDescription}
             </div>
             {/* <MStatusIndicator status={data.status} /> */}

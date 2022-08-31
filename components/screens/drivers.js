@@ -22,9 +22,12 @@ export default function Drivers() {
   let [email, setEmail] = useState('')
   let [title, setTitle] = useState('display')
   let [loadingProjects, setLoadingProjects] = useState(false)
+  let [submitting, setSubmitting] = useState(false)
   let [projectList, setProjectList] = useState([])
   let [projects, setProjects] = useState([])
   let [projectAssigned, setProjectAssigned] = useState(null)
+
+  let [idToUpdate, setIdToUpdate] = useState('')
 
   let { user, setUser } = useContext(UserContext)
   let myRole = user?.userType
@@ -256,6 +259,7 @@ export default function Drivers() {
   }
 
   function submit() {
+    setSubmitting(true)
     fetch(`${url}/employees/`, {
       headers: {
         'Content-Type': 'application/json',
@@ -279,12 +283,51 @@ export default function Drivers() {
           toast.error(res.error)
         } else {
           setViewPort('list')
+          setSubmitting(false)
           refresh()
         }
       })
       .catch((err) => {})
   }
 
+  function _setDriverToUpdate(row) {
+    setViewPort('change')
+    setIdToUpdate(row._id)
+    setFirstName(row.firstName)
+    setLastName(row.lastName)
+    setPhone(row.phone)
+    setEmail(row.email)
+    setTitle(row.title)
+  }
+
+  function updateDriver() {
+    fetch(`${url}/employees/${idToUpdate}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        username: firstName.toLowerCase(),
+        email,
+        phone,
+        userType: title,
+        title,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error)
+        } else {
+          setViewPort('list')
+          setSubmitting(false)
+          refresh()
+        }
+      })
+      .catch((err) => {})
+  }
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Drivers</div>
@@ -313,7 +356,7 @@ export default function Drivers() {
           />
         )}
 
-        {viewPort === 'new' && (
+        {(viewPort === 'new' || viewPort === 'change') && (
           <MSubmitButton
             submit={() => {
               setViewPort('list')
@@ -333,6 +376,7 @@ export default function Drivers() {
               <DriversTable
                 data={drivers}
                 handleResetPassword={resetPassword}
+                handleChange={_setDriverToUpdate}
               />
             </div>
           )}
@@ -385,7 +429,6 @@ export default function Drivers() {
               <div className="flex flex-col">
                 <div className="flex flex-row items-center">
                   <MTextView content="Email" />
-                  {<div className="text-sm text-red-600">*</div>}
                 </div>
                 <TextInputV
                   placeholder="email"
@@ -436,9 +479,125 @@ export default function Drivers() {
                 </div>
               )}
             </div>
-            <div className="">
-              <MSubmitButton submit={submit} />
+            {firstName.length >= 1 && phone.length === 10 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={submit} />
+                )}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {viewPort === 'change' && (
+        <>
+          <div className="flex flex-col space-y-5">
+            <div className="mt-5 flex flex-row items-center space-x-2">
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="First Name" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="First name"
+                  type="text"
+                  value={firstName}
+                  setValue={setFirstName}
+                />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Last Name" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="Last name"
+                  type="text"
+                  value={lastName}
+                  setValue={setLastName}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Phone" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="Phone"
+                  type="text"
+                  value={phone}
+                  setValue={setPhone}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Email" />
+                </div>
+                <TextInputV
+                  placeholder="email"
+                  type="email"
+                  value={email}
+                  setValue={setEmail}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Title" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <div className="">
+                  <Dropdown
+                    options={titleOptions}
+                    placeholder="Select driver's title"
+                    fluid
+                    search
+                    selection
+                    value={title}
+                    onChange={(e, data) => {
+                      setTitle(data.value)
+                    }}
+                  />
+                </div>
+              </div>
+
+              {isCustomer && (
+                <div className="flex flex-col">
+                  <div className="flex flex-row items-center">
+                    <MTextView content="Assign to Project" />
+                    {<div className="text-sm text-red-600">*</div>}
+                  </div>
+                  <div>
+                    <Dropdown
+                      options={projectList}
+                      placeholder="Assigned to Project...."
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setProjectAssigned(
+                          projects.filter((p) => p._id === data.value)[0]
+                        )
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
+            {firstName.length >= 1 && phone.length === 10 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={updateDriver} />
+                )}
+              </div>
+            )}
           </div>
         </>
       )}
