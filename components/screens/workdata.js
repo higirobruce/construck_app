@@ -708,11 +708,11 @@ export default function Workdata() {
 
   useEffect(() => {
     if (startDate && endDate && workList) {
-      let _workList = ogWorkList?.filter((w) => {
+      let _workList = workList?.filter((w) => {
         return (
-          Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-          Date.parse(endDate).addHours(23).addMinutes(59) >=
-            Date.parse(w?.dispatch?.date)
+          Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+          Date.parse(endDate).addHours(23).addMinutes(59) <=
+            Date.parse(w?.workEndDate)
         )
       })
       setWorkList(_workList)
@@ -1429,7 +1429,9 @@ export default function Workdata() {
 
   function download() {
     setDownloadingData(true)
-    fetch(`${url}/works/detailed/${canViewRenues}`)
+    fetch(
+      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}`
+    )
       .then((res) => res.json())
       .then((res) => {
         let data = res.map((r) => {
