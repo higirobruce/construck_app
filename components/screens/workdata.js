@@ -653,7 +653,7 @@ export default function Workdata() {
     if (search.length >= 3) {
       setLoadingData(true)
 
-      let _workList = workList.filter((w) => {
+      let _workList = ogWorkList.filter((w) => {
         let _search = search?.toLocaleLowerCase()
         let desc = w?.project?.prjDescription?.toLocaleLowerCase()
         let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
@@ -721,7 +721,7 @@ export default function Workdata() {
     if (startDate && endDate && workList) {
       let _workList = workList?.filter((w) => {
         return (
-          Date.parse(startDate) <= Date.parse(w?.workEndDate) &&
+          Date.parse(startDate) <= Date.parse(w?.workStartDate) ||
           Date.parse(endDate).addHours(23).addMinutes(59) >=
             Date.parse(w?.workEndDate)
         )
