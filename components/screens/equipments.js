@@ -523,7 +523,7 @@ export default function Equipments() {
               'Plate number': w.plateNumber,
               'Equipment type': w.eqDescription,
               'Asset class': w.assetClass,
-              'Equipment category': w.eqType,
+              'Equipment category': w.eqtype,
               Owner: w.eqOwner,
               Status: w.eqStatus,
               Rate: w.rate,
