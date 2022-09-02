@@ -704,10 +704,10 @@ export default function Workdata() {
       )
 
       if (owner === 'All') {
-        setWorkList(list)
+        setWorkList(ogWorkList)
         setLoadingData(false)
       } else {
-        let _wList = list.filter((w) => {
+        let _wList = ogWorkList.filter((w) => {
           return owner === 'Construck'
             ? w?.equipment.eqOwner === 'Construck'
             : w?.equipment.eqOwner !== 'Construck'
