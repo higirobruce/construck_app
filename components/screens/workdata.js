@@ -688,16 +688,16 @@ export default function Workdata() {
       setWorkList(_workList)
       setLoadingData(false)
     } else {
-      setStartDate(
-        Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
-      )
-      setEndDate(
-        Date.today()
-          .clearTime()
-          .moveToLastDayOfMonth()
-          .addHours(23)
-          .addMinutes(59)
-      )
+      // setStartDate(
+      //   Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
+      // )
+      // setEndDate(
+      //   Date.today()
+      //     .clearTime()
+      //     .moveToLastDayOfMonth()
+      //     .addHours(23)
+      //     .addMinutes(59)
+      // )
       if (owner === 'All') {
         setWorkList(ogWorkList)
         setLoadingData(false)
