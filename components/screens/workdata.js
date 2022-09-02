@@ -692,20 +692,17 @@ export default function Workdata() {
       setWorkList(_workList)
       setLoadingData(false)
     } else {
-      // setStartDate(
-      //   Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
-      // )
-      // setEndDate(
-      //   Date.today()
-      //     .clearTime()
-      //     .moveToLastDayOfMonth()
-      //     .addHours(23)
-      //     .addMinutes(59)
-      // )
-      let list = ogWorkList
-      if (ogWorkList?.length >= workList?.length) {
-        list = workList
-      }
+      setStartDate(
+        Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
+      )
+      setEndDate(
+        Date.today()
+          .clearTime()
+          .moveToLastDayOfMonth()
+          .addHours(23)
+          .addMinutes(59)
+      )
+
       if (owner === 'All') {
         setWorkList(list)
         setLoadingData(false)
