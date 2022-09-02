@@ -686,19 +686,6 @@ export default function Workdata() {
         _workList = _wList
       }
 
-      if (startDate && endDate) {
-        let _workList = workList?.filter((w) => {
-          return (
-            Date.parse(startDate) >= Date.parse(w?.workEndDate) &&
-            Date.parse(endDate).addHours(23).addMinutes(59) <=
-              Date.parse(w?.workEndDate)
-          )
-        })
-        setWorkList(_workList)
-        setLoadingData(false)
-      } else {
-        setWorkList(ogWorkList)
-      }
       setWorkList(_workList)
       setLoadingData(false)
     } else {
