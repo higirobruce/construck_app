@@ -652,8 +652,12 @@ export default function Workdata() {
   useEffect(() => {
     if (search.length >= 3) {
       setLoadingData(true)
+      let list = ogWorkList
+      if (ogWorkList?.length >= workList?.length) {
+        list = workList
+      }
 
-      let _workList = ogWorkList.filter((w) => {
+      let _workList = list.filter((w) => {
         let _search = search?.toLocaleLowerCase()
         let desc = w?.project?.prjDescription?.toLocaleLowerCase()
         let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
@@ -698,11 +702,15 @@ export default function Workdata() {
       //     .addHours(23)
       //     .addMinutes(59)
       // )
+      let list = ogWorkList
+      if (ogWorkList?.length >= workList?.length) {
+        list = workList
+      }
       if (owner === 'All') {
-        setWorkList(ogWorkList)
+        setWorkList(list)
         setLoadingData(false)
       } else {
-        let _wList = ogWorkList.filter((w) => {
+        let _wList = list.filter((w) => {
           return owner === 'Construck'
             ? w?.equipment.eqOwner === 'Construck'
             : w?.equipment.eqOwner !== 'Construck'
