@@ -652,12 +652,8 @@ export default function Workdata() {
   useEffect(() => {
     if (search.length >= 3) {
       setLoadingData(true)
-      let list = ogWorkList
-      if (ogWorkList?.length >= workList?.length) {
-        list = workList
-      }
 
-      let _workList = list.filter((w) => {
+      let _workList = ogWorkList.filter((w) => {
         let _search = search?.toLocaleLowerCase()
         let desc = w?.project?.prjDescription?.toLocaleLowerCase()
         let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
@@ -688,6 +684,20 @@ export default function Workdata() {
             : w?.equipment.eqOwner !== 'Construck'
         })
         _workList = _wList
+      }
+
+      if (startDate && endDate) {
+        let _workList = workList?.filter((w) => {
+          return (
+            Date.parse(startDate) >= Date.parse(w?.workEndDate) &&
+            Date.parse(endDate).addHours(23).addMinutes(59) <=
+              Date.parse(w?.workEndDate)
+          )
+        })
+        setWorkList(_workList)
+        setLoadingData(false)
+      } else {
+        setWorkList(ogWorkList)
       }
       setWorkList(_workList)
       setLoadingData(false)
