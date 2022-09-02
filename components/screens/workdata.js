@@ -718,11 +718,11 @@ export default function Workdata() {
   }, [search, owner])
 
   useEffect(() => {
-    if (startDate && endDate && workList) {
+    if (startDate && endDate) {
       let _workList = workList?.filter((w) => {
         return (
-          Date.parse(startDate) <= Date.parse(w?.workStartDate) ||
-          Date.parse(endDate).addHours(23).addMinutes(59) >=
+          Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+          Date.parse(endDate).addHours(23).addMinutes(59) <=
             Date.parse(w?.workEndDate)
         )
       })
