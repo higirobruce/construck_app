@@ -28,6 +28,10 @@ import TextInputLogin from '../common/TextIputLogin'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+import moment from 'moment'
+
 export default function Equipments() {
   let { user, setUser } = useContext(UserContext)
   //AUTORIZATION
@@ -62,6 +66,8 @@ export default function Equipments() {
   let [rate, setRate] = useState(0)
   let [supplierRate, setSupplierRate] = useState(0)
   let [uom, setUom] = useState('')
+
+  let [downloadingData, setDownloadingData] = useState(false)
 
   let [idToUpdate, setIdToUpdate] = useState('')
 
@@ -505,6 +511,59 @@ export default function Equipments() {
       })
   }
 
+  function download() {
+    setDownloadingData(true)
+
+    fetch(`${url}/equipments/`)
+      .then((res) => res.json())
+      .then((res) => {
+        let data = res['equipments'].map((w) => {
+          {
+            return {
+              'Plate number': w.plateNumber,
+              'Equipment type': w.eqDescription,
+              'Asset class': w.assetClass,
+              'Equipment category': w.eqType,
+              Owner: w.eqOwner,
+              Status: w.eqStatus,
+              Rate: w.rate,
+              'Supplier rate': w.supplierRate,
+              'Unit of measurement': w.uom,
+              'On site work?': w.assignedToSiteWork ? 'Yes' : 'No',
+              'Millage or Index': w.millage,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Equipment List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+      })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
+  }
+
   return (
     <>
       {sendToWorkshopModalIsShown && (
@@ -779,6 +838,17 @@ export default function Equipments() {
                     />
                   </label>
                 </div>
+              )}
+
+              {downloadingData ? (
+                <div>
+                  <Loader active size="tiny" inline className="ml-5" />
+                </div>
+              ) : (
+                <DownloadIcon
+                  className="h-5 w-5 cursor-pointer"
+                  onClick={() => download()}
+                />
               )}
 
               {/* <DownloadIcon className="h-5 w-5 cursor-pointer" /> */}

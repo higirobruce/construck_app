@@ -1,4 +1,9 @@
-import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
+import {
+  ArrowLeftIcon,
+  DownloadIcon,
+  PlusIcon,
+  RefreshIcon,
+} from '@heroicons/react/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import { Loader } from 'semantic-ui-react'
@@ -7,6 +12,11 @@ import CustomerCard from '../common/customerCard'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 import TextInputLogin from '../common/TextIputLogin'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+
+import moment from 'moment'
 
 export default function Customers() {
   let { user, setUser } = useContext(UserContext)
@@ -23,6 +33,7 @@ export default function Customers() {
   let [email, setEmail] = useState('')
   let [tinNumber, setTinNumber] = useState('')
   let [submitting, setSubmitting] = useState(false)
+  let [downloadingData, setDownloadingData] = useState(false)
 
   let [idToUpdate, setIdToUpdate] = useState('')
 
@@ -47,6 +58,7 @@ export default function Customers() {
         setOgCustomerList(resp)
         setLoadingCustomers(false)
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function createCustomer() {
@@ -72,7 +84,7 @@ export default function Customers() {
           loadCustomers()
         }
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function setCustomerToUpdate(data) {
@@ -107,7 +119,54 @@ export default function Customers() {
           loadCustomers()
         }
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error occured!'))
+  }
+
+  function download() {
+    setDownloadingData(true)
+    fetch(`${url}/customers/`)
+      .then((res) => res.json())
+      .then((resp) => {
+        setCustomers(resp)
+
+        let data = resp.map((w) => {
+          {
+            return {
+              Name: w.name,
+              Phone: w.phone,
+              Email: w.email,
+              TIN: w.tinNumber,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Customer List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+        setOgCustomerList(resp)
+        setLoadingCustomers(false)
+      })
+      .catch((err) => toast.error('Error occured!'))
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
   }
 
   useEffect(() => {
@@ -161,12 +220,24 @@ export default function Customers() {
         )}
 
         {viewPort === 'list' && (
-          <MSubmitButton
-            submit={loadCustomers}
-            intent="neutral"
-            icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
-            label="Refresh"
-          />
+          <>
+            {downloadingData ? (
+              <div>
+                <Loader active size="tiny" inline className="ml-5" />
+              </div>
+            ) : (
+              <DownloadIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => download()}
+              />
+            )}
+            <MSubmitButton
+              submit={loadCustomers}
+              intent="neutral"
+              icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+              label="Refresh"
+            />
+          </>
         )}
       </div>
       {viewPort === 'list' &&
