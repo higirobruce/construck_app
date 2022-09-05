@@ -16,6 +16,8 @@ import { UserContext } from '../../contexts/UserContext'
 import TextInputLogin from '../common/TextIputLogin'
 import MTextView from '../common/mTextView'
 
+import { toast, ToastContainer } from 'react-toastify'
+
 export default function Projects() {
   let { user, setUser } = useContext(UserContext)
   //AUTORIZATION
@@ -46,6 +48,7 @@ export default function Projects() {
         setOgProjectList(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
 
     fetch(`${url}/customers/`)
       .then((res) => res.json())
@@ -61,6 +64,7 @@ export default function Projects() {
           })
         )
       })
+      .catch((err) => toast.error('Error occured!'))
   }, [])
 
   useEffect(() => {
@@ -106,6 +110,7 @@ export default function Projects() {
         setOgProjectList(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function submit() {
@@ -127,6 +132,7 @@ export default function Projects() {
         refresh()
         setViewPort('list')
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   async function readFromFile(file) {
@@ -185,6 +191,7 @@ export default function Projects() {
         refresh()
         setViewPort('list')
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   return (
@@ -338,6 +345,8 @@ export default function Projects() {
           </div>
         </div>
       )}
+
+      <ToastContainer />
     </div>
   )
 }
