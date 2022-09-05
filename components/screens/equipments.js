@@ -232,6 +232,7 @@ export default function Equipments() {
       })
       .catch((err) => {
         setLoading(false)
+        toast.error('Error occured!')
       })
   }
 

@@ -146,6 +146,11 @@ export default function Workdata() {
 
   let [postingDate, setPostingDate] = useState(moment())
 
+  const disabledDate = (current) => {
+    // Can not select days before today and today
+    return current && current < moment('2022-07-01')
+  }
+
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   // useEffect(() => {
@@ -689,17 +694,6 @@ export default function Workdata() {
       setWorkList(_workList)
       setLoadingData(false)
     } else {
-      setStartDate(
-        Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
-      )
-      setEndDate(
-        Date.today()
-          .clearTime()
-          .moveToLastDayOfMonth()
-          .addHours(23)
-          .addMinutes(59)
-      )
-
       if (owner === 'All') {
         setWorkList(ogWorkList)
         setLoadingData(false)
@@ -1732,6 +1726,7 @@ export default function Workdata() {
                     setWorkStartDate(dateStrings[0])
                     setWorkEndDate(dateStrings[1])
                   }}
+                  disabledDate={disabledDate}
                   disabled={!siteWork}
                 />
               </div>
@@ -1795,6 +1790,7 @@ export default function Workdata() {
                     <div className="w-4/5">
                       <DatePicker
                         size={20}
+                        disabledDate={disabledDate}
                         defaultValue={moment()}
                         onChange={(date, dateString) => {
                           setMovementDate(dateString)
@@ -1926,6 +1922,7 @@ export default function Workdata() {
                       <div className="w-4/5">
                         <DatePicker
                           size={20}
+                          disabledDate={disabledDate}
                           defaultValue={moment()}
                           onChange={(date, dateString) => {
                             setDispatchDate(dateString)
@@ -2486,6 +2483,7 @@ export default function Workdata() {
                                 <RangePicker
                                   size={20}
                                   defaultValue={moment()}
+                                  disabledDate={disabledDate}
                                   onChange={(date, dateString) => {
                                     let _dispDates = dispatchDates
                                       ? [...dispatchDates]

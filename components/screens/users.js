@@ -41,14 +41,16 @@ export default function Users() {
         { key: '2', value: 'customer-site-manager', text: 'Site Manager' },
       ]
     : [
-        { key: '1', value: 'display', text: 'Display only' },
+        { key: '7', value: 'workshop-admin', text: 'Admin Workshop' },
+        { key: '4', value: 'revenue-admin', text: 'Admin Revenue' },
         { key: '2', value: 'admin', text: 'Administrator' },
+        { key: '1', value: 'display', text: 'Display' },
         { key: '3', value: 'revenue', text: 'Revenue officer' },
-        { key: '4', value: 'dispatch', text: 'Dispatch officer' },
-        { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
-        { key: '6', value: 'customer-admin', text: 'Customer' },
+        { key: '5', value: 'dispatch', text: 'Dispatch officer' },
+        { key: '6', value: 'dispatch-view', text: 'Display Dispatch' },
+        { key: '8', value: 'customer-admin', text: 'Customer Admin' },
         {
-          key: '7',
+          key: '9',
           value: 'customer-project-manager',
           text: 'Project Manager',
         },
@@ -68,6 +70,7 @@ export default function Users() {
           : setUsers(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
 
     fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
@@ -104,6 +107,7 @@ export default function Users() {
           : setUsers(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function resetPassword(user) {
@@ -152,7 +156,7 @@ export default function Users() {
           refresh()
         }
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function _setUserToUpdate(data) {
@@ -165,7 +169,6 @@ export default function Users() {
     setPhone(data.phone)
     setEmail(data.email)
     setRole(data.userType)
-    console.log(data)
   }
 
   function updateUser() {
@@ -190,7 +193,6 @@ export default function Users() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         if (res.error) {
           toast.error(res.error)
         } else {
