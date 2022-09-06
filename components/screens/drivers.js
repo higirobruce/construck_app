@@ -25,6 +25,7 @@ export default function Drivers() {
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
   let [drivers, setDrivers] = useState(null)
+  let [ogDriversList, setOgDriversList] = useState(null)
   let [loading, setLoading] = useState(false)
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
@@ -226,6 +227,7 @@ export default function Drivers() {
       .then((res) => res.json())
       .then((res) => {
         setDrivers(res)
+        setOgDriversList(res)
         setLoading(false)
       })
       .catch((err) => toast.error('Error occured!'))
@@ -254,6 +256,26 @@ export default function Drivers() {
         setLoadingProjects(false)
       })
   }, [])
+
+  useEffect(() => {
+    if (search.length >= 3) {
+      setLoading(true)
+      let _driversList = ogDriversList.filter((w) => {
+        let _search = search?.toLocaleLowerCase()
+        let firstName = w?.firstName?.toLocaleLowerCase()
+        let lastName = w?.lastName?.toLocaleLowerCase()
+
+        return firstName.includes(_search) || lastName.includes(_search)
+      })
+      setDrivers(_driversList)
+      setLoading(false)
+    }
+
+    if (search.length < 3) {
+      setDrivers(ogDriversList)
+      setLoading(false)
+    }
+  }, [search])
 
   function refresh() {
     setLoading(true)
