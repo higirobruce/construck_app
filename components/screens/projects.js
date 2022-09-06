@@ -4,7 +4,6 @@ import {
   ArrowDownTrayIcon,
   PlusIcon,
   ArrowPathIcon,
-  ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import ProjectCard from '../common/projectCard'
