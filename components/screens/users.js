@@ -24,6 +24,8 @@ export default function Users() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let [users, setUsers] = useState(null)
   let [ogUsersList, setOgUsersList] = useState(null)
+  let [customers, setCustomers] = useState([])
+  let [customerList, setCustomerList] = useState([])
   let [loading, setLoading] = useState(false)
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
@@ -112,6 +114,21 @@ export default function Users() {
         toast.error(err)
         setLoadingProjects(false)
       })
+
+    fetch(`${url}/customers/`, {})
+      .then((res) => res.json())
+      .then((resp) => {
+        setCustomers(resp)
+        let customersOptions = resp.map((c) => {
+          return {
+            key: c._id,
+            value: c._id,
+            text: c.name,
+          }
+        })
+        setCustomerList(customersOptions)
+      })
+      .catch((err) => toast.error('Error occured!'))
   }, [])
 
   useEffect(() => {
@@ -139,13 +156,21 @@ export default function Users() {
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
-        isCustomer
-          ? setUsers(
-              res.filter((r) => {
-                return r?.company?._id === user?.company?._id
-              })
-            )
-          : setUsers(res)
+        if (isCustomer) {
+          setUsers(
+            res.filter((r) => {
+              return r?.company?._id === user?.company?._id
+            })
+          )
+          setOgUsersList(
+            res.filter((r) => {
+              return r?.company?._id === user?.company?._id
+            })
+          )
+        } else {
+          setUsers(res)
+          setOgUsersList(res)
+        }
         setLoading(false)
       })
       .catch((err) => toast.error('Error occured!'))
@@ -157,7 +182,6 @@ export default function Users() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
     })
       .then((res) => res.json)
@@ -173,7 +197,6 @@ export default function Users() {
     fetch(`${url}/users/`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -222,7 +245,6 @@ export default function Users() {
     fetch(`${url}/users/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -459,6 +481,29 @@ export default function Users() {
                           projects.filter((p) => p._id === data.value)[0]
                         )
                         setUserCompany(projectAssigned?.customerId)
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {role == 'customer-admin' && (
+                <div className="flex flex-col">
+                  <div className="flex flex-row items-center">
+                    <MTextView content="Customer" />
+                    {<div className="text-sm text-red-600">*</div>}
+                  </div>
+                  <div>
+                    <Dropdown
+                      options={customerList}
+                      placeholder="Select Customer"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setUserCompany(
+                          customers.filter((c) => c._id === data.value)[0]
+                        )
                       }}
                     />
                   </div>

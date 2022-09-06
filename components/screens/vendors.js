@@ -92,7 +92,6 @@ export default function Vendors() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
     })
       .then((res) => res.json)
@@ -108,7 +107,6 @@ export default function Vendors() {
     fetch(`${url}/vendors/`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -147,7 +145,6 @@ export default function Vendors() {
     fetch(`${url}/vendors/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'PUT',
       body: JSON.stringify({

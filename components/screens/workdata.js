@@ -874,7 +874,6 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         recalledBy: user._id,
@@ -898,7 +897,6 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         duration,
@@ -928,7 +926,6 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         duration,
@@ -956,7 +953,6 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startIndex,
@@ -980,7 +976,6 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         reasonForRejection,
@@ -1184,7 +1179,6 @@ export default function Workdata() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
             },
             body: JSON.stringify({
               project: toProjects[0],

@@ -54,9 +54,7 @@ export default function Customers() {
     setEmail('')
     setTinNumber('')
     fetch(`${url}/customers/`, {
-      headers: {
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
-      },
+      headers: {},
     })
       .then((res) => res.json())
       .then((resp) => {
@@ -73,7 +71,6 @@ export default function Customers() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         name,
@@ -111,7 +108,6 @@ export default function Customers() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         name,
@@ -137,9 +133,7 @@ export default function Customers() {
   function download() {
     setDownloadingData(true)
     fetch(`${url}/customers/`, {
-      headers: {
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
-      },
+      headers: {},
     })
       .then((res) => res.json())
       .then((resp) => {

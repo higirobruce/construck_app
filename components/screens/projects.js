@@ -124,7 +124,6 @@ export default function Projects() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         id: selectedCustomer,
@@ -153,7 +152,6 @@ export default function Projects() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
             },
             body: JSON.stringify({
               prjDescription: row[2],
@@ -192,7 +190,6 @@ export default function Projects() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         customerId,

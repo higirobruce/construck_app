@@ -220,9 +220,7 @@ export default function Drivers() {
   useEffect(() => {
     setLoadingProjects(true)
     fetch(`${url}/employees/`, {
-      headers: {
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
-      },
+      headers: {},
     })
       .then((res) => res.json())
       .then((res) => {
@@ -233,9 +231,7 @@ export default function Drivers() {
       .catch((err) => toast.error('Error occured!'))
 
     fetch(`${url}/projects/v2`, {
-      headers: {
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
-      },
+      headers: {},
     })
       .then((resp) => resp.json())
       .then((resp) => {
@@ -280,9 +276,7 @@ export default function Drivers() {
   function refresh() {
     setLoading(true)
     fetch(`${url}/employees/`, {
-      headers: {
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
-      },
+      headers: {},
     })
       .then((res) => res.json())
       .then((res) => {
@@ -299,7 +293,6 @@ export default function Drivers() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
     })
       .then((res) => res.json)
@@ -315,7 +308,6 @@ export default function Drivers() {
     fetch(`${url}/employees/`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -357,7 +349,6 @@ export default function Drivers() {
     fetch(`${url}/employees/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -387,9 +378,7 @@ export default function Drivers() {
     setDownloadingData(true)
 
     fetch(`${url}/employees/`, {
-      headers: {
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
-      },
+      headers: {},
     })
       .then((res) => res.json())
       .then((res) => {

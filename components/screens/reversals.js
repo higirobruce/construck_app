@@ -80,7 +80,6 @@ export default function Reversals() {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
           },
           body: JSON.stringify({
             reversedBy: user._id,
@@ -97,7 +96,6 @@ export default function Reversals() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
         },
         body: JSON.stringify({
           reversedBy: user._id,

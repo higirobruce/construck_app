@@ -244,7 +244,6 @@ export default function Equipments() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
             },
             body: JSON.stringify({
               plateNumber: row[2],
@@ -311,7 +310,6 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
     })
       .then((res) => res.json())
@@ -357,7 +355,6 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
     })
       .then((res) => res.json())
@@ -401,7 +398,6 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
     })
       .then((res) => res.json())
@@ -451,7 +447,6 @@ export default function Equipments() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         plateNumber,
@@ -499,7 +494,6 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         plateNumber,
