@@ -21,6 +21,7 @@ import {
   ArrowDownTrayIcon,
   ArrowLeftIcon,
   ArrowPathIcon,
+  CheckIcon,
   DocumentDuplicateIcon,
   PlusIcon,
   TrashIcon,
