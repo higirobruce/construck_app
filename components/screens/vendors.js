@@ -23,6 +23,7 @@ import moment from 'moment'
 export default function Vendors() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let [vendors, setVendors] = useState(null)
+  let [ogVendorsList, setOgVendorsList] = useState(null)
   let [loading, setLoading] = useState(false)
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
@@ -43,10 +44,30 @@ export default function Vendors() {
       .then((res) => res.json())
       .then((res) => {
         setVendors(res)
+        setOgVendorsList(res)
         setLoading(false)
       })
       .catch((err) => toast.error('Error occured!'))
   }, [])
+
+  useEffect(() => {
+    if (search.length >= 3) {
+      setLoading(true)
+      let _vendorsList = ogVendorsList.filter((w) => {
+        let _search = search?.toLocaleLowerCase()
+        let name = w?.name?.toLocaleLowerCase()
+
+        return name.includes(_search)
+      })
+      setVendors(_vendorsList)
+      setLoading(false)
+    }
+
+    if (search.length < 3) {
+      setVendors(ogVendorsList)
+      setLoading(false)
+    }
+  }, [search])
 
   function refresh() {
     setLoading(true)
@@ -54,6 +75,7 @@ export default function Vendors() {
       .then((res) => res.json())
       .then((res) => {
         setVendors(res)
+        setOgVendorsList(res)
         setLoading(false)
         setSubmitting(false)
       })

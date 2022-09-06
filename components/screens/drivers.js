@@ -287,6 +287,7 @@ export default function Drivers() {
       .then((res) => res.json())
       .then((res) => {
         setDrivers(res)
+        setOgDriversList(res)
         setLoading(false)
       })
       .catch((err) => toast.error('Error occured!'))
