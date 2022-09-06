@@ -16,6 +16,7 @@ import {
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
 import { UserContext } from '../../contexts/UserContext'
+import Image from 'next/image'
 
 export default function MenuBar() {
   let { screen, setScreen } = useContext(ScreenContext)
@@ -57,8 +58,10 @@ export default function MenuBar() {
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
-        <div className="mt-5 mb-10 hidden text-2xl font-bold text-zinc-800 md:block">
-          Shabika App.
+        <div className="flex flex-row space-x-2">
+          <div className="mt-5 mb-10 hidden text-2xl font-bold text-zinc-800 md:block">
+            Shabika App.
+          </div>
         </div>
 
         {canSeeDashboard && (
