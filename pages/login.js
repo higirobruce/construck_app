@@ -28,6 +28,8 @@ export default function Login() {
   const [country, setCountry] = useState('')
   const [submitting, setSubmitting] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   function login() {
     setSubmitting(true)
@@ -36,6 +38,7 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
         },
         body: JSON.stringify({
           email,
@@ -89,6 +92,7 @@ export default function Login() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
         },
         body: JSON.stringify({
           email,
@@ -105,6 +109,7 @@ export default function Login() {
             fetch(`${url}/email/send`, {
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
               },
               method: 'POST',
               body: JSON.stringify({
@@ -149,6 +154,7 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
         },
         body: JSON.stringify({
           password,

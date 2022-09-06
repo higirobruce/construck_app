@@ -39,6 +39,8 @@ export default function Customers() {
 
   let [loadingCustomers, setLoadingCustomers] = useState(true)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   useEffect(() => {
     loadCustomers()
@@ -51,7 +53,11 @@ export default function Customers() {
     setName('')
     setEmail('')
     setTinNumber('')
-    fetch(`${url}/customers/`)
+    fetch(`${url}/customers/`, {
+      headers: {
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
+    })
       .then((res) => res.json())
       .then((resp) => {
         setCustomers(resp)
@@ -65,7 +71,10 @@ export default function Customers() {
     setSubmitting(true)
     fetch(`${url}/customers`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         name,
         email,
@@ -100,7 +109,10 @@ export default function Customers() {
     setSubmitting(true)
     fetch(`${url}/customers/${idToUpdate}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         name,
         email,
@@ -124,7 +136,11 @@ export default function Customers() {
 
   function download() {
     setDownloadingData(true)
-    fetch(`${url}/customers/`)
+    fetch(`${url}/customers/`, {
+      headers: {
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
+    })
       .then((res) => res.json())
       .then((resp) => {
         setCustomers(resp)

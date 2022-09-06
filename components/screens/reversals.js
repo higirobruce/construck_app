@@ -78,7 +78,10 @@ export default function Reversals() {
         `${url}/works/swreverse/${params.id}?date=${params.dispatchDate}&totalRevenue=${params.totalRevenue}&totalExpenditure=${params.totalExpenditure}&duration=${params.duration}`,
         {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+          },
           body: JSON.stringify({
             reversedBy: user._id,
           }),
@@ -92,7 +95,10 @@ export default function Reversals() {
     } else {
       fetch(`${url}/works/reverse/${params.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+        },
         body: JSON.stringify({
           reversedBy: user._id,
         }),

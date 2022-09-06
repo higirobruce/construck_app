@@ -53,12 +53,15 @@ export default function Dashboard() {
   let [nDispatched, setNDispatched] = useState(0)
   let [nRecords, setNRecords] = useState(-1)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   useEffect(() => {
     fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate,
@@ -85,6 +88,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -111,6 +115,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -140,6 +145,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -168,6 +174,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -194,6 +201,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -220,6 +228,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -255,6 +264,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -290,6 +300,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -325,6 +336,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate
@@ -354,6 +366,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate,
@@ -376,6 +389,7 @@ export default function Dashboard() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         startDate: startDate,
@@ -411,7 +425,10 @@ export default function Dashboard() {
 
     fetch(`${url}/works/gethoursperdriver`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         startDate,
         endDate,

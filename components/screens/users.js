@@ -126,7 +126,10 @@ export default function Users() {
     //TODO
     fetch(`${url}/users/resetPassword/${user._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
     })
       .then((res) => res.json)
       .then((res) => {
@@ -141,6 +144,7 @@ export default function Users() {
     fetch(`${url}/users/`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -189,6 +193,7 @@ export default function Users() {
     fetch(`${url}/users/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -265,6 +270,7 @@ export default function Users() {
     //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
     // )
   }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Users</div>

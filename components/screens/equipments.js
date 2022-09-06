@@ -242,7 +242,10 @@ export default function Equipments() {
         rows.forEach((row) => {
           let promise = fetch(`${url}/equipments/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+            },
             body: JSON.stringify({
               plateNumber: row[2],
               eqtype: row[5],
@@ -306,7 +309,10 @@ export default function Equipments() {
 
     fetch(`${url}/equipments/sendToWorkshop/${rowId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
     })
       .then((res) => res.json())
       .then((res) => {
@@ -349,7 +355,10 @@ export default function Equipments() {
 
     fetch(`${url}/equipments/makeAvailable/${rowId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
     })
       .then((res) => res.json())
       .then((res) => {
@@ -390,7 +399,10 @@ export default function Equipments() {
 
     fetch(`${url}/equipments/dispose/${rowId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
     })
       .then((res) => res.json())
       .then((res) => {
@@ -437,7 +449,10 @@ export default function Equipments() {
     setSubmitting(true)
     fetch(`${url}/equipments/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         plateNumber,
         eqDescription,
@@ -482,7 +497,10 @@ export default function Equipments() {
     setSubmitting(true)
     fetch(`${url}/equipments/${idToUpdate}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         plateNumber,
         eqDescription,

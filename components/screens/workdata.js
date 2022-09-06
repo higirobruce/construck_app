@@ -872,7 +872,10 @@ export default function Workdata() {
     setSubmitting(true)
     fetch(`${url}/works/recall/${row._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         recalledBy: user._id,
       }),
@@ -893,7 +896,10 @@ export default function Workdata() {
     // duration, endIndex, tripsDone, comment
     fetch(`${url}/works/stop/${row._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         duration,
         endIndex,
@@ -920,7 +926,10 @@ export default function Workdata() {
     // duration, endIndex, tripsDone, comment
     fetch(`${url}/works/end/${row._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         duration,
         endIndex,
@@ -945,7 +954,10 @@ export default function Workdata() {
     // duration, endIndex, tripsDone, comment
     fetch(`${url}/works/start/${row._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         startIndex,
         startedBy: user._id,
@@ -968,6 +980,7 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       body: JSON.stringify({
         reasonForRejection,
@@ -1063,7 +1076,11 @@ export default function Workdata() {
             promises.push(
               fetch(`${url}/works`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization:
+                    'Basic ' + btoa(apiUsername + ':' + apiPassword),
+                },
                 body: JSON.stringify({
                   project: toProjects[i],
                   equipment: selEquipments[i],
@@ -1111,7 +1128,11 @@ export default function Workdata() {
             promises.push(
               fetch(`${url}/works`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization:
+                    'Basic ' + btoa(apiUsername + ':' + apiPassword),
+                },
                 body: JSON.stringify({
                   project,
                   equipment: selEquipments[i],
@@ -1161,7 +1182,10 @@ export default function Workdata() {
         if (lowbedWork) {
           await fetch(`${url}/works`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+            },
             body: JSON.stringify({
               project: toProjects[0],
               equipment: lowbed[0],

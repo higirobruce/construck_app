@@ -22,6 +22,8 @@ import moment from 'moment'
 
 export default function Drivers() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
   let [drivers, setDrivers] = useState(null)
   let [loading, setLoading] = useState(false)
   let [viewPort, setViewPort] = useState('list')
@@ -216,7 +218,11 @@ export default function Drivers() {
 
   useEffect(() => {
     setLoadingProjects(true)
-    fetch(`${url}/employees/`)
+    fetch(`${url}/employees/`, {
+      headers: {
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setDrivers(res)
@@ -224,7 +230,11 @@ export default function Drivers() {
       })
       .catch((err) => toast.error('Error occured!'))
 
-    fetch(`${url}/projects/v2`)
+    fetch(`${url}/projects/v2`, {
+      headers: {
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
+    })
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -247,7 +257,11 @@ export default function Drivers() {
 
   function refresh() {
     setLoading(true)
-    fetch(`${url}/employees/`)
+    fetch(`${url}/employees/`, {
+      headers: {
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setDrivers(res)
@@ -260,7 +274,10 @@ export default function Drivers() {
     //TODO
     fetch(`${url}/employees/resetPassword/${driver._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
     })
       .then((res) => res.json)
       .then((res) => {
@@ -275,6 +292,7 @@ export default function Drivers() {
     fetch(`${url}/employees/`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -316,6 +334,7 @@ export default function Drivers() {
     fetch(`${url}/employees/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -344,7 +363,11 @@ export default function Drivers() {
   function download() {
     setDownloadingData(true)
 
-    fetch(`${url}/employees/`)
+    fetch(`${url}/employees/`, {
+      headers: {
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let data = res.map((w) => {

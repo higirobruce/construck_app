@@ -68,7 +68,10 @@ export default function Vendors() {
     //TODO
     fetch(`${url}/vendors/resetPassword/${driver._id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
     })
       .then((res) => res.json)
       .then((res) => {
@@ -83,6 +86,7 @@ export default function Vendors() {
     fetch(`${url}/vendors/`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -121,6 +125,7 @@ export default function Vendors() {
     fetch(`${url}/vendors/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
       },
       method: 'PUT',
       body: JSON.stringify({

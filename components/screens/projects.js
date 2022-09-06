@@ -122,7 +122,10 @@ export default function Projects() {
     setSubmitting(true)
     fetch(`${url}/customers/project`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         id: selectedCustomer,
         project: {
@@ -148,7 +151,10 @@ export default function Projects() {
         rows.forEach((row) => {
           let promise = fetch(`${url}/projects/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+            },
             body: JSON.stringify({
               prjDescription: row[2],
             }),
@@ -184,7 +190,10 @@ export default function Projects() {
     setSubmitting(true)
     fetch(`${url}/customers/project/${idToUpdate}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + btoa(apiUsername + ':' + apiPassword),
+      },
       body: JSON.stringify({
         customerId,
         prjDescription: projectDescription,
