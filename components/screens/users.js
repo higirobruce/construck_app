@@ -23,6 +23,7 @@ import moment from 'moment'
 export default function Users() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let [users, setUsers] = useState(null)
+  let [ogUsersList, setOgUsersList] = useState(null)
   let [loading, setLoading] = useState(false)
   let [viewPort, setViewPort] = useState('list')
   let [search, setSearch] = useState('')
@@ -73,13 +74,21 @@ export default function Users() {
     fetch(`${url}/users/`)
       .then((res) => res.json())
       .then((res) => {
-        isCustomer
-          ? setUsers(
-              res.filter((r) => {
-                return r?.company?._id === user?.company?._id
-              })
-            )
-          : setUsers(res)
+        if (isCustomer) {
+          setUsers(
+            res.filter((r) => {
+              return r?.company?._id === user?.company?._id
+            })
+          )
+          setOgUsersList(
+            res.filter((r) => {
+              return r?.company?._id === user?.company?._id
+            })
+          )
+        } else {
+          setUsers(res)
+          setOgUsersList(res)
+        }
         setLoading(false)
       })
       .catch((err) => toast.error('Error occured!'))
@@ -104,6 +113,26 @@ export default function Users() {
         setLoadingProjects(false)
       })
   }, [])
+
+  useEffect(() => {
+    if (search.length >= 3) {
+      setLoading(true)
+      let _usersList = ogUsersList.filter((w) => {
+        let _search = search?.toLocaleLowerCase()
+        let userFirstName = w?.firstName?.toLocaleLowerCase()
+        let userLastName = w?.lastName?.toLocaleLowerCase()
+
+        return userFirstName.includes(_search) || userLastName.includes(_search)
+      })
+      setUsers(_usersList)
+      setLoading(false)
+    }
+
+    if (search.length < 3) {
+      setUsers(ogUsersList)
+      setLoading(false)
+    }
+  }, [search])
 
   function refresh() {
     setLoading(true)
