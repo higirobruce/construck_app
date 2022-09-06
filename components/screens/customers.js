@@ -1,9 +1,9 @@
 import {
   ArrowLeftIcon,
-  DownloadIcon,
+  ArrowDownTrayIcon,
   PlusIcon,
-  RefreshIcon,
-} from '@heroicons/react/outline'
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import { Loader } from 'semantic-ui-react'
@@ -226,7 +226,7 @@ export default function Customers() {
                 <Loader active size="tiny" inline className="ml-5" />
               </div>
             ) : (
-              <DownloadIcon
+              <ArrowDownTrayIcon
                 className="h-5 w-5 cursor-pointer"
                 onClick={() => download()}
               />
@@ -234,7 +234,7 @@ export default function Customers() {
             <MSubmitButton
               submit={loadCustomers}
               intent="neutral"
-              icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
               label="Refresh"
             />
           </>

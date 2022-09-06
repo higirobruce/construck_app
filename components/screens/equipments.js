@@ -1,17 +1,16 @@
 import {
-  AdjustmentsIcon,
   ArrowLeftIcon,
-  BanIcon,
+  ArchiveBoxXMarkIcon,
   CheckIcon,
   CogIcon,
-  DocumentDuplicateIcon,
-  DownloadIcon,
+  ArrowDownTrayIcon,
   PlusIcon,
-  RefreshIcon,
+  ArrowPathIcon,
   ShieldCheckIcon,
   TruckIcon,
-  UploadIcon,
-} from '@heroicons/react/outline'
+  ArrowUpTrayIcon,
+} from '@heroicons/react/24/outline'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import React, { useContext, useEffect, useState } from 'react'
 import EquipmentCard from '../common/equipmentCard'
 import MSubmitButton from '../common/mSubmitButton'
@@ -19,7 +18,6 @@ import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import { Tooltip } from 'antd'
-import { ExclamationIcon, LockClosedIcon } from '@heroicons/react/solid'
 import Modal from '../common/modal'
 import { UserContext } from '../../contexts/UserContext'
 import EqStatusCard from '../common/eqStatusCard'
@@ -650,7 +648,7 @@ export default function Equipments() {
                     ? 'dispatched'
                     : ''
                 }
-                icon={<ExclamationIcon className="h-5 w-5" />}
+                icon={<ExclamationTriangleIcon className="h-5 w-5" />}
                 onClick={() =>
                   filterBy === 'dispatched'
                     ? setFilterBy('all')
@@ -693,7 +691,7 @@ export default function Equipments() {
                     ? 'disposed'
                     : ''
                 }
-                icon={<BanIcon className="h-5 w-5" />}
+                icon={<ArchiveBoxXMarkIcon className="h-5 w-5" />}
                 onClick={() =>
                   filterBy === 'disposed'
                     ? setFilterBy('all')
@@ -762,7 +760,7 @@ export default function Equipments() {
                         : 'flex flex-row items-center rounded-lg bg-zinc-100 p-1 text-zinc-600 ring-1 ring-zinc-300'
                     }
                   >
-                    <ExclamationIcon className="h-5 w-5" />
+                    <ExclamationTriangleIcon className="h-5 w-5" />
                     <div>({nDispatched})</div>
                   </div>
                 </Tooltip>
@@ -828,7 +826,7 @@ export default function Equipments() {
                 <div>
                   <label>
                     <span className="mt-2 cursor-pointer text-base leading-normal">
-                      <UploadIcon className="h-5 w-5" />
+                      <ArrowUpTrayIcon className="h-5 w-5" />
                     </span>
                     <input
                       type="file"
@@ -846,18 +844,18 @@ export default function Equipments() {
                   <Loader active size="tiny" inline className="ml-5" />
                 </div>
               ) : (
-                <DownloadIcon
+                <ArrowDownTrayIcon
                   className="h-5 w-5 cursor-pointer"
                   onClick={() => download()}
                 />
               )}
 
-              {/* <DownloadIcon className="h-5 w-5 cursor-pointer" /> */}
+              {/* <ArrowDownTrayIcon className="h-5 w-5 cursor-pointer" /> */}
               {/* <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" /> */}
               <MSubmitButton
                 submit={refresh}
                 intent="neutral"
-                icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+                icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
                 label="Refresh"
               />
             </div>

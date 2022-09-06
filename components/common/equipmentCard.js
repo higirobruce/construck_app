@@ -1,25 +1,18 @@
 import {
   CheckIcon,
-  ExclamationCircleIcon,
-  PauseIcon,
-  PencilAltIcon,
-  PlayIcon,
   ReceiptRefundIcon,
   StopIcon,
-  CogIcon,
-  BanIcon,
-  DotsHorizontalIcon,
+  ArchiveBoxXMarkIcon,
+  EllipsisHorizontalIcon,
   TrashIcon,
-} from '@heroicons/react/outline'
+} from '@heroicons/react/24/outline'
 import {
-  FolderOpenIcon,
-  ExclamationIcon,
+  ExclamationTriangleIcon,
   LockClosedIcon,
-  SwitchHorizontalIcon,
-} from '@heroicons/react/solid'
+  ArrowsRightLeftIcon,
+} from '@heroicons/react/24/solid'
 import React from 'react'
 import { Icon } from 'semantic-ui-react'
-import MTextView from './mTextView'
 
 const MStatusIndicator = ({ status }) => {
   if (status === 'available')
@@ -32,7 +25,7 @@ const MStatusIndicator = ({ status }) => {
   else if (status === 'dispatched') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <ExclamationIcon className="h-5 w-5 text-zinc-600" />
+        <ExclamationTriangleIcon className="h-5 w-5 text-zinc-600" />
         {/* <MTextView content={status} /> */}
       </div>
     )
@@ -46,14 +39,14 @@ const MStatusIndicator = ({ status }) => {
   } else if (status === 'workshop') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <BanIcon className="h-4 w-4 text-red-300" />
+        <ArchiveBoxXMarkIcon className="h-4 w-4 text-red-300" />
         {/* <MTextView content={status} /> */}
       </div>
     )
   } else if (status === 'updating') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <DotsHorizontalIcon className="h-5 w-5 text-gray-500" />
+        <EllipsisHorizontalIcon className="h-5 w-5 text-gray-500" />
         {/* <MTextView content={status} /> */}
       </div>
     )
@@ -132,7 +125,7 @@ export default function EquipmentType({
         </div>
         {data.eqStatus !== 'updating' && (
           <div className="col-start-4 mt-1 flex flex-row space-x-1">
-            {/* <PencilAltIcon
+            {/* <PencilSquareIcon
             className={
               intent === 'available'
                 ? 'h-5 w-5 cursor-pointer self-end text-yellow-600'
@@ -174,7 +167,7 @@ export default function EquipmentType({
 
             {data.eqStatus === 'workshop' && canMoveAssets && (
               <div className="flex flex-col justify-between">
-                <SwitchHorizontalIcon
+                <ArrowsRightLeftIcon
                   onClick={() => {
                     handleMakeAvailable(data.id)
                   }}
@@ -201,7 +194,7 @@ export default function EquipmentType({
         )}
         {data.eqStatus === 'updating' && (
           <div className="col-start-4 mt-1 flex flex-row space-x-1">
-            <DotsHorizontalIcon className="h-5 w-5 text-gray-300" />
+            <EllipsisHorizontalIcon className="h-5 w-5 text-gray-300" />
           </div>
         )}
       </div>

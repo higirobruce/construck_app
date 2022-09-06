@@ -1,4 +1,4 @@
-import { BadgeCheckIcon } from '@heroicons/react/outline'
+import { BadgeCheckIcon } from '@heroicons/react/24/outline'
 import React, { useContext, useState } from 'react'
 import TextInput from '../components/common/TextIput'
 import { UserContext } from '../contexts/UserContext'

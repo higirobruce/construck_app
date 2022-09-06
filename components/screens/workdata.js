@@ -2,21 +2,11 @@ import React, { useContext, useEffect, useState } from 'react'
 import WorkListTable from '../common/workListTable'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
-import {
-  RefreshIcon,
-  PlusIcon,
-  ArrowLeftIcon,
-  DownloadIcon,
-  TrashIcon,
-  CheckIcon,
-  AdjustmentsIcon,
-} from '@heroicons/react/outline'
 import MTitle from '../common/mTitle'
 import { Dimmer, Dropdown, Loader } from 'semantic-ui-react'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import _ from 'lodash'
-import { DocumentDuplicateIcon } from '@heroicons/react/solid'
 import { UserContext } from '../../contexts/UserContext'
 import { DatePicker, Descriptions } from 'antd'
 import Modal from '../common/modal'
@@ -26,6 +16,15 @@ import * as XLSX from 'xlsx'
 import TextInputV from '../common/TextIputV'
 import 'datejs'
 import moment from 'moment'
+import {
+  AdjustmentsHorizontalIcon,
+  ArrowDownTrayIcon,
+  ArrowLeftIcon,
+  ArrowPathIcon,
+  DocumentDuplicateIcon,
+  PlusIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline'
 
 const { RangePicker } = DatePicker
 
@@ -107,6 +106,7 @@ export default function Workdata() {
   let [stopModalIsShown, setStopModalIsShown] = useState(false)
   let [startModalIsShown, setStartModalIsShown] = useState(false)
   let [approveModalIsShown, setApproveModalIsShown] = useState(false)
+  let [expandSwModalIsShown, setExpandSwModalIsShown] = useState(false)
   let [rejectModalIsShown, setRejectModalIsShown] = useState(false)
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
   let [endModalIsShown, setEndModalIsShown] = useState(false)
@@ -845,6 +845,12 @@ export default function Workdata() {
     setApproveModalIsShown(true)
   }
 
+  function _setExpandSWRow(row, index, pageStartIndex) {
+    setRow(row)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
+    setExpandSwModalIsShown(true)
+  }
+
   function _setRejectRow(row, index, pageStartIndex) {
     setRow(row)
     setRowIndex(parseInt(index) + parseInt(pageStartIndex))
@@ -1572,7 +1578,7 @@ export default function Workdata() {
                   Approve selected
                 </div>
               )}
-              <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
+              <AdjustmentsHorizontalIcon className="h-5 w-5 cursor-pointer text-red-500" />
 
               {downloadingData ? (
                 <div>
@@ -1580,7 +1586,7 @@ export default function Workdata() {
                 </div>
               ) : (
                 canViewRenues && (
-                  <DownloadIcon
+                  <ArrowDownTrayIcon
                     className="h-5 w-5 cursor-pointer"
                     onClick={() => download()}
                   />
@@ -1591,7 +1597,7 @@ export default function Workdata() {
               <MSubmitButton
                 submit={refresh}
                 intent="neutral"
-                icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+                icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
                 label="Refresh"
               />
             </div>
@@ -1611,6 +1617,7 @@ export default function Workdata() {
                 <WorkListTable
                   data={workList}
                   handelApprove={_setApproveRow}
+                  handelExpandSw={_setExpandSWRow}
                   handelReject={_setRejectRow}
                   handelRecall={_setRecallRow}
                   handelStop={_setStopRow}
@@ -2702,6 +2709,16 @@ export default function Workdata() {
           isShown={orderModalIsShown}
           setIsShown={setOrderModalIsShown}
           handleConfirm={order}
+        />
+      )}
+
+      {expandSwModalIsShown && (
+        <Modal
+          title="More details"
+          body="Please select which dates to approve or reject."
+          isShown={expandSwModalIsShown}
+          setIsShown={setExpandSwModalIsShown}
+          handleConfirm={approve}
         />
       )}
     </>

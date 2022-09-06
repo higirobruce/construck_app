@@ -1,11 +1,11 @@
 import {
-  CashIcon,
-  DocumentDownloadIcon,
-  DownloadIcon,
+  ReceiptRefundIcon,
+  DocumentArrowDownTrayIcon,
+  ArrowDownTrayIcon,
   EyeIcon,
-  ViewListIcon,
-} from '@heroicons/react/outline'
-import { DocumentReportIcon } from '@heroicons/react/solid'
+  ListBulletIcon,
+} from '@heroicons/react/24/outline'
+import { DocumentReportIcon } from '@heroicons/react/24/solid'
 import React from 'react'
 
 export default function EqStatusCard({ intent, data, icon, onClick }) {

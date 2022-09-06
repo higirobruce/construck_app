@@ -1,11 +1,8 @@
 import {
-  CashIcon,
-  DocumentDownloadIcon,
-  DownloadIcon,
-  EyeIcon,
-  ViewListIcon,
-} from '@heroicons/react/outline'
-import { DocumentReportIcon } from '@heroicons/react/solid'
+  ArrowDownTrayIcon,
+  ReceiptRefundIcon,
+  ListBulletIcon,
+} from '@heroicons/react/24/outline'
 import React from 'react'
 
 export default function StatisticCard({ intent, data, icon }) {
@@ -29,10 +26,10 @@ export default function StatisticCard({ intent, data, icon }) {
       <div className="flex flex-row justify-between">
         <div className="text-lg font-semibold text-gray-700">{data.title}</div>
         <div className="flex flex-row space-x-3">
-          <ViewListIcon className="h-4 w-4 cursor-pointer text-blue-300" />
-          <DownloadIcon className="h-4 w-4 cursor-pointer text-blue-300" />
+          <ListBulletIcon className="h-4 w-4 cursor-pointer text-blue-300" />
+          <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer text-blue-300" />
           {data.title === 'Final Revenues' && (
-            <CashIcon className="h-4 w-4 cursor-pointer text-green-500" />
+            <ReceiptRefundIcon className="h-4 w-4 cursor-pointer text-green-500" />
           )}
         </div>
       </div>

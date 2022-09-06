@@ -1,17 +1,17 @@
 import {
   CheckIcon,
-  ExclamationCircleIcon,
-  PauseIcon,
-  PencilAltIcon,
+  PencilSquareIcon,
   PlayIcon,
   ReceiptRefundIcon,
   StopIcon,
   CogIcon,
-  BanIcon,
-} from '@heroicons/react/outline'
-import { FolderOpenIcon, ExclamationIcon } from '@heroicons/react/solid'
+  ArchiveBoxXMarkIcon,
+} from '@heroicons/react/24/outline'
+import {
+  FolderOpenIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/solid'
 import React from 'react'
-import MTextView from './mTextView'
 
 const MStatusIndicator = ({ status }) => {
   if (status === 'available')
@@ -24,14 +24,14 @@ const MStatusIndicator = ({ status }) => {
   else if (status === 'assigned to job') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <ExclamationIcon className="h-5 w-5 text-zinc-600" />
+        <ExclamationTriangleIcon className="h-5 w-5 text-zinc-600" />
         {/* <MTextView content={status} /> */}
       </div>
     )
   } else if (status === 'not available') {
     return (
       <div className="flex flex-row items-center space-x-1">
-        <BanIcon className="h-5 w-5 text-orange-500" />
+        <ArchiveBoxXMarkIcon className="h-5 w-5 text-orange-500" />
         {/* <MTextView content={status} /> */}
       </div>
     )
@@ -110,7 +110,7 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
           </div>
         </div>
         <div className="mt-1 flex flex-row space-x-3">
-          <PencilAltIcon
+          <PencilSquareIcon
             className={
               intent === 'available'
                 ? 'h-5 w-5 cursor-pointer text-yellow-600'
