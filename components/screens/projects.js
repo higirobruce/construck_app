@@ -1,11 +1,10 @@
 import {
   ArrowLeftIcon,
   DocumentDuplicateIcon,
-  DownloadIcon,
+  ArrowDownTrayIcon,
   PlusIcon,
-  RefreshIcon,
-  UploadIcon,
-} from '@heroicons/react/outline'
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import ProjectCard from '../common/projectCard'
 import MSubmitButton from '../common/mSubmitButton'
@@ -15,6 +14,13 @@ import { Dropdown, Loader } from 'semantic-ui-react'
 import { UserContext } from '../../contexts/UserContext'
 import TextInputLogin from '../common/TextIputLogin'
 import MTextView from '../common/mTextView'
+
+import { toast, ToastContainer } from 'react-toastify'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+
+import moment from 'moment'
 
 export default function Projects() {
   let { user, setUser } = useContext(UserContext)
@@ -35,6 +41,7 @@ export default function Projects() {
   let [submitting, setSubmitting] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
+  let [downloadingData, setDownloadingData] = useState(false)
   let [idToUpdate, setIdToUpdate] = useState('')
   let [customerId, setCustomerId] = useState('')
 
@@ -46,6 +53,7 @@ export default function Projects() {
         setOgProjectList(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
 
     fetch(`${url}/customers/`)
       .then((res) => res.json())
@@ -61,6 +69,7 @@ export default function Projects() {
           })
         )
       })
+      .catch((err) => toast.error('Error occured!'))
   }, [])
 
   useEffect(() => {
@@ -106,6 +115,7 @@ export default function Projects() {
         setOgProjectList(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function submit() {
@@ -127,6 +137,7 @@ export default function Projects() {
         refresh()
         setViewPort('list')
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   async function readFromFile(file) {
@@ -185,6 +196,52 @@ export default function Projects() {
         refresh()
         setViewPort('list')
       })
+      .catch((err) => toast.error('Error occured!'))
+  }
+
+  function download() {
+    setDownloadingData(true)
+
+    fetch(`${url}/projects/v2`)
+      .then((res) => res.json())
+      .then((res) => {
+        let data = res.map((w) => {
+          {
+            return {
+              'Project description': w.prjDescription,
+              'Project status': w.status,
+              Customer: w.customer,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Projects List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+      })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
   }
 
   return (
@@ -220,12 +277,21 @@ export default function Projects() {
 
         {viewPort === 'list' && (
           <div className="flex flex-row items-center space-x-5">
-            <DownloadIcon className="h-5 w-5 cursor-pointer" />
+            {downloadingData ? (
+              <div>
+                <Loader active size="tiny" inline className="ml-5" />
+              </div>
+            ) : (
+              <ArrowDownTrayIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => download()}
+              />
+            )}
             <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
             <MSubmitButton
               submit={refresh}
               intent="neutral"
-              icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
               label="Refresh"
             />
           </div>
@@ -338,6 +404,8 @@ export default function Projects() {
           </div>
         </div>
       )}
+
+      <ToastContainer />
     </div>
   )
 }

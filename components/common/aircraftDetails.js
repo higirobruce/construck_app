@@ -1,15 +1,15 @@
 import {
   DocumentTextIcon,
-  ExclamationIcon,
+  ExclamationTriangleIcon,
   StopIcon,
-} from '@heroicons/react/outline'
+} from '@heroicons/react/24/outline'
 import ms from 'ms'
 import React from 'react'
 import MTextView from './mTextView'
 
 function getExpiration(expirationDate, thresholdDays) {
   if (new Date(expirationDate) < Date.now())
-    return <ExclamationIcon className="h-5 w-5 text-red-400" />
+    return <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
 
   let remainingDays = new Date(expirationDate) - Date.now()
 

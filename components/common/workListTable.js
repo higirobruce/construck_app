@@ -1,18 +1,5 @@
 import { useContext, useState } from 'react'
 
-import {
-  CheckIcon,
-  ExclamationIcon,
-  ExclamationCircleIcon,
-  XIcon,
-  PauseIcon,
-  PlayIcon,
-  CashIcon,
-  DotsHorizontalIcon,
-  PrinterIcon,
-  ReceiptRefundIcon,
-  StopIcon,
-} from '@heroicons/react/solid'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 import MTextView from './mTextView'
@@ -21,16 +8,27 @@ import MPagination from './pagination'
 import { paginate } from '../../utils/paginate'
 import { UserContext } from '../../contexts/UserContext'
 import _ from 'lodash'
-import {
-  ClipboardCheckIcon,
-  ClipboardIcon,
-  SwitchVerticalIcon,
-  TrashIcon,
-} from '@heroicons/react/outline'
+
 import { ResponsiveWrapper } from '@nivo/core'
 import { Tooltip } from 'antd'
 import moment from 'moment'
+import {
+  ArrowsUpDownIcon,
+  CheckIcon,
+  ClipboardDocumentCheckIcon,
+  ClipboardIcon,
+  FolderOpenIcon,
+  PrinterIcon,
+  TrashIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 
+import {
+  StopIcon,
+  PlayIcon,
+  ExclamationTriangleIcon,
+  ReceiptRefundIcon,
+} from '@heroicons/react/24/solid'
 const MStatusIndicator = ({ status }) => {
   if (status === 'approved')
     return (
@@ -45,7 +43,7 @@ const MStatusIndicator = ({ status }) => {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
-          <XIcon className="h-5 w-5 text-red-500" />
+          <XMarkIcon className="h-5 w-5 text-red-500" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
@@ -54,7 +52,7 @@ const MStatusIndicator = ({ status }) => {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
-          <ExclamationIcon className="h-5 w-5 text-yellow-500" />
+          <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
@@ -99,7 +97,7 @@ const MStatusIndicator = ({ status }) => {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
-          <DotsHorizontalIcon className="h-5 w-5 text-gray-200" />
+          <EllipsisHorizontalIcon className="h-5 w-5 text-gray-200" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
@@ -140,6 +138,7 @@ const getShiftLabel = (shift) => {
 export default function WorkListTable({
   data,
   handelApprove,
+  handelExpandSw,
   handelReject,
   handelRecall,
   handleOrder,
@@ -220,7 +219,7 @@ export default function WorkListTable({
                     onClick={() => handleOrder('byDate')}
                   >
                     <div>Date</div>
-                    <SwitchVerticalIcon className="h-4 w-4" />
+                    <ArrowsUpDownIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
 
@@ -236,7 +235,7 @@ export default function WorkListTable({
                     onClick={() => handleOrder('by project')}
                   >
                     <div>Project Name</div>
-                    <SwitchVerticalIcon className="h-4 w-4" />
+                    <ArrowsUpDownIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
                 <Table.HeaderCell>
@@ -255,7 +254,7 @@ export default function WorkListTable({
                       onClick={() => handleOrder('byTotalAmount')}
                     >
                       <div>Actual revenue</div>
-                      <SwitchVerticalIcon className="h-4 w-4" />
+                      <ArrowsUpDownIcon className="h-4 w-4" />
                     </div>
                   </Table.HeaderCell>
                 )}
@@ -267,7 +266,7 @@ export default function WorkListTable({
                     onClick={() => handleOrder('byDriver')}
                   >
                     {isVendor ? 'Vendor Name' : ' Driver'}
-                    <SwitchVerticalIcon className="h-4 w-4" />
+                    <ArrowsUpDownIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
                 <Table.HeaderCell singleLine>
@@ -280,7 +279,7 @@ export default function WorkListTable({
                     onClick={() => handleOrder('byTripsDone')}
                   >
                     <div>Trips Done</div>
-                    <SwitchVerticalIcon className="h-4 w-4" />
+                    <ArrowsUpDownIcon className="h-4 w-4" />
                   </div>
                 </Table.HeaderCell>
                 <Table.HeaderCell>Customer</Table.HeaderCell>
@@ -388,10 +387,9 @@ export default function WorkListTable({
                           row.status === 'approved' ||
                           row.status === 'rejected'
                             ? row?.equipment?.uom === 'hour'
-                              ? msToTime(
-                                  getDuration(row?.startTime, row?.duration)
-                                )
-                              : Math.round(row?.duration * 100) / 100 + 'days'
+                              ? _.round(row?.duration / (1000 * 60 * 60), 2) +
+                                ' hours'
+                              : Math.round(row?.duration * 100) / 100 + ' days'
                             : '...'
                         }
                       />
@@ -468,7 +466,8 @@ export default function WorkListTable({
                     <Table.Cell>
                       <div className="mr-2 flex flex-row">
                         {user.userType === 'customer-site-manager' &&
-                          row.status === 'stopped' && (
+                          row.status === 'stopped' &&
+                          !row.siteWork && (
                             <>
                               <div
                                 onClick={() =>
@@ -484,7 +483,7 @@ export default function WorkListTable({
                                 }
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
-                                <XIcon className="h-5 w-5 text-red-400" />
+                                <XMarkIcon className="h-5 w-5 text-red-400" />
                               </div>
 
                               {row.selected && (
@@ -500,9 +499,24 @@ export default function WorkListTable({
                                   onClick={() => handleSelect(row)}
                                   className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                                 >
-                                  <ClipboardCheckIcon className="h-5 w-5 text-blue-400" />
+                                  <ClipboardDocumentCheckIcon className="h-5 w-5 text-blue-400" />
                                 </div>
                               )}
+                            </>
+                          )}
+
+                        {user.userType === 'customer-site-manager' &&
+                          row.siteWork &&
+                          row.dailyWork.length >= 1 && (
+                            <>
+                              <div
+                                onClick={() =>
+                                  handelExpandSw(row, index, pageStartIndex)
+                                }
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                              >
+                                <FolderOpenIcon className="h-5 w-5 text-blue-400" />
+                              </div>
                             </>
                           )}
 
@@ -513,7 +527,7 @@ export default function WorkListTable({
                                 // onClick={() => handelApprove(row)}
                                 className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                               >
-                                <CashIcon className="h-5 w-5 text-green-400" />
+                                <ReceiptRefundIcon className="h-5 w-5 text-green-400" />
                               </div>
                               <div
                                 // onClick={() => handelReject(row)}

@@ -1,4 +1,4 @@
-import { ArrowRightIcon, RefreshIcon } from '@heroicons/react/outline'
+import { ArrowRightIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import React, { useContext, useState } from 'react'
 import TextInput from '../common/TextIput'
 import { DatePicker, Descriptions } from 'antd'
@@ -196,7 +196,7 @@ export default function Reversals() {
                       }
                       className="flex h-8 w-8 cursor-pointer items-center justify-center rounded bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 active:bg-red-500"
                     >
-                      <RefreshIcon className="h-5 w-5" />
+                      <ArrowPathIcon className="h-5 w-5" />
                     </div>
                   </div>
                 )

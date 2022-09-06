@@ -1,4 +1,9 @@
-import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
+import {
+  ArrowLeftIcon,
+  ArrowDownTrayIcon,
+  PlusIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
@@ -9,6 +14,11 @@ import TextInputV from '../common/TextIputV'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import { UserContext } from '../../contexts/UserContext'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+
+import moment from 'moment'
 
 export default function Users() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -28,6 +38,8 @@ export default function Users() {
   let [projectAssigned, setProjectAssigned] = useState(null)
   let [submitting, setSubmitting] = useState(false)
 
+  let [downloadingData, setDownloadingData] = useState(false)
+
   let [idToUpdate, setIdToUpdate] = useState('')
 
   let { user, setUser } = useContext(UserContext)
@@ -41,14 +53,16 @@ export default function Users() {
         { key: '2', value: 'customer-site-manager', text: 'Site Manager' },
       ]
     : [
-        { key: '1', value: 'display', text: 'Display only' },
+        { key: '7', value: 'workshop-admin', text: 'Admin Workshop' },
+        { key: '4', value: 'revenue-admin', text: 'Admin Revenue' },
         { key: '2', value: 'admin', text: 'Administrator' },
+        { key: '1', value: 'display', text: 'Display' },
         { key: '3', value: 'revenue', text: 'Revenue officer' },
-        { key: '4', value: 'dispatch', text: 'Dispatch officer' },
-        { key: '5', value: 'dispatch-view', text: 'Display Dispatch' },
-        { key: '6', value: 'customer-admin', text: 'Customer' },
+        { key: '5', value: 'dispatch', text: 'Dispatch officer' },
+        { key: '6', value: 'dispatch-view', text: 'Display Dispatch' },
+        { key: '8', value: 'customer-admin', text: 'Customer Admin' },
         {
-          key: '7',
+          key: '9',
           value: 'customer-project-manager',
           text: 'Project Manager',
         },
@@ -68,6 +82,7 @@ export default function Users() {
           : setUsers(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
 
     fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
@@ -104,6 +119,7 @@ export default function Users() {
           : setUsers(res)
         setLoading(false)
       })
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function resetPassword(user) {
@@ -152,7 +168,7 @@ export default function Users() {
           refresh()
         }
       })
-      .catch((err) => {})
+      .catch((err) => toast.error('Error occured!'))
   }
 
   function _setUserToUpdate(data) {
@@ -165,7 +181,6 @@ export default function Users() {
     setPhone(data.phone)
     setEmail(data.email)
     setRole(data.userType)
-    console.log(data)
   }
 
   function updateUser() {
@@ -190,7 +205,6 @@ export default function Users() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         if (res.error) {
           toast.error(res.error)
         } else {
@@ -203,6 +217,53 @@ export default function Users() {
         setSubmitting(false)
         toast.error(err)
       })
+  }
+
+  function download() {
+    setDownloadingData(true)
+
+    fetch(`${url}/users/`)
+      .then((res) => res.json())
+      .then((res) => {
+        let data = res.map((w) => {
+          {
+            return {
+              'First Name': w.firstName,
+              'Last Name': w.lastName,
+              Email: w.email,
+              Phone: w.phone,
+              Role: w.userType,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Users List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+      })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
   }
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
@@ -224,12 +285,24 @@ export default function Users() {
         )}
 
         {viewPort === 'list' && (
-          <MSubmitButton
-            submit={refresh}
-            intent="neutral"
-            icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
-            label="Refresh"
-          />
+          <>
+            {downloadingData ? (
+              <div>
+                <Loader active size="tiny" inline className="ml-5" />
+              </div>
+            ) : (
+              <ArrowDownTrayIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => download()}
+              />
+            )}
+            <MSubmitButton
+              submit={refresh}
+              intent="neutral"
+              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
+              label="Refresh"
+            />
+          </>
         )}
 
         {(viewPort === 'new' || viewPort === 'change') && (

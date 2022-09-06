@@ -1,14 +1,8 @@
 import {
-  CashIcon,
-  DocumentDownloadIcon,
-  DownloadIcon,
-  EyeIcon,
-  MailIcon,
-  PencilAltIcon,
+  ReceiptRefundIcon,
+  EnvelopeOpenIcon,
   PhoneIcon,
-  ViewListIcon,
-} from '@heroicons/react/outline'
-import { FolderIcon, FolderOpenIcon } from '@heroicons/react/solid'
+} from '@heroicons/react/24/outline'
 import React from 'react'
 
 export default function CustomerCard({ intent, data, icon, updateMe }) {
@@ -37,7 +31,7 @@ export default function CustomerCard({ intent, data, icon, updateMe }) {
           {data.name + '  (' + data.nProjects + ')'}
         </div>
         {/* <div className="flex flex-row space-x-3">
-          <PencilAltIcon className="h-5 w-5 cursor-pointer text-yellow-600" />
+          <PencilSquareIcon className="h-5 w-5 cursor-pointer text-yellow-600" />
           <FolderOpenIcon className="h-5 w-5 cursor-pointer text-blue-500" />
         </div> */}
       </div>
@@ -51,14 +45,14 @@ export default function CustomerCard({ intent, data, icon, updateMe }) {
         </div>
         <div className="flex flex-row items-center justify-between text-base font-normal text-gray-500">
           <div>
-            <MailIcon className="h-5 w-5 text-gray-800" />
+            <EnvelopeOpenIcon className="h-5 w-5 text-gray-800" />
           </div>
           <div>{data.email}</div>
         </div>
 
         <div className="flex flex-row items-center justify-between text-base font-normal text-gray-500">
           <div>
-            <CashIcon className="h-5 w-5 text-gray-800" />
+            <ReceiptRefundIcon className="h-5 w-5 text-gray-800" />
           </div>
           <div>{data.tinNumber}</div>
         </div>

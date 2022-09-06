@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { DocumentTextIcon } from '@heroicons/react/solid'
+import { DocumentTextIcon } from '@heroicons/react/24/solid'
 import {
   ChatIcon,
-  DotsHorizontalIcon,
+  EllipsisHorizontalIcon,
   CheckIcon,
-  ExclamationIcon,
+  ExclamationTriangleIcon,
   ExclamationCircleIcon,
   XIcon,
   PauseIcon,
-} from '@heroicons/react/solid'
+} from '@heroicons/react/24/solid'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 import MTextView from './mTextView'
@@ -34,7 +34,7 @@ const MStatusIndicator = ({ status }) => {
   } else if (status === 'in progress') {
     return (
       <div className="flex flex-row">
-        <ExclamationIcon className="h-5 w-5 text-yellow-500" />
+        <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />
         <MTextView content={status} />
       </div>
     )
@@ -119,7 +119,7 @@ export default function ViolationsTable({
                       onClick={() => handelOpen(row)}
                       className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
-                      <DotsHorizontalIcon className="h-5 w-5 text-blue-400" />
+                      <EllipsisHorizontalIcon className="h-5 w-5 text-blue-400" />
                     </div>
                     <div
                       onClick={() => handelShowMessages(row)}

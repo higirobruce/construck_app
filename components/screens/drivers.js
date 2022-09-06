@@ -1,4 +1,9 @@
-import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
+import {
+  ArrowLeftIcon,
+  ArrowDownTrayIcon,
+  PlusIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
@@ -9,6 +14,11 @@ import TextInputV from '../common/TextIputV'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import { UserContext } from '../../contexts/UserContext'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+
+import moment from 'moment'
 
 export default function Drivers() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -26,6 +36,8 @@ export default function Drivers() {
   let [projectList, setProjectList] = useState([])
   let [projects, setProjects] = useState([])
   let [projectAssigned, setProjectAssigned] = useState(null)
+
+  let [downloadingData, setDownloadingData] = useState(false)
 
   let [idToUpdate, setIdToUpdate] = useState('')
 
@@ -328,6 +340,55 @@ export default function Drivers() {
       })
       .catch((err) => {})
   }
+
+  function download() {
+    setDownloadingData(true)
+
+    fetch(`${url}/employees/`)
+      .then((res) => res.json())
+      .then((res) => {
+        let data = res.map((w) => {
+          {
+            return {
+              'First Name': w.firstName,
+              'Last Name': w.lastName,
+              Email: w.email,
+              Phone: w.phone,
+              Title: w.title,
+              'Employment Status': w.employmentStatus,
+              Status: w.status,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Drivers List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+      })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
+  }
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Drivers</div>
@@ -348,12 +409,24 @@ export default function Drivers() {
         )}
 
         {viewPort === 'list' && (
-          <MSubmitButton
-            submit={refresh}
-            intent="neutral"
-            icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
-            label="Refresh"
-          />
+          <>
+            {downloadingData ? (
+              <div>
+                <Loader active size="tiny" inline className="ml-5" />
+              </div>
+            ) : (
+              <ArrowDownTrayIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => download()}
+              />
+            )}
+            <MSubmitButton
+              submit={refresh}
+              intent="neutral"
+              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
+              label="Refresh"
+            />
+          </>
         )}
 
         {(viewPort === 'new' || viewPort === 'change') && (

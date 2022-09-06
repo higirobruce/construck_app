@@ -1,17 +1,16 @@
 import {
-  AdjustmentsIcon,
   ArrowLeftIcon,
-  BanIcon,
+  ArchiveBoxXMarkIcon,
   CheckIcon,
   CogIcon,
-  DocumentDuplicateIcon,
-  DownloadIcon,
+  ArrowDownTrayIcon,
   PlusIcon,
-  RefreshIcon,
+  ArrowPathIcon,
   ShieldCheckIcon,
   TruckIcon,
-  UploadIcon,
-} from '@heroicons/react/outline'
+  ArrowUpTrayIcon,
+} from '@heroicons/react/24/outline'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import React, { useContext, useEffect, useState } from 'react'
 import EquipmentCard from '../common/equipmentCard'
 import MSubmitButton from '../common/mSubmitButton'
@@ -19,7 +18,6 @@ import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import { Tooltip } from 'antd'
-import { ExclamationIcon, LockClosedIcon } from '@heroicons/react/solid'
 import Modal from '../common/modal'
 import { UserContext } from '../../contexts/UserContext'
 import EqStatusCard from '../common/eqStatusCard'
@@ -27,6 +25,10 @@ import TextInputV from '../common/TextIputV'
 import TextInputLogin from '../common/TextIputLogin'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+import moment from 'moment'
 
 export default function Equipments() {
   let { user, setUser } = useContext(UserContext)
@@ -62,6 +64,8 @@ export default function Equipments() {
   let [rate, setRate] = useState(0)
   let [supplierRate, setSupplierRate] = useState(0)
   let [uom, setUom] = useState('')
+
+  let [downloadingData, setDownloadingData] = useState(false)
 
   let [idToUpdate, setIdToUpdate] = useState('')
 
@@ -226,6 +230,7 @@ export default function Equipments() {
       })
       .catch((err) => {
         setLoading(false)
+        toast.error('Error occured!')
       })
   }
 
@@ -505,6 +510,59 @@ export default function Equipments() {
       })
   }
 
+  function download() {
+    setDownloadingData(true)
+
+    fetch(`${url}/equipments/`)
+      .then((res) => res.json())
+      .then((res) => {
+        let data = res['equipments'].map((w) => {
+          {
+            return {
+              'Plate number': w.plateNumber,
+              'Equipment type': w.eqDescription,
+              'Asset class': w.assetClass,
+              'Equipment category': w.eqtype,
+              Owner: w.eqOwner,
+              Status: w.eqStatus,
+              Rate: w.rate,
+              'Supplier rate': w.supplierRate,
+              'Unit of measurement': w.uom,
+              'On site work?': w.assignedToSiteWork ? 'Yes' : 'No',
+              'Millage or Index': w.millage,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Equipment List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+      })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
+  }
+
   return (
     <>
       {sendToWorkshopModalIsShown && (
@@ -590,7 +648,7 @@ export default function Equipments() {
                     ? 'dispatched'
                     : ''
                 }
-                icon={<ExclamationIcon className="h-5 w-5" />}
+                icon={<ExclamationTriangleIcon className="h-5 w-5" />}
                 onClick={() =>
                   filterBy === 'dispatched'
                     ? setFilterBy('all')
@@ -633,7 +691,7 @@ export default function Equipments() {
                     ? 'disposed'
                     : ''
                 }
-                icon={<BanIcon className="h-5 w-5" />}
+                icon={<ArchiveBoxXMarkIcon className="h-5 w-5" />}
                 onClick={() =>
                   filterBy === 'disposed'
                     ? setFilterBy('all')
@@ -702,7 +760,7 @@ export default function Equipments() {
                         : 'flex flex-row items-center rounded-lg bg-zinc-100 p-1 text-zinc-600 ring-1 ring-zinc-300'
                     }
                   >
-                    <ExclamationIcon className="h-5 w-5" />
+                    <ExclamationTriangleIcon className="h-5 w-5" />
                     <div>({nDispatched})</div>
                   </div>
                 </Tooltip>
@@ -768,7 +826,7 @@ export default function Equipments() {
                 <div>
                   <label>
                     <span className="mt-2 cursor-pointer text-base leading-normal">
-                      <UploadIcon className="h-5 w-5" />
+                      <ArrowUpTrayIcon className="h-5 w-5" />
                     </span>
                     <input
                       type="file"
@@ -781,12 +839,23 @@ export default function Equipments() {
                 </div>
               )}
 
-              {/* <DownloadIcon className="h-5 w-5 cursor-pointer" /> */}
+              {downloadingData ? (
+                <div>
+                  <Loader active size="tiny" inline className="ml-5" />
+                </div>
+              ) : (
+                <ArrowDownTrayIcon
+                  className="h-5 w-5 cursor-pointer"
+                  onClick={() => download()}
+                />
+              )}
+
+              {/* <ArrowDownTrayIcon className="h-5 w-5 cursor-pointer" /> */}
               {/* <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" /> */}
               <MSubmitButton
                 submit={refresh}
                 intent="neutral"
-                icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+                icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
                 label="Refresh"
               />
             </div>

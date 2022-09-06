@@ -1,12 +1,9 @@
 import {
-  CashIcon,
+  ReceiptRefundIcon,
   ClockIcon,
-  DownloadIcon,
-  ExclamationIcon,
-  SwitchVerticalIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   TruckIcon,
-} from '@heroicons/react/outline'
+} from '@heroicons/react/24/outline'
 import React, { useEffect, useState } from 'react'
 import StatisticCard from '../common/statisticCard'
 import 'antd/dist/antd.css'
@@ -15,7 +12,7 @@ import { DatePicker, Space } from 'antd'
 import TextInputV from '../common/TextIputV'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
-import { DocumentDownloadIcon, MapIcon } from '@heroicons/react/solid'
+import { ArrowDownTrayIcon } from '@heroicons/react/24/solid'
 import 'datejs'
 import moment from 'moment'
 import * as FileSaver from 'file-saver'
@@ -521,7 +518,7 @@ export default function Dashboard() {
                 provisionalRevenues?.toLocaleString() + ' RWF'
               ),
             }}
-            icon={<CashIcon className="h-5 w-5 text-yellow-600" />}
+            icon={<ReceiptRefundIcon className="h-5 w-5 text-yellow-600" />}
           />
           <StatisticCard
             data={{
@@ -532,7 +529,7 @@ export default function Dashboard() {
                 finalRevenues?.toLocaleString() + ' RWF'
               ),
             }}
-            icon={<CashIcon className="h-5 w-5 text-blue-600" />}
+            icon={<ReceiptRefundIcon className="h-5 w-5 text-blue-600" />}
           />
           <StatisticCard
             data={{
@@ -543,7 +540,7 @@ export default function Dashboard() {
                 assetUtilization + '%'
               ),
             }}
-            icon={<TrendingUpIcon className="h-5 w-5 text-green-600" />}
+            icon={<ArrowTrendingUpIcon className="h-5 w-5 text-green-600" />}
           />
 
           <StatisticCard
@@ -578,7 +575,7 @@ export default function Dashboard() {
           {downloadingDrivers ? (
             <Loader active size="mini" inline />
           ) : (
-            <DocumentDownloadIcon className="h-5 w-5" />
+            <ArrowDownTrayIcon className="h-5 w-5" />
           )}
           <div onClick={() => downloadDrivers()}>Get Hours/Driver report</div>
         </div>

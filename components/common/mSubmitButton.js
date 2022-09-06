@@ -1,5 +1,5 @@
 import React from 'react'
-import { BadgeCheckIcon } from '@heroicons/react/outline'
+import { BadgeCheckIcon } from '@heroicons/react/24/outline'
 
 export default function MSubmitButton({
   submit,

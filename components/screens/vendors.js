@@ -1,4 +1,9 @@
-import { ArrowLeftIcon, PlusIcon, RefreshIcon } from '@heroicons/react/outline'
+import {
+  ArrowLeftIcon,
+  ArrowDownTrayIcon,
+  PlusIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MSubmitButton from '../common/mSubmitButton'
@@ -9,6 +14,11 @@ import TextInputV from '../common/TextIputV'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import { UserContext } from '../../contexts/UserContext'
+
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+
+import moment from 'moment'
 
 export default function Vendors() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -21,6 +31,10 @@ export default function Vendors() {
 
   let [phone, setPhone] = useState('')
   let [mobile, setMobile] = useState('')
+
+  let [idToUpdate, setIdToUpdate] = useState('')
+
+  let [downloadingData, setDownloadingData] = useState(false)
 
   let { user, setUser } = useContext(UserContext)
 
@@ -95,6 +109,83 @@ export default function Vendors() {
       })
   }
 
+  function _setVendorToUpdate(row) {
+    setViewPort('change')
+    setIdToUpdate(row._id)
+    setName(row.name)
+    setPhone(row.phone)
+    setMobile(row.mobile)
+  }
+
+  function updateVendor() {
+    fetch(`${url}/vendors/${idToUpdate}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'PUT',
+      body: JSON.stringify({
+        name,
+        phone,
+        mobile,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.error) {
+          toast.error(res.error)
+        } else {
+          setViewPort('list')
+          setSubmitting(false)
+          refresh()
+        }
+      })
+      .catch((err) => {})
+  }
+
+  function download() {
+    setDownloadingData(true)
+
+    fetch(`${url}/vendors/`)
+      .then((res) => res.json())
+      .then((res) => {
+        let data = res.map((w) => {
+          {
+            return {
+              Name: w.name,
+              Phone: w.phone,
+              'Other phone': w.mobile,
+            }
+          }
+        })
+
+        exportToCSV(
+          data,
+          `Vendors List ${moment().format('DD-MMM-YYYY HH:mm:ss')}`
+        )
+
+        setDownloadingData(false)
+      })
+      .catch((err) => {
+        setLoading(false)
+      })
+
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
+    const exportToCSV = (apiData, fileName) => {
+      const ws = XLSX.utils.json_to_sheet(apiData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, fileName + fileExtension)
+    }
+
+    // exportToCSV(
+    //   _siteWorkDetails,
+    //   `Detailed Site works ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
+    // )
+  }
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">Vendors</div>
@@ -115,15 +206,27 @@ export default function Vendors() {
         )}
 
         {viewPort === 'list' && (
-          <MSubmitButton
-            submit={refresh}
-            intent="neutral"
-            icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
-            label="Refresh"
-          />
+          <>
+            {downloadingData ? (
+              <div>
+                <Loader active size="tiny" inline className="ml-5" />
+              </div>
+            ) : (
+              <ArrowDownTrayIcon
+                className="h-5 w-5 cursor-pointer"
+                onClick={() => download()}
+              />
+            )}
+            <MSubmitButton
+              submit={refresh}
+              intent="neutral"
+              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
+              label="Refresh"
+            />
+          </>
         )}
 
-        {viewPort === 'new' && (
+        {(viewPort === 'new' || viewPort === 'change') && (
           <MSubmitButton
             submit={() => {
               setViewPort('list')
@@ -143,6 +246,7 @@ export default function Vendors() {
               <VendorsTable
                 data={vendors}
                 handleResetPassword={resetPassword}
+                handleUpdateVendor={_setVendorToUpdate}
               />
             </div>
           )}
@@ -198,6 +302,61 @@ export default function Vendors() {
                   <Loader inline size="small" active />
                 ) : (
                   <MSubmitButton submit={submit} />
+                )}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {viewPort === 'change' && (
+        <>
+          <div className="flex flex-col space-y-5">
+            <div className="mt-5 flex flex-row items-center space-x-2">
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Vendor Name" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="Vendor name"
+                  type="text"
+                  value={name}
+                  setValue={setName}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Phone" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <TextInputV
+                  placeholder="Phone"
+                  type="text"
+                  value={phone}
+                  setValue={setPhone}
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Other phone" />
+                </div>
+                <TextInputV
+                  placeholder="Other phone"
+                  type="text"
+                  value={mobile}
+                  setValue={setMobile}
+                />
+              </div>
+            </div>
+            {name.length >= 1 && phone.length === 10 && (
+              <div>
+                {submitting ? (
+                  <Loader inline size="small" active />
+                ) : (
+                  <MSubmitButton submit={updateVendor} />
                 )}
               </div>
             )}

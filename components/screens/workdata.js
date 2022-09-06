@@ -2,21 +2,11 @@ import React, { useContext, useEffect, useState } from 'react'
 import WorkListTable from '../common/workListTable'
 import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
-import {
-  RefreshIcon,
-  PlusIcon,
-  ArrowLeftIcon,
-  DownloadIcon,
-  TrashIcon,
-  CheckIcon,
-  AdjustmentsIcon,
-} from '@heroicons/react/outline'
 import MTitle from '../common/mTitle'
 import { Dimmer, Dropdown, Loader } from 'semantic-ui-react'
 import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import _ from 'lodash'
-import { DocumentDuplicateIcon } from '@heroicons/react/solid'
 import { UserContext } from '../../contexts/UserContext'
 import { DatePicker, Descriptions } from 'antd'
 import Modal from '../common/modal'
@@ -26,6 +16,15 @@ import * as XLSX from 'xlsx'
 import TextInputV from '../common/TextIputV'
 import 'datejs'
 import moment from 'moment'
+import {
+  AdjustmentsHorizontalIcon,
+  ArrowDownTrayIcon,
+  ArrowLeftIcon,
+  ArrowPathIcon,
+  DocumentDuplicateIcon,
+  PlusIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline'
 
 const { RangePicker } = DatePicker
 
@@ -107,6 +106,7 @@ export default function Workdata() {
   let [stopModalIsShown, setStopModalIsShown] = useState(false)
   let [startModalIsShown, setStartModalIsShown] = useState(false)
   let [approveModalIsShown, setApproveModalIsShown] = useState(false)
+  let [expandSwModalIsShown, setExpandSwModalIsShown] = useState(false)
   let [rejectModalIsShown, setRejectModalIsShown] = useState(false)
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
   let [endModalIsShown, setEndModalIsShown] = useState(false)
@@ -145,6 +145,11 @@ export default function Workdata() {
   let [comment, setComment] = useState(null)
 
   let [postingDate, setPostingDate] = useState(moment())
+
+  const disabledDate = (current) => {
+    // Can not select days before today and today
+    return current && current < moment('2022-07-01')
+  }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
@@ -685,19 +690,10 @@ export default function Workdata() {
         })
         _workList = _wList
       }
+
       setWorkList(_workList)
       setLoadingData(false)
     } else {
-      setStartDate(
-        Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
-      )
-      setEndDate(
-        Date.today()
-          .clearTime()
-          .moveToLastDayOfMonth()
-          .addHours(23)
-          .addMinutes(59)
-      )
       if (owner === 'All') {
         setWorkList(ogWorkList)
         setLoadingData(false)
@@ -718,11 +714,11 @@ export default function Workdata() {
   }, [search, owner])
 
   useEffect(() => {
-    if (startDate && endDate && workList) {
+    if (startDate && endDate) {
       let _workList = workList?.filter((w) => {
         return (
-          Date.parse(startDate) <= Date.parse(w?.workStartDate) ||
-          Date.parse(endDate).addHours(23).addMinutes(59) >=
+          Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+          Date.parse(endDate).addHours(23).addMinutes(59) <=
             Date.parse(w?.workEndDate)
         )
       })
@@ -847,6 +843,12 @@ export default function Workdata() {
     setRow(row)
     setRowIndex(parseInt(index) + parseInt(pageStartIndex))
     setApproveModalIsShown(true)
+  }
+
+  function _setExpandSWRow(row, index, pageStartIndex) {
+    setRow(row)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
+    setExpandSwModalIsShown(true)
   }
 
   function _setRejectRow(row, index, pageStartIndex) {
@@ -1576,7 +1578,7 @@ export default function Workdata() {
                   Approve selected
                 </div>
               )}
-              <AdjustmentsIcon className="h-5 w-5 cursor-pointer text-red-500" />
+              <AdjustmentsHorizontalIcon className="h-5 w-5 cursor-pointer text-red-500" />
 
               {downloadingData ? (
                 <div>
@@ -1584,7 +1586,7 @@ export default function Workdata() {
                 </div>
               ) : (
                 canViewRenues && (
-                  <DownloadIcon
+                  <ArrowDownTrayIcon
                     className="h-5 w-5 cursor-pointer"
                     onClick={() => download()}
                   />
@@ -1595,7 +1597,7 @@ export default function Workdata() {
               <MSubmitButton
                 submit={refresh}
                 intent="neutral"
-                icon={<RefreshIcon className="h-5 w-5 text-zinc-800" />}
+                icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
                 label="Refresh"
               />
             </div>
@@ -1615,6 +1617,7 @@ export default function Workdata() {
                 <WorkListTable
                   data={workList}
                   handelApprove={_setApproveRow}
+                  handelExpandSw={_setExpandSWRow}
                   handelReject={_setRejectRow}
                   handelRecall={_setRecallRow}
                   handelStop={_setStopRow}
@@ -1730,6 +1733,7 @@ export default function Workdata() {
                     setWorkStartDate(dateStrings[0])
                     setWorkEndDate(dateStrings[1])
                   }}
+                  disabledDate={disabledDate}
                   disabled={!siteWork}
                 />
               </div>
@@ -1793,6 +1797,7 @@ export default function Workdata() {
                     <div className="w-4/5">
                       <DatePicker
                         size={20}
+                        disabledDate={disabledDate}
                         defaultValue={moment()}
                         onChange={(date, dateString) => {
                           setMovementDate(dateString)
@@ -1924,6 +1929,7 @@ export default function Workdata() {
                       <div className="w-4/5">
                         <DatePicker
                           size={20}
+                          disabledDate={disabledDate}
                           defaultValue={moment()}
                           onChange={(date, dateString) => {
                             setDispatchDate(dateString)
@@ -2484,6 +2490,7 @@ export default function Workdata() {
                                 <RangePicker
                                   size={20}
                                   defaultValue={moment()}
+                                  disabledDate={disabledDate}
                                   onChange={(date, dateString) => {
                                     let _dispDates = dispatchDates
                                       ? [...dispatchDates]
@@ -2702,6 +2709,16 @@ export default function Workdata() {
           isShown={orderModalIsShown}
           setIsShown={setOrderModalIsShown}
           handleConfirm={order}
+        />
+      )}
+
+      {expandSwModalIsShown && (
+        <Modal
+          title="More details"
+          body="Please select which dates to approve or reject."
+          isShown={expandSwModalIsShown}
+          setIsShown={setExpandSwModalIsShown}
+          handleConfirm={approve}
         />
       )}
     </>

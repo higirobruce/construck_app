@@ -1,20 +1,18 @@
 import {
+  ArrowLeftOnRectangleIcon,
+  ArrowPathIcon,
+  BellIcon,
   ChartBarIcon,
-  DocumentDuplicateIcon,
   CogIcon,
-  InboxIcon,
+  DocumentDuplicateIcon,
+  IdentificationIcon,
   TruckIcon,
+  UserCircleIcon,
+  UserGroupIcon,
   UserIcon,
   UsersIcon,
-  UserGroupIcon,
-  ViewGridAddIcon,
-  LogoutIcon,
-  BellIcon,
-  UserCircleIcon,
-  RefreshIcon,
-  IdentificationIcon,
-} from '@heroicons/react/outline'
-
+  QueueListIcon,
+} from '@heroicons/react/24/outline'
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
 import { UserContext } from '../../contexts/UserContext'
@@ -25,7 +23,8 @@ export default function MenuBar() {
 
   let role = user?.userType
 
-  let canSeeDashboard = role === 'admin' || role === 'display'
+  let canSeeDashboard =
+    role === 'admin' || role === 'display' || role === 'revenue-admin'
   let canSeeDispatches =
     role === 'admin' ||
     role === 'dispatch' ||
@@ -33,7 +32,8 @@ export default function MenuBar() {
     role === 'vendor' ||
     role === 'customer-admin' ||
     role === 'customer-project-manager' ||
-    role === 'customer-site-manager'
+    role === 'customer-site-manager' ||
+    role === 'revenue-admin'
   let canSeeUsers =
     role === 'admin' ||
     role === 'customer-admin' ||
@@ -129,7 +129,7 @@ export default function MenuBar() {
               }
               onClick={() => setScreen('projects')}
             >
-              <ViewGridAddIcon className="h-5 w-5" />
+              <QueueListIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">
                 Projects
               </div>
@@ -216,7 +216,7 @@ export default function MenuBar() {
             }
             onClick={() => setScreen('reversals')}
           >
-            <RefreshIcon className="h-5 w-5" />
+            <ArrowPathIcon className="h-5 w-5" />
             <div className="hidden w-1/2 font-semibold md:block">Reversals</div>
           </div>
         )}
@@ -224,7 +224,7 @@ export default function MenuBar() {
 
       <div className="flex w-full flex-col items-center px-5">
         <div className="mb-5 flex w-full flex-col justify-evenly md:flex-row">
-          <LogoutIcon
+          <ArrowLeftOnRectangleIcon
             className="mb-1 h-7 w-7 cursor-pointer text-red-400"
             onClick={() => logout()}
           />

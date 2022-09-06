@@ -1,28 +1,28 @@
-import React, { useContext, useState } from "react";
-import MTextView from "./mTextView";
+import React, { useContext, useState } from 'react'
+import MTextView from './mTextView'
 import {
-  CashIcon,
+  ReceiptRefundIcon,
   CreditCardIcon,
   LibraryIcon,
-} from "@heroicons/react/outline";
-import MSubmitButton from "./mSubmitButton";
-import MUploadButton from "./uploadButton";
-import SmallTextInput from "./mSmallTextIput";
-import { LanguageContext } from "../../contexts/languageContext";
-import { labels, messages, placeholders } from "../../utils/labels";
+} from '@heroicons/react/outline'
+import MSubmitButton from './mSubmitButton'
+import MUploadButton from './uploadButton'
+import SmallTextInput from './mSmallTextIput'
+import { LanguageContext } from '../../contexts/languageContext'
+import { labels, messages, placeholders } from '../../utils/labels'
 
 export default function MPayment({ submit, balance }) {
-  const [paymentMethod, setPaymentMethod] = useState("wallet");
-  const { language, setLanguage } = useContext(LanguageContext);
+  const [paymentMethod, setPaymentMethod] = useState('wallet')
+  const { language, setLanguage } = useContext(LanguageContext)
 
   return (
-    <div className="rounded-md shadow-md bg-white px-5 py-3 my-3">
+    <div className="my-3 rounded-md bg-white px-5 py-3 shadow-md">
       {/* Title */}
       <div className="text-lg font-semibold text-gray-700">
         {`${labels[`${language}`].reviewAndAuthorize}`}
       </div>
       {/* Intro text */}
-      <div className="text-sm font-base text-gray-400 w-3/4">
+      <div className="font-base w-3/4 text-sm text-gray-400">
         Consequat aliquip sint deserunt ullamco sunt non occaecat tempor in.
         Labore nisi nostrud pariatur duis minim aute velit. Commodo cillum culpa
         et exercitation irure officia tempor nisi fugiat est labore enim.
@@ -35,7 +35,7 @@ export default function MPayment({ submit, balance }) {
         <MTextView content={`${labels[`${language}`].invoice}`} />
       </div>
 
-      <div className="grid grid-cols-2 w-1/5 gap-2 ring-1 ring-gray-200 rounded-md pt-3 px-2">
+      <div className="grid w-1/5 grid-cols-2 gap-2 rounded-md px-2 pt-3 ring-1 ring-gray-200">
         <div>
           <div className="text-md font-bold text-gray-400">{`${
             labels[`${language}`].permits
@@ -43,7 +43,7 @@ export default function MPayment({ submit, balance }) {
           <div className="text-md font-bold text-gray-400">{`${
             labels[`${language}`].processingFees
           }`}</div>
-          <div className="text-md font-bold text-gray-600 mt-3">{`${
+          <div className="text-md mt-3 font-bold text-gray-600">{`${
             labels[`${language}`].totalBill
           }`}</div>
         </div>
@@ -56,7 +56,7 @@ export default function MPayment({ submit, balance }) {
             <div className="text-md font-bold text-gray-400">$ 20</div>
           </div>
 
-          <div className="flex flex-row justify-end mt-3 mb-3">
+          <div className="mt-3 mb-3 flex flex-row justify-end">
             <div className="text-md font-bold text-gray-600">$ 170.5</div>
           </div>
         </div>
@@ -67,49 +67,49 @@ export default function MPayment({ submit, balance }) {
         <MTextView content={`${labels[`${language}`].paymentMethod}`} />
       </div>
 
-      <div className="grid grid-cols-3 w-3/5 gap-2 ">
+      <div className="grid w-3/5 grid-cols-3 gap-2">
         <button
-          onClick={() => setPaymentMethod("wallet")}
+          onClick={() => setPaymentMethod('wallet')}
           className={
-            paymentMethod === "wallet"
-              ? "flex justify-between ring-1 ring-gray-200 h-16 rounded-sm items-center bg-purple-500 transition ease-out duration-200 cursor-pointer px-5 shadow-md text-gray-100"
-              : "flex justify-between ring-1 ring-gray-200 h-16 rounded-sm items-center hover:bg-gray-50 transition ease-out duration-200 cursor-pointer px-5 shadow-md text-gray-500"
+            paymentMethod === 'wallet'
+              ? 'flex h-16 cursor-pointer items-center justify-between rounded-sm bg-purple-500 px-5 text-gray-100 shadow-md ring-1 ring-gray-200 transition duration-200 ease-out'
+              : 'flex h-16 cursor-pointer items-center justify-between rounded-sm px-5 text-gray-500 shadow-md ring-1 ring-gray-200 transition duration-200 ease-out hover:bg-gray-50'
           }
         >
-          <CashIcon className="h-10 w-10" />
+          <ReceiptRefundIcon className="h-10 w-10" />
           <div className="text-xl font-semibold">{`${
             labels[`${language}`].myWallet
           }`}</div>
         </button>
 
         <button
-          onClick={() => setPaymentMethod("card")}
+          onClick={() => setPaymentMethod('card')}
           className={
-            paymentMethod === "card"
-              ? "flex justify-between ring-1 ring-gray-200 h-16 rounded-sm items-center bg-blue-500 transition ease-out duration-200 cursor-pointer px-5 shadow-md text-gray-100"
-              : "flex justify-between ring-1 ring-gray-200 h-16 rounded-sm items-center hover:bg-gray-50 transition ease-out duration-200 cursor-pointer px-5 shadow-md text-gray-500"
+            paymentMethod === 'card'
+              ? 'flex h-16 cursor-pointer items-center justify-between rounded-sm bg-blue-500 px-5 text-gray-100 shadow-md ring-1 ring-gray-200 transition duration-200 ease-out'
+              : 'flex h-16 cursor-pointer items-center justify-between rounded-sm px-5 text-gray-500 shadow-md ring-1 ring-gray-200 transition duration-200 ease-out hover:bg-gray-50'
           }
         >
-          <CreditCardIcon className="h-10 w-10 " />
-          <div className="text-xl font-semibold ">XXXX XXXX XXXX X1288</div>
+          <CreditCardIcon className="h-10 w-10" />
+          <div className="text-xl font-semibold">XXXX XXXX XXXX X1288</div>
         </button>
 
         <button
-          onClick={() => setPaymentMethod("bank")}
+          onClick={() => setPaymentMethod('bank')}
           className={
-            paymentMethod === "bank"
-              ? "flex justify-between ring-1 ring-gray-200 h-16 rounded-sm items-center bg-red-400 transition ease-out duration-200 cursor-pointer px-5 shadow-md text-white"
-              : "flex justify-between ring-1 ring-gray-200 h-16 rounded-sm items-center hover:bg-gray-50 transition ease-out duration-200 cursor-pointer px-5 shadow-md text-gray-500"
+            paymentMethod === 'bank'
+              ? 'flex h-16 cursor-pointer items-center justify-between rounded-sm bg-red-400 px-5 text-white shadow-md ring-1 ring-gray-200 transition duration-200 ease-out'
+              : 'flex h-16 cursor-pointer items-center justify-between rounded-sm px-5 text-gray-500 shadow-md ring-1 ring-gray-200 transition duration-200 ease-out hover:bg-gray-50'
           }
         >
-          <LibraryIcon className="h-10 w-10 " />
-          <div className="text-xl font-semibold ">{`${
+          <LibraryIcon className="h-10 w-10" />
+          <div className="text-xl font-semibold">{`${
             labels[`${language}`].bankTransfer
           }`}</div>
         </button>
       </div>
 
-      {paymentMethod === "bank" && (
+      {paymentMethod === 'bank' && (
         <div className="my-3">
           <SmallTextInput
             label="Bank Name"
@@ -117,7 +117,7 @@ export default function MPayment({ submit, balance }) {
             setValue={() => {}}
             value=""
           />
-          <div className="flex flex-row items-center space-x-5 my-3">
+          <div className="my-3 flex flex-row items-center space-x-5">
             <MTextView content="Proof of payment:" />
             <MUploadButton />
           </div>
@@ -125,25 +125,25 @@ export default function MPayment({ submit, balance }) {
       )}
 
       {/* Authorize payment */}
-      <div className="flex flex-row space-x-16 items-center mt-5 ">
+      <div className="mt-5 flex flex-row items-center space-x-16">
         <button
           onClick={() => submit(paymentMethod)}
-          className="focus:outline-none focus:ring-2 focus:ring-green-800 flex items-center justify-center space-x-2  h-10 bg-green-500 rounded-md shadow-md cursor-pointer p-2 active:shadow-sm active:scale-95 hover:shadow-sm transition ease-in-out duration-100"
+          className="flex h-10 cursor-pointer items-center justify-center space-x-2 rounded-md bg-green-500 p-2 shadow-md transition duration-100 ease-in-out hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-green-800 active:scale-95 active:shadow-sm"
         >
           {/* <BadgeCheckIcon className="h-5 w-5 text-white" /> */}
-          <div className="text-white font-bold ">{`${
+          <div className="font-bold text-white">{`${
             labels[`${language}`].authorizePayment
           }`}</div>
         </button>
 
-        {paymentMethod === "wallet" && (
-          <div className="text-purple-500 font-bold flex relative">
-            {`${labels[`${language}`].yourBalanceIs}`}{" "}
+        {paymentMethod === 'wallet' && (
+          <div className="relative flex font-bold text-purple-500">
+            {`${labels[`${language}`].yourBalanceIs}`}{' '}
             {balance.toLocaleString()} $
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-200 opacity-50"></span>
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-purple-200 opacity-50"></span>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }

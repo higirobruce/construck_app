@@ -1,4 +1,4 @@
-import { DotsHorizontalIcon, PencilIcon } from '@heroicons/react/solid'
+import { EllipsisHorizontalIcon, PencilIcon } from '@heroicons/react/24/solid'
 import React, { useContext, useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import MTextView from './mTextView'
@@ -68,7 +68,7 @@ export default function OperatorsTable({ data, handleOpen }) {
                       onClick={() => handleOpen(row)}
                       className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
                     >
-                      <DotsHorizontalIcon className="h-5 w-5 text-blue-400" />
+                      <EllipsisHorizontalIcon className="h-5 w-5 text-blue-400" />
                     </div>
                     <div className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm">
                       <PencilIcon className="h-5 w-5 text-yellow-400" />
