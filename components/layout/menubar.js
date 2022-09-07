@@ -58,7 +58,7 @@ export default function MenuBar() {
 
       <div className="flex w-full flex-col items-center">
         <div className="mt-5 mb-10 hidden text-2xl font-bold text-zinc-800 md:block">
-          Shabika App.
+          Shabika App
         </div>
 
         {canSeeDashboard && (
