@@ -119,12 +119,8 @@ export default function Workdata() {
   let [submitting, setSubmitting] = useState(false)
   let [loadingData, setLoadingData] = useState(true)
 
-  let [startDate, setStartDate] = useState(
-    Date.today().clearTime().moveToFirstDayOfMonth().addDays(-30)
-  )
-  let [endDate, setEndDate] = useState(
-    Date.today().clearTime().moveToLastDayOfMonth().addHours(23).addMinutes(59)
-  )
+  let [startDate, setStartDate] = useState(null)
+  let [endDate, setEndDate] = useState(null)
 
   let [workStartDate, setWorkStartDate] = useState(
     Date.today().clearTime().moveToFirstDayOfMonth()
@@ -692,43 +688,105 @@ export default function Workdata() {
         _workList = _wList
       }
 
+      if (startDate && endDate) {
+        _workList = _workList?.filter((w) => {
+          // return (
+          //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+          //   Date.parse(endDate).addHours(23).addMinutes(59) <=
+          //     Date.parse(w?.workEndDate)
+          // )
+
+          return (
+            moment(Date.parse(w?.workStartDate)).isSameOrAfter(
+              moment(Date.parse(startDate))
+            ) &&
+            moment(Date.parse(w?.workEndDate)).isSameOrBefore(
+              moment(Date.parse(endDate))
+            )
+          )
+        })
+      } else {
+      }
+
       setWorkList(_workList)
       setLoadingData(false)
     } else {
+      let _wList = []
       if (owner === 'All') {
-        setWorkList(ogWorkList)
+        _wList = ogWorkList
         setLoadingData(false)
       } else {
-        let _wList = ogWorkList.filter((w) => {
+        _wList = ogWorkList.filter((w) => {
           return owner === 'Construck'
             ? w?.equipment.eqOwner === 'Construck'
             : w?.equipment.eqOwner !== 'Construck'
         })
-        setWorkList(_wList)
       }
+
+      if (startDate && endDate) {
+        _wList = _wList?.filter((w) => {
+          // return (
+          //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+          //   Date.parse(endDate).addHours(23).addMinutes(59) <=
+          //     Date.parse(w?.workEndDate)
+          // )
+
+          return (
+            moment(Date.parse(w?.workStartDate)).isSameOrAfter(
+              moment(Date.parse(startDate))
+            ) &&
+            moment(Date.parse(w?.workEndDate)).isSameOrBefore(
+              moment(Date.parse(endDate))
+            )
+          )
+        })
+      } else {
+      }
+
+      setWorkList(_wList)
     }
 
     // if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
     //   setWorkList(ogWorkList)
     //   setLoadingData(false)
     // }
-  }, [search, owner])
+  }, [search, owner, startDate, endDate])
 
-  useEffect(() => {
-    if (startDate && endDate) {
-      let _workList = workList?.filter((w) => {
-        return (
-          Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
-          Date.parse(endDate).addHours(23).addMinutes(59) <=
-            Date.parse(w?.workEndDate)
-        )
-      })
-      setWorkList(_workList)
-      setLoadingData(false)
-    } else {
-      setWorkList(ogWorkList)
-    }
-  }, [startDate, endDate])
+  // useEffect(() => {
+  //   let list = []
+  //   if (startDate && endDate) {
+  //     if (search.length >= 1) {
+  //       list = workList
+  //     } else {
+  //       list = ogWorkList
+  //     }
+  //     let _workList = list?.filter((w) => {
+  //       // return (
+  //       //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+  //       //   Date.parse(endDate).addHours(23).addMinutes(59) <=
+  //       //     Date.parse(w?.workEndDate)
+  //       // )
+
+  //       return (
+  //         moment(Date.parse(w?.workStartDate)).isSameOrAfter(
+  //           moment(Date.parse(startDate))
+  //         ) &&
+  //         moment(Date.parse(w?.workEndDate)).isSameOrBefore(
+  //           moment(Date.parse(endDate))
+  //         )
+  //       )
+  //     })
+  //     setWorkList(_workList)
+  //     setLoadingData(false)
+  //   } else {
+  //     if (search.length >= 1) {
+  //       list = workList
+  //     } else {
+  //       list = ogWorkList
+  //     }
+  //     setWorkList(list)
+  //   }
+  // }, [startDate, endDate])
 
   useEffect(() => {
     workList &&
