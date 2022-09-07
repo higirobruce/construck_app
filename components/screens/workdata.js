@@ -695,15 +695,25 @@ export default function Workdata() {
           //   Date.parse(endDate).addHours(23).addMinutes(59) <=
           //     Date.parse(w?.workEndDate)
           // )
-
-          return (
-            moment(Date.parse(w?.workStartDate)).isSameOrAfter(
-              moment(Date.parse(startDate))
-            ) &&
-            moment(Date.parse(w?.workEndDate)).isSameOrBefore(
-              moment(Date.parse(endDate))
+          if (w?.siteWork === false) {
+            return (
+              moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
+                moment(Date.parse(startDate))
+              ) &&
+              moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
+                moment(Date.parse(endDate))
+              )
             )
-          )
+          } else {
+            return (
+              moment(Date.parse(w?.workStartDate)).isSameOrBefore(
+                moment(Date.parse(endDate))
+              ) &&
+              moment(Date.parse(w?.workEndDate)).isSameOrAfter(
+                moment(Date.parse(startDate))
+              )
+            )
+          }
         })
       } else {
       }
@@ -731,14 +741,25 @@ export default function Workdata() {
           //     Date.parse(w?.workEndDate)
           // )
 
-          return (
-            moment(Date.parse(w?.workStartDate)).isSameOrAfter(
-              moment(Date.parse(startDate))
-            ) &&
-            moment(Date.parse(w?.workEndDate)).isSameOrBefore(
-              moment(Date.parse(endDate))
+          if (w?.siteWork === false) {
+            return (
+              moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
+                moment(Date.parse(startDate))
+              ) &&
+              moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
+                moment(Date.parse(endDate))
+              )
             )
-          )
+          } else {
+            return (
+              moment(Date.parse(w?.workStartDate)).isSameOrBefore(
+                moment(Date.parse(endDate))
+              ) &&
+              moment(Date.parse(w?.workEndDate)).isSameOrAfter(
+                moment(Date.parse(startDate))
+              )
+            )
+          }
         })
       } else {
       }

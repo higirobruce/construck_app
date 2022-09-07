@@ -3,6 +3,7 @@ import {
   ClockIcon,
   ArrowTrendingUpIcon,
   TruckIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/outline'
 import React, { useEffect, useState } from 'react'
 import StatisticCard from '../common/statisticCard'
@@ -522,7 +523,7 @@ export default function Dashboard() {
                 provisionalRevenues?.toLocaleString() + ' RWF'
               ),
             }}
-            icon={<ReceiptRefundIcon className="h-5 w-5 text-yellow-600" />}
+            icon={<BanknotesIcon className="h-5 w-5 text-yellow-600" />}
           />
           <StatisticCard
             data={{
@@ -533,7 +534,7 @@ export default function Dashboard() {
                 finalRevenues?.toLocaleString() + ' RWF'
               ),
             }}
-            icon={<ReceiptRefundIcon className="h-5 w-5 text-blue-600" />}
+            icon={<BanknotesIcon className="h-5 w-5 text-blue-600" />}
           />
           <StatisticCard
             data={{
