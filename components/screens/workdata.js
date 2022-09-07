@@ -1073,8 +1073,6 @@ export default function Workdata() {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  Authorization:
-                    'Basic ' + btoa(apiUsername + ':' + apiPassword),
                 },
                 body: JSON.stringify({
                   project: toProjects[i],
@@ -1125,8 +1123,6 @@ export default function Workdata() {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  Authorization:
-                    'Basic ' + btoa(apiUsername + ':' + apiPassword),
                 },
                 body: JSON.stringify({
                   project,
