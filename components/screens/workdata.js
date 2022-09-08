@@ -118,7 +118,7 @@ export default function Workdata() {
   let [rowIndex, setRowIndex] = useState()
 
   let [submitting, setSubmitting] = useState(false)
-  let [loadingData, setLoadingData] = useState(true)
+  let [loadingData, setLoadingData] = useState(false)
   let [startDate, setStartDate] = useState(moment().format('YYYY-MM-01'))
   let [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'))
 
@@ -1753,7 +1753,7 @@ export default function Workdata() {
 
         {viewPort === 'list' && (
           <>
-            {(!workList || loadingData) && <Loader active />}
+            {loadingData && <Loader active />}
             {workList &&
               !loadingData &&
               (submitting ? (

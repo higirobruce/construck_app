@@ -165,6 +165,7 @@ export default function WorkListTable({
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
   }
+  if (!data) data = []
 
   let pagesObj = paginate(data, pageNumber, pageSize)
   let pData = pagesObj.pagedData
