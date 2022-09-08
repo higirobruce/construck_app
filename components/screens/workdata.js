@@ -18,6 +18,7 @@ import 'datejs'
 import moment from 'moment'
 import {
   AdjustmentsHorizontalIcon,
+  AdjustmentsVerticalIcon,
   ArrowDownTrayIcon,
   ArrowLeftIcon,
   ArrowPathIcon,
@@ -118,9 +119,8 @@ export default function Workdata() {
 
   let [submitting, setSubmitting] = useState(false)
   let [loadingData, setLoadingData] = useState(true)
-
-  let [startDate, setStartDate] = useState(null)
-  let [endDate, setEndDate] = useState(null)
+  let [startDate, setStartDate] = useState(moment().format('YYYY-MM-01'))
+  let [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'))
 
   let [workStartDate, setWorkStartDate] = useState(
     Date.today().clearTime().moveToFirstDayOfMonth()
@@ -152,7 +152,7 @@ export default function Workdata() {
 
   // useEffect(() => {
   //   setLoadingData(true)
-  //   fetch(`${url}/works/v3/`)
+  //   fetch(`${url}/works/filtered?startDate=${startDate}&endDate=${endDate}`)
   //     .then((resp) => resp.json())
   //     .then((resp) => {
   //       let data = !isVendor
@@ -331,31 +331,31 @@ export default function Workdata() {
   }, [tripsDone])
 
   useEffect(() => {
-    setLoadingData(true)
+    // setLoadingData(true)
 
-    fetch(`${url}/works/v3/`)
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let data = !isVendor
-          ? resp
-          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-        let _workList = data
-        // ?.filter((w) => {
-        //   return (
-        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
-        //       Date.parse(w?.dispatch?.date)
-        //   )
-        // })
-        setWorkList(_workList)
-        setOgWorkList(data)
+    // fetch(`${url}/works/filtered?startDate=${startDate}&endDate=${endDate}`)
+    //   .then((resp) => resp.json())
+    //   .then((resp) => {
+    //     let data = !isVendor
+    //       ? resp
+    //       : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+    //     let _workList = data
+    //     // ?.filter((w) => {
+    //     //   return (
+    //     //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+    //     //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+    //     //       Date.parse(w?.dispatch?.date)
+    //     //   )
+    //     // })
+    //     setWorkList(_workList)
+    //     setOgWorkList(data)
 
-        setLoadingData(false)
-      })
-      .catch((err) => {
-        toast.error(err)
-        setLoadingData(false)
-      })
+    //     setLoadingData(false)
+    //   })
+    //   .catch((err) => {
+    //     toast.error(err)
+    //     setLoadingData(false)
+    //   })
 
     fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
@@ -652,119 +652,121 @@ export default function Workdata() {
   }, [eqType, dispatchDate, dayShift, workStartDate])
 
   useEffect(() => {
-    if (search.length >= 3) {
-      setLoadingData(true)
+    if (workList && workList?.length >= 1) {
+      if (search.length >= 3) {
+        setLoadingData(true)
 
-      let _workList = ogWorkList.filter((w) => {
-        let _search = search?.toLocaleLowerCase()
-        let desc = w?.project?.prjDescription?.toLocaleLowerCase()
-        let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
-        let customer = w?.project?.customer?.toLocaleLowerCase()
-        let equipmentType = w?.equipment?.eqDescription?.toLocaleLowerCase()
-        let driver =
-          w?.driver?.firstName?.toLocaleLowerCase() +
-          w?.driver?.lastName?.toLocaleLowerCase()
-        let _owner = w?.equipment?.eqOwner.toLocaleLowerCase()
+        let _workList = ogWorkList.filter((w) => {
+          let _search = search?.toLocaleLowerCase()
+          let desc = w?.project?.prjDescription?.toLocaleLowerCase()
+          let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
+          let customer = w?.project?.customer?.toLocaleLowerCase()
+          let equipmentType = w?.equipment?.eqDescription?.toLocaleLowerCase()
+          let driver =
+            w?.driver?.firstName?.toLocaleLowerCase() +
+            w?.driver?.lastName?.toLocaleLowerCase()
+          let _owner = w?.equipment?.eqOwner.toLocaleLowerCase()
 
-        if (!driver) driver = _owner
-        return (
-          desc?.includes(_search) ||
-          plateNumber?.includes(_search) ||
-          customer?.includes(_search) ||
-          equipmentType?.includes(_search) ||
-          driver?.includes(_search)
-        )
-      })
+          if (!driver) driver = _owner
+          return (
+            desc?.includes(_search) ||
+            plateNumber?.includes(_search) ||
+            customer?.includes(_search) ||
+            equipmentType?.includes(_search) ||
+            driver?.includes(_search)
+          )
+        })
 
-      if (owner === 'All') {
+        if (owner === 'All') {
+          setWorkList(_workList)
+          setLoadingData(false)
+        } else {
+          let _wList = _workList.filter((w) => {
+            return owner === 'Construck'
+              ? w?.equipment.eqOwner === 'Construck'
+              : w?.equipment.eqOwner !== 'Construck'
+          })
+          _workList = _wList
+        }
+
+        if (startDate && endDate && workList && ogWorkList) {
+          _workList = _workList?.filter((w) => {
+            // return (
+            //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+            //   Date.parse(endDate).addHours(23).addMinutes(59) <=
+            //     Date.parse(w?.workEndDate)
+            // )
+            if (w?.siteWork === false) {
+              return (
+                moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
+                  moment(Date.parse(startDate))
+                ) &&
+                moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
+                  moment(Date.parse(endDate))
+                )
+              )
+            } else {
+              return (
+                moment(Date.parse(w?.workStartDate)).isSameOrBefore(
+                  moment(Date.parse(endDate))
+                ) &&
+                moment(Date.parse(w?.workEndDate)).isSameOrAfter(
+                  moment(Date.parse(startDate))
+                )
+              )
+            }
+          })
+        } else {
+        }
+
         setWorkList(_workList)
         setLoadingData(false)
       } else {
-        let _wList = _workList.filter((w) => {
-          return owner === 'Construck'
-            ? w?.equipment.eqOwner === 'Construck'
-            : w?.equipment.eqOwner !== 'Construck'
-        })
-        _workList = _wList
-      }
+        let _wList = []
+        if (owner === 'All') {
+          _wList = ogWorkList
+          setLoadingData(false)
+        } else {
+          _wList = ogWorkList.filter((w) => {
+            return owner === 'Construck'
+              ? w?.equipment.eqOwner === 'Construck'
+              : w?.equipment.eqOwner !== 'Construck'
+          })
+        }
 
-      if (startDate && endDate) {
-        _workList = _workList?.filter((w) => {
-          // return (
-          //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
-          //   Date.parse(endDate).addHours(23).addMinutes(59) <=
-          //     Date.parse(w?.workEndDate)
-          // )
-          if (w?.siteWork === false) {
-            return (
-              moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
-                moment(Date.parse(startDate))
-              ) &&
-              moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
-                moment(Date.parse(endDate))
+        if (startDate && endDate) {
+          _wList = _wList?.filter((w) => {
+            // return (
+            //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
+            //   Date.parse(endDate).addHours(23).addMinutes(59) <=
+            //     Date.parse(w?.workEndDate)
+            // )
+
+            if (w?.siteWork === false) {
+              return (
+                moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
+                  moment(Date.parse(startDate))
+                ) &&
+                moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
+                  moment(Date.parse(endDate))
+                )
               )
-            )
-          } else {
-            return (
-              moment(Date.parse(w?.workStartDate)).isSameOrBefore(
-                moment(Date.parse(endDate))
-              ) &&
-              moment(Date.parse(w?.workEndDate)).isSameOrAfter(
-                moment(Date.parse(startDate))
+            } else {
+              return (
+                moment(Date.parse(w?.workStartDate)).isSameOrBefore(
+                  moment(Date.parse(endDate))
+                ) &&
+                moment(Date.parse(w?.workEndDate)).isSameOrAfter(
+                  moment(Date.parse(startDate))
+                )
               )
-            )
-          }
-        })
-      } else {
+            }
+          })
+        } else {
+        }
+
+        setWorkList(_wList)
       }
-
-      setWorkList(_workList)
-      setLoadingData(false)
-    } else {
-      let _wList = []
-      if (owner === 'All') {
-        _wList = ogWorkList
-        setLoadingData(false)
-      } else {
-        _wList = ogWorkList.filter((w) => {
-          return owner === 'Construck'
-            ? w?.equipment.eqOwner === 'Construck'
-            : w?.equipment.eqOwner !== 'Construck'
-        })
-      }
-
-      if (startDate && endDate) {
-        _wList = _wList?.filter((w) => {
-          // return (
-          //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
-          //   Date.parse(endDate).addHours(23).addMinutes(59) <=
-          //     Date.parse(w?.workEndDate)
-          // )
-
-          if (w?.siteWork === false) {
-            return (
-              moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
-                moment(Date.parse(startDate))
-              ) &&
-              moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
-                moment(Date.parse(endDate))
-              )
-            )
-          } else {
-            return (
-              moment(Date.parse(w?.workStartDate)).isSameOrBefore(
-                moment(Date.parse(endDate))
-              ) &&
-              moment(Date.parse(w?.workEndDate)).isSameOrAfter(
-                moment(Date.parse(startDate))
-              )
-            )
-          }
-        })
-      } else {
-      }
-
-      setWorkList(_wList)
     }
 
     // if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
@@ -824,7 +826,7 @@ export default function Workdata() {
     setLoadingData(true)
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
-    fetch(`${url}/works/v3/`)
+    fetch(`${url}/works/filtered?startDate=${startDate}&endDate=${endDate}`)
       .then((resp) => resp.json())
       .then((resp) => {
         let data = !isVendor
@@ -1577,6 +1579,54 @@ export default function Workdata() {
     // )
   }
 
+  function getData() {
+    setSearch('')
+    setSiteWork(false)
+    setLowbedWork(false)
+    setLoadingData(true)
+    setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
+    setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
+    fetch(
+      `${url}/works/filtered?startDate=${startDate}&endDate=${endDate}&ssearchText=${search}`
+    )
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let data = !isVendor
+          ? resp
+          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+
+        let _workList = data
+
+        // ?.filter((w) => {
+        //   return (
+        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+        //       Date.parse(w?.dispatch?.date)
+        //   )
+        // })
+        setWorkList(_workList)
+        setOgWorkList(data)
+
+        setEquipments([])
+        setEquipmentList([])
+        setDrivers([])
+        setNJobs(1)
+        setNMachinesToMove(1)
+        setSelEquipments([])
+        setFromProjects([])
+        settoProjects([])
+        setTargetTrips(0)
+        setEqType('')
+        setLoadingData(false)
+        setSubmitting(false)
+      })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+        setSubmitting(false)
+      })
+  }
+
   return (
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
@@ -1672,7 +1722,10 @@ export default function Workdata() {
                   Approve selected
                 </div>
               )}
-              <AdjustmentsHorizontalIcon className="h-5 w-5 cursor-pointer text-red-500" />
+              <AdjustmentsVerticalIcon
+                className="h-5 w-5 cursor-pointer text-red-500"
+                onClick={getData}
+              />
 
               {downloadingData ? (
                 <div>
