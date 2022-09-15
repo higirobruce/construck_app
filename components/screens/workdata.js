@@ -627,7 +627,7 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}`
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -1343,7 +1343,7 @@ export default function Workdata() {
   function download() {
     setDownloadingData(true)
     fetch(
-      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}`
+      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`
     )
       .then((res) => res.json())
       .then((res) => {
@@ -1393,7 +1393,7 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}`
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`
     )
       .then((resp) => resp.json())
       .then((resp) => {
