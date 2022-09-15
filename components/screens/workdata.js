@@ -1461,7 +1461,7 @@ export default function Workdata() {
             <div className="grid grid-cols-1 gap-2 md:flex md:flex-1 md:flex-row md:items-center md:space-x-5 md:py-5">
               <div className="md:w-1/2">
                 <TextInput
-                  placeholder="Search Project, Driver, Plate Number"
+                  placeholder="Search Plate Number"
                   setValue={setSearch}
                 />
               </div>
