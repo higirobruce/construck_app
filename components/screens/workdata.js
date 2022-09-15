@@ -1343,7 +1343,7 @@ export default function Workdata() {
   function download() {
     setDownloadingData(true)
     fetch(
-      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}`
+      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}`
     )
       .then((res) => res.json())
       .then((res) => {
@@ -1393,7 +1393,7 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}`
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}`
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -1459,10 +1459,17 @@ export default function Workdata() {
 
           {viewPort === 'list' && (
             <div className="grid grid-cols-1 gap-2 md:flex md:flex-1 md:flex-row md:items-center md:space-x-5 md:py-5">
-              <div className="md:w-1/2">
+              <div className="md:w-1/3">
                 <TextInput
                   placeholder="Search Plate Number"
                   setValue={setSearch}
+                />
+              </div>
+
+              <div className="md:w-1/3">
+                <TextInput
+                  placeholder="Search Project"
+                  setValue={setSearchProject}
                 />
               </div>
               {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} />
