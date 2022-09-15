@@ -18,7 +18,7 @@ import 'datejs'
 import moment from 'moment'
 import {
   AdjustmentsHorizontalIcon,
-  AdjustmentsVerticalIcon,
+  MagnifyingGlassIcon,
   ArrowDownTrayIcon,
   ArrowLeftIcon,
   ArrowPathIcon,
@@ -143,185 +143,16 @@ export default function Workdata() {
 
   let [postingDate, setPostingDate] = useState(moment())
 
+  let [pageNumber, setPageNumber] = useState(1)
+
+  let [dataCount, setDataCount] = useState(0)
+
   const disabledDate = (current) => {
     // Can not select days before today and today
     return current && current < moment('2022-07-01')
   }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
-
-  // useEffect(() => {
-  //   setLoadingData(true)
-  //   fetch(`${url}/works/filtered?startDate=${startDate}&endDate=${endDate}`)
-  //     .then((resp) => resp.json())
-  //     .then((resp) => {
-  //       let data = !isVendor
-  //         ? resp
-  //         : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-
-  //       let _workList = data
-
-  //       // ?.filter((w) => {
-  //       //   return (
-  //       //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-  //       //     Date.parse(endDate).addHours(23).addMinutes(59) >=
-  //       //       Date.parse(w?.dispatch?.date)
-  //       //   )
-  //       // })
-  //       setWorkList(_workList)
-  //       setOgWorkList(data)
-  //       setLoadingData(false)
-  //     })
-  //     .catch((err) => {
-  //       setLoadingData(false)
-  //       toast.error('Connection issue!!!')
-  //     })
-  //   fetch(`${url}/projects/v2`)
-  //     .then((resp) => resp.json())
-  //     .then((resp) => {
-  //       let list = resp
-  //       let projectOptions = list.map((p) => {
-  //         return {
-  //           key: p._id,
-  //           value: p._id,
-  //           text: p.prjDescription,
-  //           customer: p.customer,
-  //         }
-  //       })
-  //       setProjectList(projectOptions)
-  //       setProjects(list)
-  //     })
-  //     .catch((err) => {
-  //       toast.error(err)
-  //       setLoadingData(false)
-  //     })
-
-  //   fetch(`${url}/reasons`)
-  //     .then((resp) => resp.json())
-  //     .then((resp) => {
-  //       let list = resp
-  //       let reasonOptions = list.map((p) => {
-  //         return {
-  //           key: p._id,
-  //           value: p.descriptionRw,
-  //           text: p.description,
-  //         }
-  //       })
-  //       setReasonList(reasonOptions)
-  //     })
-  //     .catch((err) => {
-  //       toast.error(err)
-  //       setLoadingData(false)
-  //     })
-
-  //   fetch(
-  //     `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
-  //   )
-  //     .then((resp) => resp.json())
-  //     .then((resp) => {
-  //       let list = resp
-  //       let userOptions = list.map((l) => {
-  //         return {
-  //           key: l._id,
-  //           value: l._id,
-  //           text: l.firstName + ' ' + l.lastName,
-  //         }
-  //       })
-  //       // userOptions.push({
-  //       //   key: 'NA',
-  //       //   value: 'NA',
-  //       //   text: 'Not applicable',
-  //       // })
-  //       setDriverList(userOptions)
-  //       seLowBedDriverList(userOptions)
-  //       let _drLists = [userOptions]
-  //       setDriverLists(_drLists)
-  //     })
-  //     .catch((err) => {
-  //       toast.error(err)
-  //       setLoadingData(false)
-  //     })
-
-  //   fetch(
-  //     `${url}/equipments/${dispatchDate}/${
-  //       dayShift ? 'dayShift' : 'nightShift'
-  //     }`
-  //   )
-  //     .then((resp) => resp.json())
-  //     .then((resp) => {
-  //       setLoadingEquipments(false)
-  //       let list = resp
-  //       let listLowbeds = resp
-
-  //       let equipmentsFullOptions = list.map((l) => {
-  //         return {
-  //           key: l._id,
-  //           value: l._id,
-  //           text:
-  //             l.eqOwner === 'Construck'
-  //               ? l.plateNumber
-  //               : l.plateNumber + ' - ' + l.eqOwner,
-  //         }
-  //       })
-
-  //       if (resp && listLowbeds.length > 0) {
-  //         let equipmentsOptions = listLowbeds.map((l) => {
-  //           return {
-  //             key: l._id,
-  //             value: l._id,
-  //             text: l.plateNumber,
-  //           }
-  //         })
-  //         setLowbedList(equipmentsOptions)
-  //         setOgLowbedList(listLowbeds)
-  //         setEquipmentsOgFull(list)
-  //         setEquipmentFullList(equipmentsFullOptions)
-  //         let _eqLists = [equipmentsFullOptions]
-  //         setEquipmentFullLists(_eqLists)
-  //       } else {
-  //         setLowbedList([])
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       setLoadingEquipments(false)
-  //     })
-
-  //   fetch(`${url}/jobTypes/`)
-  //     .then((resp) => resp.json())
-  //     .then((resp) => {
-  //       let jobsForTrucks = resp.filter(
-  //         (eq) =>
-  //           eq.eqType === 'Truck' &&
-  //           eq._id !== '62690b97cf45ad62aa6144e2' &&
-  //           eq._id !== '62a70a7197ee8984c1be6c9f'
-  //       )
-  //       let jobsForMachines = resp.filter(
-  //         (eq) =>
-  //           eq.eqType === 'Machine' &&
-  //           eq._id !== '62690b97cf45ad62aa6144e2' &&
-  //           eq._id !== '62a70a7197ee8984c1be6c9f'
-  //       )
-  //       setJobTypeListTrucks(
-  //         jobsForTrucks.map((j) => {
-  //           return {
-  //             key: j._id,
-  //             value: j._id,
-  //             text: j.jobDescription,
-  //           }
-  //         })
-  //       )
-  //       setJobTypeListMachines(
-  //         jobsForMachines.map((j) => {
-  //           return {
-  //             key: j._id,
-  //             value: j._id,
-  //             text: j.jobDescription,
-  //           }
-  //         })
-  //       )
-  //     })
-  //     .catch((err) => {})
-  // }, [])
 
   useEffect(() => {
     let targetTrips = parseInt(workList?.rowIndex?.dispatch?.targetTrips)
@@ -331,32 +162,6 @@ export default function Workdata() {
   }, [tripsDone])
 
   useEffect(() => {
-    // setLoadingData(true)
-
-    // fetch(`${url}/works/filtered?startDate=${startDate}&endDate=${endDate}`)
-    //   .then((resp) => resp.json())
-    //   .then((resp) => {
-    //     let data = !isVendor
-    //       ? resp
-    //       : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
-    //     let _workList = data
-    //     // ?.filter((w) => {
-    //     //   return (
-    //     //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-    //     //     Date.parse(endDate).addHours(23).addMinutes(59) >=
-    //     //       Date.parse(w?.dispatch?.date)
-    //     //   )
-    //     // })
-    //     setWorkList(_workList)
-    //     setOgWorkList(data)
-
-    //     setLoadingData(false)
-    //   })
-    //   .catch((err) => {
-    //     toast.error(err)
-    //     setLoadingData(false)
-    //   })
-
     fetch(`${url}/projects/v2`)
       .then((resp) => resp.json())
       .then((resp) => {
@@ -651,129 +456,120 @@ export default function Workdata() {
       .catch((err) => {})
   }, [eqType, dispatchDate, dayShift, workStartDate])
 
-  useEffect(() => {
-    if (workList && workList?.length >= 1) {
-      if (search.length >= 3) {
-        setLoadingData(true)
+  // useEffect(() => {
+  //   if (workList && workList?.length >= 1) {
+  //     if (search.length >= 3) {
+  //       setLoadingData(true)
 
-        let _workList = ogWorkList.filter((w) => {
-          let _search = search?.toLocaleLowerCase()
-          let desc = w?.project?.prjDescription?.toLocaleLowerCase()
-          let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
-          let customer = w?.project?.customer?.toLocaleLowerCase()
-          let equipmentType = w?.equipment?.eqDescription?.toLocaleLowerCase()
-          let driver =
-            w?.driver?.firstName?.toLocaleLowerCase() +
-            w?.driver?.lastName?.toLocaleLowerCase()
-          let _owner = w?.equipment?.eqOwner.toLocaleLowerCase()
+  //       let _workList = ogWorkList.filter((w) => {
+  //         let _search = search?.toLocaleLowerCase()
+  //         let desc = w?.project?.prjDescription?.toLocaleLowerCase()
+  //         let plateNumber = w?.equipment?.plateNumber?.toLocaleLowerCase()
+  //         let customer = w?.project?.customer?.toLocaleLowerCase()
+  //         let equipmentType = w?.equipment?.eqDescription?.toLocaleLowerCase()
+  //         let driver =
+  //           w?.driver?.firstName?.toLocaleLowerCase() +
+  //           w?.driver?.lastName?.toLocaleLowerCase()
+  //         let _owner = w?.equipment?.eqOwner.toLocaleLowerCase()
 
-          if (!driver) driver = _owner
-          return (
-            desc?.includes(_search) ||
-            plateNumber?.includes(_search) ||
-            customer?.includes(_search) ||
-            equipmentType?.includes(_search) ||
-            driver?.includes(_search)
-          )
-        })
+  //         if (!driver) driver = _owner
+  //         return (
+  //           desc?.includes(_search) ||
+  //           plateNumber?.includes(_search) ||
+  //           customer?.includes(_search) ||
+  //           equipmentType?.includes(_search) ||
+  //           driver?.includes(_search)
+  //         )
+  //       })
 
-        if (owner === 'All') {
-          setWorkList(_workList)
-          setLoadingData(false)
-        } else {
-          let _wList = _workList.filter((w) => {
-            return owner === 'Construck'
-              ? w?.equipment.eqOwner === 'Construck'
-              : w?.equipment.eqOwner !== 'Construck'
-          })
-          _workList = _wList
-        }
+  //       if (owner === 'All') {
+  //         setWorkList(_workList)
+  //         setLoadingData(false)
+  //       } else {
+  //         let _wList = _workList.filter((w) => {
+  //           return owner === 'Construck'
+  //             ? w?.equipment.eqOwner === 'Construck'
+  //             : w?.equipment.eqOwner !== 'Construck'
+  //         })
+  //         _workList = _wList
+  //       }
 
-        if (startDate && endDate && workList && ogWorkList) {
-          _workList = _workList?.filter((w) => {
-            // return (
-            //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
-            //   Date.parse(endDate).addHours(23).addMinutes(59) <=
-            //     Date.parse(w?.workEndDate)
-            // )
-            if (w?.siteWork === false) {
-              return (
-                moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
-                  moment(Date.parse(startDate))
-                ) &&
-                moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
-                  moment(Date.parse(endDate))
-                )
-              )
-            } else {
-              return (
-                moment(Date.parse(w?.workStartDate)).isSameOrBefore(
-                  moment(Date.parse(endDate))
-                ) &&
-                moment(Date.parse(w?.workEndDate)).isSameOrAfter(
-                  moment(Date.parse(startDate))
-                )
-              )
-            }
-          })
-        } else {
-        }
+  //       if (startDate && endDate && workList && ogWorkList) {
+  //         _workList = _workList?.filter((w) => {
 
-        setWorkList(_workList)
-        setLoadingData(false)
-      } else {
-        let _wList = []
-        if (owner === 'All') {
-          _wList = ogWorkList
-          setLoadingData(false)
-        } else {
-          _wList = ogWorkList.filter((w) => {
-            return owner === 'Construck'
-              ? w?.equipment.eqOwner === 'Construck'
-              : w?.equipment.eqOwner !== 'Construck'
-          })
-        }
+  //           if (w?.siteWork === false) {
+  //             return (
+  //               moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
+  //                 moment(Date.parse(startDate))
+  //               ) &&
+  //               moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
+  //                 moment(Date.parse(endDate))
+  //               )
+  //             )
+  //           } else {
+  //             return (
+  //               moment(Date.parse(w?.workStartDate)).isSameOrBefore(
+  //                 moment(Date.parse(endDate))
+  //               ) &&
+  //               moment(Date.parse(w?.workEndDate)).isSameOrAfter(
+  //                 moment(Date.parse(startDate))
+  //               )
+  //             )
+  //           }
+  //         })
+  //       } else {
+  //       }
 
-        if (startDate && endDate) {
-          _wList = _wList?.filter((w) => {
-            // return (
-            //   Date.parse(startDate) >= Date.parse(w?.workStartDate) &&
-            //   Date.parse(endDate).addHours(23).addMinutes(59) <=
-            //     Date.parse(w?.workEndDate)
-            // )
+  //       setWorkList(_workList)
+  //       setLoadingData(false)
+  //     } else {
+  //       let _wList = []
+  //       if (owner === 'All') {
+  //         _wList = ogWorkList
+  //         setLoadingData(false)
+  //       } else {
+  //         _wList = ogWorkList.filter((w) => {
+  //           return owner === 'Construck'
+  //             ? w?.equipment.eqOwner === 'Construck'
+  //             : w?.equipment.eqOwner !== 'Construck'
+  //         })
+  //       }
 
-            if (w?.siteWork === false) {
-              return (
-                moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
-                  moment(Date.parse(startDate))
-                ) &&
-                moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
-                  moment(Date.parse(endDate))
-                )
-              )
-            } else {
-              return (
-                moment(Date.parse(w?.workStartDate)).isSameOrBefore(
-                  moment(Date.parse(endDate))
-                ) &&
-                moment(Date.parse(w?.workEndDate)).isSameOrAfter(
-                  moment(Date.parse(startDate))
-                )
-              )
-            }
-          })
-        } else {
-        }
+  //       if (startDate && endDate) {
+  //         _wList = _wList?.filter((w) => {
 
-        setWorkList(_wList)
-      }
-    }
+  //           if (w?.siteWork === false) {
+  //             return (
+  //               moment(Date.parse(w?.dispatch?.date)).isSameOrAfter(
+  //                 moment(Date.parse(startDate))
+  //               ) &&
+  //               moment(Date.parse(w?.dispatch?.date)).isSameOrBefore(
+  //                 moment(Date.parse(endDate))
+  //               )
+  //             )
+  //           } else {
+  //             return (
+  //               moment(Date.parse(w?.workStartDate)).isSameOrBefore(
+  //                 moment(Date.parse(endDate))
+  //               ) &&
+  //               moment(Date.parse(w?.workEndDate)).isSameOrAfter(
+  //                 moment(Date.parse(startDate))
+  //               )
+  //             )
+  //           }
+  //         })
+  //       } else {
+  //       }
 
-    // if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
-    //   setWorkList(ogWorkList)
-    //   setLoadingData(false)
-    // }
-  }, [search, owner, startDate, endDate])
+  //       setWorkList(_wList)
+  //     }
+  //   }
+
+  //   // if (search.length < 3 && searchDriver.length < 3 && owner !== 'All') {
+  //   //   setWorkList(ogWorkList)
+  //   //   setLoadingData(false)
+  //   // }
+  // }, [search, owner, startDate, endDate])
 
   // useEffect(() => {
   //   let list = []
@@ -819,6 +615,10 @@ export default function Workdata() {
       )
   }, [duration])
 
+  useEffect(() => {
+    getData(false)
+  }, [pageNumber])
+
   function refresh() {
     setSearch('')
     setSiteWork(false)
@@ -826,12 +626,16 @@ export default function Workdata() {
     setLoadingData(true)
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
-    fetch(`${url}/works/filtered?startDate=${startDate}&endDate=${endDate}`)
+    fetch(
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}`
+    )
       .then((resp) => resp.json())
       .then((resp) => {
+        let dataList = resp.workList
+        setDataCount(resp.dataCount)
         let data = !isVendor
-          ? resp
-          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+          ? dataList
+          : dataList.filter((p) => p.equipment?.eqOwner === user.firstName)
 
         let _workList = data
 
@@ -962,7 +766,7 @@ export default function Workdata() {
     })
       .then((resp) => resp.json())
       .then((resp) => {
-        refresh()
+        getData(false)
       })
       .catch((err) => setSubmitting(false))
   }
@@ -991,7 +795,7 @@ export default function Workdata() {
     })
       .then((resp) => resp.json())
       .then((resp) => {
-        refresh()
+        getData(false)
       })
       .catch((err) => setSubmitting(false))
   }
@@ -1018,7 +822,7 @@ export default function Workdata() {
     })
       .then((resp) => resp.json())
       .then((resp) => {
-        refresh()
+        getData(false)
       })
       .catch((err) => setSubmitting(false))
   }
@@ -1043,7 +847,7 @@ export default function Workdata() {
     })
       .then((resp) => resp.json())
       .then((resp) => {
-        refresh()
+        getData(false)
       })
       .catch((err) => setSubmitting(false))
   }
@@ -1064,7 +868,7 @@ export default function Workdata() {
     })
       .then((resp) => resp.json())
       .then((resp) => {
-        refresh()
+        getData(false)
       })
       .catch((err) => setSubmitting(false))
   }
@@ -1543,6 +1347,7 @@ export default function Workdata() {
     )
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         let data = res.map((r) => {
           r['Dispatch date'] = Date.parse(r['Dispatch date'])
           r['Posted On'] = Date.parse(r['Posted On'])
@@ -1557,6 +1362,7 @@ export default function Workdata() {
         setDownloadingData(false)
       })
       .catch((err) => {
+        console.log(err)
         toast.error('Error occured!')
         setDownloadingData(false)
       })
@@ -1579,21 +1385,24 @@ export default function Workdata() {
     // )
   }
 
-  function getData() {
-    setSearch('')
+  function getData(reset = true) {
+    if (reset) setPageNumber(1)
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered?startDate=${startDate}&endDate=${endDate}&ssearchText=${search}`
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}`
     )
       .then((resp) => resp.json())
       .then((resp) => {
+        let dataList = resp.workList
+        setDataCount(resp.dataCount)
+
         let data = !isVendor
-          ? resp
-          : resp.filter((p) => p.equipment?.eqOwner === user.firstName)
+          ? dataList
+          : dataList.filter((p) => p.equipment?.eqOwner === user.firstName)
 
         let _workList = data
 
@@ -1627,11 +1436,14 @@ export default function Workdata() {
       })
   }
 
+  function handlePageChange(e, data) {
+    setPageNumber(data.activePage)
+  }
   return (
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
         <div className="text-2xl font-semibold">
-          Dispatch Forms ({workList ? dataSize : 0})
+          Dispatch Forms ({workList ? dataCount : 0})
         </div>
         <div className="grid w-full grid-cols-1 gap-1 md:flex md:flex-row md:items-center md:justify-between md:space-x-10">
           {viewPort === 'list' && canDispatch && (
@@ -1722,10 +1534,16 @@ export default function Workdata() {
                   Approve selected
                 </div>
               )}
-              <AdjustmentsVerticalIcon
-                className="h-5 w-5 cursor-pointer text-red-500"
-                onClick={getData}
-              />
+              {loadingData ? (
+                <div>
+                  <Loader active size="small" inline className="ml-5" />
+                </div>
+              ) : (
+                <MagnifyingGlassIcon
+                  className="h-6 w-6 cursor-pointer text-red-500"
+                  onClick={getData}
+                />
+              )}
 
               {downloadingData ? (
                 <div>
@@ -1774,7 +1592,10 @@ export default function Workdata() {
                   handleDeselect={deselect}
                   handelEnd={_setEndRow}
                   handleSetDataSize={setDataSize}
+                  handlePageChange={handlePageChange}
+                  dataCount={dataCount}
                   loading
+                  pageNumber={pageNumber}
                 />
               ))}
           </>

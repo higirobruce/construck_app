@@ -149,10 +149,14 @@ export default function WorkListTable({
   handelStart,
   handelEnd,
   handleSetDataSize,
+  handlePageChange,
+  dataCount,
+  pageNumber,
 }) {
+  console.log(dataCount)
   const [pageSize, setPageSize] = useState(15)
-  const [pageNumber, setPageNumber] = useState(1)
   const { user, setUser } = useContext(UserContext)
+
   //Authorization
   let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
   let canStartAndStopJob =
@@ -162,22 +166,22 @@ export default function WorkListTable({
   let canViewRenues = user.userType === 'revenue' || user.userType == 'admin'
   let isVendor = user.userType === 'vendor'
 
-  function handlePageChange(e, data) {
-    setPageNumber(data.activePage)
-  }
   if (!data) data = []
 
   let pagesObj = paginate(data, pageNumber, pageSize)
-  let pData = pagesObj.pagedData
-  let pageStartIndex = pagesObj.startIndex
+  let pData = data
+  // let pData = pagesObj.pagedData
+  let pageStartIndex = 0
+  // let pageStartIndex = pagesObj.startIndex
 
   if (user.userType === 'customer-admin') {
     let _pData = data.filter((p) => {
       return p.project?.customer === user.company?.name
     })
     data = _pData
-    pData = paginate(_pData, pageNumber, pageSize).pagedData
-    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
+    // pData = data
+    // pData = paginate(_pData, pageNumber, pageSize).pagedData
+    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (
     user.userType === 'customer-site-manager' ||
     user.userType === 'customer-project-manager'
@@ -187,29 +191,32 @@ export default function WorkListTable({
       return p.project?.prjDescription === user.assignedProject?.prjDescription
     })
     data = _pData
-    pData = paginate(_pData, pageNumber, pageSize).pagedData
-    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
+    // pData = data
+    // pData = paginate(_pData, pageNumber, pageSize).pagedData
+    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'driver') {
     let _pData = data.filter((p) => {
       return p.driver?._id === user._id
     })
     data = _pData
-    pData = paginate(_pData, pageNumber, pageSize).pagedData
-    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
+    // pData = data
+    // pData = paginate(_pData, pageNumber, pageSize).pagedData
+    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'vendor') {
     let _pData = data.filter((p) => {
       return p.equipment?.eqOwner === user.firstName
     })
     data = _pData
-    pData = paginate(_pData, pageNumber, pageSize).pagedData
-    pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
+    // pData = data
+    // pData = paginate(_pData, pageNumber, pageSize).pagedData
+    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   }
 
-  handleSetDataSize(data.length)
+  handleSetDataSize(dataCount)
 
   return (
     <div className="block">
-      {pData.length > 0 && (
+      {dataCount > 0 && (
         <>
           <Table size="small" compact>
             <Table.Header>
@@ -389,8 +396,8 @@ export default function WorkListTable({
                           row.status === 'rejected'
                             ? row?.equipment?.uom === 'hour'
                               ? _.round(row?.duration / (1000 * 60 * 60), 2) +
-                                ' hours'
-                              : Math.round(row?.duration * 100) / 100 + ' days'
+                                'h'
+                              : Math.round(row?.duration * 100) / 100 + 'd'
                             : '...'
                         }
                       />
@@ -606,14 +613,15 @@ export default function WorkListTable({
             </Table.Body>
           </Table>
           <MPagination
-            count={data.length}
+            count={dataCount}
             onPageChange={handlePageChange}
             pageSize={pageSize}
+            activePage={pageNumber}
           />
         </>
       )}
 
-      {pData.length === 0 && (
+      {dataCount === 0 && (
         <div className="my-2 flex w-full flex-row items-center justify-center">
           No data found!
         </div>
