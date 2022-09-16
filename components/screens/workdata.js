@@ -153,6 +153,8 @@ export default function Workdata() {
   }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   useEffect(() => {
     let targetTrips = parseInt(workList?.rowIndex?.dispatch?.targetTrips)
@@ -162,7 +164,11 @@ export default function Workdata() {
   }, [tripsDone])
 
   useEffect(() => {
-    fetch(`${url}/projects/v2`)
+    fetch(`${url}/projects/v2`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -182,7 +188,11 @@ export default function Workdata() {
         setLoadingData(false)
       })
 
-    fetch(`${url}/reasons`)
+    fetch(`${url}/reasons`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -201,7 +211,15 @@ export default function Workdata() {
       })
 
     fetch(
-      `${url}/employees/${dispatchDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+      `${url}/employees/${dispatchDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -228,7 +246,13 @@ export default function Workdata() {
     fetch(
       `${url}/equipments/${dispatchDate}/${
         dayShift ? 'dayShift' : 'nightShift'
-      }`
+      }`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -282,7 +306,11 @@ export default function Workdata() {
         setLoadingEquipments(false)
       })
 
-    fetch(`${url}/jobTypes/`)
+    fetch(`${url}/jobTypes/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((resp) => resp.json())
       .then((resp) => {
         let jobsForTrucks = resp.filter(
@@ -323,7 +351,13 @@ export default function Workdata() {
     setLoadingEquipments(true)
     let dispDate = siteWork === true ? workStartDate : dispatchDate
     fetch(
-      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -350,7 +384,13 @@ export default function Workdata() {
     fetch(
       `${url}/equipments/type/${eqType}/${dispDate}/${
         dayShift ? 'dayShift' : 'nightShift'
-      }`
+      }`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -376,7 +416,13 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`
+      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -430,7 +476,11 @@ export default function Workdata() {
         setLoadingEquipments(false)
       })
 
-    fetch(`${url}/jobtypes/eqType/` + eqType)
+    fetch(`${url}/jobtypes/eqType/` + eqType, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((resp) => resp.json())
       .then((resp) => {
         if (resp) {
@@ -627,7 +677,13 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {
@@ -676,6 +732,9 @@ export default function Workdata() {
     setSubmitting(true)
     fetch(`${url}/works/approve/${row._id}`, {
       method: 'PUT',
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
     })
       .then((resp) => resp.json())
       .then((resp) => {
@@ -690,6 +749,10 @@ export default function Workdata() {
     selectedWorks.forEach((s) => {
       let p = fetch(`${url}/works/approve/${s}`, {
         method: 'PUT',
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
       })
       promises.push(p)
     })
@@ -759,6 +822,7 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         recalledBy: user._id,
@@ -782,6 +846,7 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         duration,
@@ -811,6 +876,7 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         duration,
@@ -838,6 +904,7 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         startIndex,
@@ -861,6 +928,7 @@ export default function Workdata() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         reasonForRejection,
@@ -958,6 +1026,8 @@ export default function Workdata() {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
+                  Authorization:
+                    'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
                 },
                 body: JSON.stringify({
                   project: toProjects[i],
@@ -1008,6 +1078,8 @@ export default function Workdata() {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
+                  Authorization:
+                    'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
                 },
                 body: JSON.stringify({
                   project,
@@ -1060,6 +1132,8 @@ export default function Workdata() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
             },
             body: JSON.stringify({
               project: toProjects[0],
@@ -1343,7 +1417,13 @@ export default function Workdata() {
   function download() {
     setDownloadingData(true)
     fetch(
-      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`
+      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((res) => res.json())
       .then((res) => {
@@ -1393,7 +1473,13 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((resp) => resp.json())
       .then((resp) => {

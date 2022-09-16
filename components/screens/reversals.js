@@ -17,6 +17,9 @@ export default function Reversals() {
   let [endDate, setEndDate] = useState(null)
   let [transactions, setTransactions] = useState(null)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+
   let [loading, setLoading] = useState(false)
   let [reverseTransaction, setReverseTransaction] = useState(false)
   let [params, setParams] = useState({})
@@ -26,7 +29,13 @@ export default function Reversals() {
   function getTransactions() {
     setLoading(true)
     fetch(
-      `${url}/works/v3/toreverse/${plateNumber}?startDate=${startDate}&endDate=${endDate}`
+      `${url}/works/v3/toreverse/${plateNumber}?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((res) => res.json())
       .then((res) => {
@@ -41,7 +50,13 @@ export default function Reversals() {
   function refresh() {
     setLoading(true)
     fetch(
-      `${url}/works/v3/toreverse/${plateNumber}?startDate=${startDate}&endDate=${endDate}`
+      `${url}/works/v3/toreverse/${plateNumber}?startDate=${startDate}&endDate=${endDate}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
     )
       .then((res) => res.json())
       .then((res) => {
@@ -80,6 +95,8 @@ export default function Reversals() {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
+            Authorization:
+              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
           },
           body: JSON.stringify({
             reversedBy: user._id,
@@ -96,6 +113,8 @@ export default function Reversals() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
         },
         body: JSON.stringify({
           reversedBy: user._id,

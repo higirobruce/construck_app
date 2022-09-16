@@ -22,6 +22,8 @@ import moment from 'moment'
 
 export default function Users() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
   let [users, setUsers] = useState(null)
   let [ogUsersList, setOgUsersList] = useState(null)
   let [customers, setCustomers] = useState([])
@@ -73,7 +75,11 @@ export default function Users() {
 
   useEffect(() => {
     setLoadingProjects(true)
-    fetch(`${url}/users/`)
+    fetch(`${url}/users/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         if (isCustomer) {
@@ -95,7 +101,11 @@ export default function Users() {
       })
       .catch((err) => toast.error('Error occured!'))
 
-    fetch(`${url}/projects/v2`)
+    fetch(`${url}/projects/v2`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((resp) => resp.json())
       .then((resp) => {
         let list = resp
@@ -115,7 +125,11 @@ export default function Users() {
         setLoadingProjects(false)
       })
 
-    fetch(`${url}/customers/`, {})
+    fetch(`${url}/customers/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((resp) => {
         setCustomers(resp)
@@ -153,7 +167,11 @@ export default function Users() {
 
   function refresh() {
     setLoading(true)
-    fetch(`${url}/users/`)
+    fetch(`${url}/users/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         if (isCustomer) {
@@ -182,6 +200,7 @@ export default function Users() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
     })
       .then((res) => res.json)
@@ -197,6 +216,7 @@ export default function Users() {
     fetch(`${url}/users/`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -245,6 +265,7 @@ export default function Users() {
     fetch(`${url}/users/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -278,7 +299,11 @@ export default function Users() {
   function download() {
     setDownloadingData(true)
 
-    fetch(`${url}/users/`)
+    fetch(`${url}/users/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let data = res.map((w) => {

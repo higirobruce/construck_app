@@ -41,12 +41,19 @@ export default function Projects() {
   let [submitting, setSubmitting] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+
   let [downloadingData, setDownloadingData] = useState(false)
   let [idToUpdate, setIdToUpdate] = useState('')
   let [customerId, setCustomerId] = useState('')
 
   useEffect(() => {
-    fetch(`${url}/projects/v2`)
+    fetch(`${url}/projects/v2`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setProjects(res)
@@ -55,7 +62,11 @@ export default function Projects() {
       })
       .catch((err) => toast.error('Error occured!'))
 
-    fetch(`${url}/customers/`)
+    fetch(`${url}/customers/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((resp) => {
         setCustomers(resp)
@@ -108,7 +119,11 @@ export default function Projects() {
 
   function refresh() {
     setLoading(true)
-    fetch(`${url}/projects/v2`)
+    fetch(`${url}/projects/v2`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setProjects(res)
@@ -124,6 +139,7 @@ export default function Projects() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         id: selectedCustomer,
@@ -152,6 +168,8 @@ export default function Projects() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
             },
             body: JSON.stringify({
               prjDescription: row[2],
@@ -190,6 +208,7 @@ export default function Projects() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         customerId,
@@ -208,7 +227,11 @@ export default function Projects() {
   function download() {
     setDownloadingData(true)
 
-    fetch(`${url}/projects/v2`)
+    fetch(`${url}/projects/v2`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let data = res.map((w) => {

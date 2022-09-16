@@ -80,6 +80,8 @@ export default function Equipments() {
   let [vendorOptions, setVendorOptions] = useState([])
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   let assetClassOptions = [
     { key: 1, text: 'OTHER MACHINES', value: 'OTHER MACHINES' },
@@ -175,7 +177,11 @@ export default function Equipments() {
         value: 'Construck',
       },
     ]
-    fetch(`${url}/vendors`)
+    fetch(`${url}/vendors`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let _vOptions = res.map((vendor) => {
@@ -201,7 +207,11 @@ export default function Equipments() {
     setRate(0)
     setSupplierRate(0)
     setUom('')
-    fetch(`${url}/equipments/`)
+    fetch(`${url}/equipments/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let eqs = res?.equipments
@@ -244,6 +254,8 @@ export default function Equipments() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
             },
             body: JSON.stringify({
               plateNumber: row[2],
@@ -310,6 +322,7 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
     })
       .then((res) => res.json())
@@ -355,6 +368,7 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
     })
       .then((res) => res.json())
@@ -398,6 +412,7 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
     })
       .then((res) => res.json())
@@ -447,6 +462,7 @@ export default function Equipments() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         plateNumber,
@@ -494,6 +510,7 @@ export default function Equipments() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       body: JSON.stringify({
         plateNumber,
@@ -525,7 +542,11 @@ export default function Equipments() {
   function download() {
     setDownloadingData(true)
 
-    fetch(`${url}/equipments/`)
+    fetch(`${url}/equipments/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let data = res['equipments'].map((w) => {

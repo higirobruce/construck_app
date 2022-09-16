@@ -38,6 +38,8 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
         },
         body: JSON.stringify({
           email,
@@ -91,6 +93,8 @@ export default function Login() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
         },
         body: JSON.stringify({
           email,
@@ -107,6 +111,8 @@ export default function Login() {
             fetch(`${url}/email/send`, {
               headers: {
                 'Content-Type': 'application/json',
+                Authorization:
+                  'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
               },
               method: 'POST',
               body: JSON.stringify({
@@ -151,6 +157,8 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
         },
         body: JSON.stringify({
           password,

@@ -22,6 +22,8 @@ import moment from 'moment'
 
 export default function Vendors() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
   let [vendors, setVendors] = useState(null)
   let [ogVendorsList, setOgVendorsList] = useState(null)
   let [loading, setLoading] = useState(false)
@@ -40,7 +42,11 @@ export default function Vendors() {
   let { user, setUser } = useContext(UserContext)
 
   useEffect(() => {
-    fetch(`${url}/vendors/`)
+    fetch(`${url}/vendors/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setVendors(res)
@@ -71,7 +77,11 @@ export default function Vendors() {
 
   function refresh() {
     setLoading(true)
-    fetch(`${url}/vendors/`)
+    fetch(`${url}/vendors/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setVendors(res)
@@ -92,6 +102,7 @@ export default function Vendors() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
     })
       .then((res) => res.json)
@@ -107,6 +118,7 @@ export default function Vendors() {
     fetch(`${url}/vendors/`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       method: 'POST',
       body: JSON.stringify({
@@ -145,6 +157,7 @@ export default function Vendors() {
     fetch(`${url}/vendors/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
       method: 'PUT',
       body: JSON.stringify({
@@ -169,7 +182,11 @@ export default function Vendors() {
   function download() {
     setDownloadingData(true)
 
-    fetch(`${url}/vendors/`)
+    fetch(`${url}/vendors/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         let data = res.map((w) => {
