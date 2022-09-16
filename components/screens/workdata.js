@@ -677,7 +677,9 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`,
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
+        searchProject
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
       {
         headers: {
           Authorization:
@@ -1417,7 +1419,9 @@ export default function Workdata() {
   function download() {
     setDownloadingData(true)
     fetch(
-      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`,
+      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
+        searchProject
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
       {
         headers: {
           Authorization:
@@ -1473,7 +1477,9 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${searchProject}&isVendor=${isVendor}&vendorName=${user.firstName}`,
+      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
+        searchProject
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
       {
         headers: {
           Authorization:
