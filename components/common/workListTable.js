@@ -17,6 +17,7 @@ import {
   CheckIcon,
   ClipboardDocumentCheckIcon,
   ClipboardIcon,
+  EllipsisHorizontalIcon,
   FolderOpenIcon,
   PrinterIcon,
   TrashIcon,
