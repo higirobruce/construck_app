@@ -150,7 +150,6 @@ export default function Users() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         if (isCustomer) {
           setUsers(
             res.filter((r) => {

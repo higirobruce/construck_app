@@ -935,8 +935,6 @@ export default function Workdata() {
   function bulkApproveDailyWorks() {
     setLoadingData(true)
     let promises = []
-
-    console.log(row)
   }
 
   function _setRecallRow(row, index, pageStartIndex) {
@@ -1608,7 +1606,6 @@ export default function Workdata() {
     )
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         let data = res.map((r) => {
           r['Dispatch date'] = Date.parse(r['Dispatch date'])
           r['Posted On'] = Date.parse(r['Posted On'])
@@ -1623,7 +1620,6 @@ export default function Workdata() {
         setDownloadingData(false)
       })
       .catch((err) => {
-        console.log(err)
         toast.error('Error occured!')
         setDownloadingData(false)
       })

@@ -113,7 +113,6 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
       .then((res) => res.json())
       .then((res) => {
         let result = res[0]
-        console.log(res)
         setLoadingApprovedRev(false)
         setApprovedRevenue(result?.totalRevenue ? result?.totalRevenue : 0)
       })
@@ -132,7 +131,6 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
       .then((res) => res.json())
       .then((res) => {
         let result = res[0]
-        console.log(res)
         setLoadingRejectedRev(false)
         setRejectedRevenue(result?.totalRevenue ? result?.totalRevenue : 0)
       })

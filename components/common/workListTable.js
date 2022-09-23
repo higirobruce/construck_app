@@ -154,7 +154,6 @@ export default function WorkListTable({
   dataCount,
   pageNumber,
 }) {
-  console.log(dataCount)
   const [pageSize, setPageSize] = useState(15)
   const { user, setUser } = useContext(UserContext)
 
