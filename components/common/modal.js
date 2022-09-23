@@ -1,14 +1,103 @@
-import { DatePicker } from 'antd'
+import { DatePicker, Tooltip } from 'antd'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
-import { Dropdown } from 'semantic-ui-react'
+import { Dropdown, Loader } from 'semantic-ui-react'
 import MTextView from './mTextView'
 import TextInput from './TextIput'
 import TextInputLogin from './TextIputLogin'
 import TextInputV from './TextIputV'
+import SmallTextInput from './mSmallTextIput'
+import * as _ from 'lodash'
 
 import { toast, ToastContainer } from 'react-toastify'
+import {
+  ArrowPathIcon,
+  CheckBadgeIcon,
+  EllipsisHorizontalIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  HandThumbUpIcon,
+  PlayIcon,
+  ReceiptRefundIcon,
+  StopIcon,
+} from '@heroicons/react/24/outline'
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import CheckableTag from 'antd/lib/tag/CheckableTag'
+import MSmallSubmitButton from './mSmallSubmitButton'
 
+const MStatusIndicator = ({ status }) => {
+  if (status === 'approved')
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <CheckIcon className="h-5 w-5 text-green-500" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  else if (status === 'rejected') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <XMarkIcon className="h-5 w-5 text-red-500" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'in progress' || status === 'on going') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'checked') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <ExclamationCircleIcon className="h-5 w-5 text-blue-500" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'created') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <PlayIcon className="h-5 w-5 text-teal-500" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'stopped') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <StopIcon className="h-5 w-5 text-red-500" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'recalled') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <ReceiptRefundIcon className="h-5 w-5 text-zinc-600" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else {
+    return (
+      <div className="flex flex-row items-center justify-center">
+        <Loader active size="tiny" inline />
+        {/* <MTextView content={status} /> */}
+      </div>
+    )
+  }
+}
 export default function Modal({
   isShown,
   setIsShown,
@@ -25,6 +114,9 @@ export default function Modal({
   handleSetMoreComment,
   handleSetReason,
   handleSetPostingDate,
+  handleApproveDailyWork,
+  handleRejectDailyWork,
+  handleDiscardDailyWork,
   reasons,
   rowData,
   showReasonField = false,
@@ -35,6 +127,8 @@ export default function Modal({
   reasonSelected = false,
   isSiteWork,
   dailyWorks,
+  handleConfirmApproval,
+  handleConfirmRejection,
 }) {
   let [lEndIndex, setLEndIndex] = useState(0)
   let uom = rowData?.equipment?.uom
@@ -303,35 +397,146 @@ export default function Modal({
               </div>
             )}
 
-            <div className="mt-6 flex flex-row justify-end space-x-5">
-              <button
-                onClick={() => {
-                  setIsShown(false)
-                  showReasonField && handleSetReason('NA')
-                }}
-                type="button"
-                className="transform rounded-md bg-white px-3 py-2 text-sm capitalize tracking-wide text-zinc-800 ring-1 ring-gray-200 transition-colors duration-200 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring focus:ring-zinc-300 focus:ring-opacity-50 dark:bg-sky-600 dark:hover:bg-sky-700 dark:focus:bg-sky-700"
-              >
-                Cancel
-              </button>
+            {type === 'expand' && (
+              <div className="flex flex-col space-y-5">
+                {rowData?.dailyWork
+                  ?.filter((d) => {
+                    return d.pending === false
+                  })
+                  .map((d, index) => {
+                    return (
+                      <div
+                        className="flex flex-row items-center space-x-3"
+                        key={index}
+                      >
+                        <MTextView content={d?.date} />
+                        <MTextView
+                          content={
+                            d?.uom === 'hour'
+                              ? _.round(d?.duration / (1000 * 60 * 60), 1) +
+                                ' ' +
+                                d?.uom +
+                                's'
+                              : d?.duration + ' ' + d?.uom + 's'
+                          }
+                        />
+                        {!d.toConfirm && !d.status && (
+                          <>
+                            <div
+                              // onClick={() => handleApproveDailyWork(d, index)}
+                              className="flex cursor-pointer items-center justify-evenly rounded-full"
+                            >
+                              <MSmallSubmitButton
+                                label="approve"
+                                intent="success"
+                                submit={() => handleApproveDailyWork(d, index)}
+                              />
+                            </div>
 
-              {((!startIndexInvalid && !endIndexInvalid) ||
-                startIndexNotApplicable ||
-                !rowData?.startIndex ||
-                (type === 'stop' && reasonSelected)) &&
-                !postLive && (
-                  <button
-                    onClick={() => {
-                      handleConfirm()
-                      setIsShown(false)
-                    }}
-                    type="button"
-                    className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
-                  >
-                    Ok
-                  </button>
-                )}
-            </div>
+                            <div className="flex cursor-pointer items-center justify-evenly rounded-full">
+                              <MSmallSubmitButton
+                                label="reject"
+                                intent="danger"
+                                submit={() => handleRejectDailyWork(d, index)}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {d.toConfirm && !d.status && (
+                          <>
+                            <div
+                              // onClick={() => {}}
+                              className="flex cursor-pointer items-center justify-evenly rounded-full"
+                            >
+                              <MSmallSubmitButton
+                                label="confirm"
+                                submit={() => {
+                                  d.toBeApproved &&
+                                    handleConfirmApproval(d, index)
+                                  d.toBeRejected &&
+                                    handleConfirmRejection(d, index)
+                                }}
+                              />
+                            </div>
+
+                            <div
+                              // onClick={() => {}}
+                              className="flex cursor-pointer items-center justify-evenly rounded-full"
+                            >
+                              <MSmallSubmitButton
+                                label="discard"
+                                intent="danger"
+                                submit={() => handleDiscardDailyWork(d, index)}
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {d.toBeRejected && (
+                          <SmallTextInput
+                            isRequired={true}
+                            placeholder="Reason"
+                            setValue={handleSetReason}
+                          />
+                        )}
+
+                        {d.status && (
+                          <>
+                            <MStatusIndicator status={d.status} />
+                          </>
+                        )}
+                      </div>
+                    )
+                  })}
+              </div>
+            )}
+
+            {type !== 'expand' && (
+              <div className="mt-6 flex flex-row justify-end space-x-5">
+                <button
+                  onClick={() => {
+                    setIsShown(false)
+                    showReasonField && handleSetReason('NA')
+                  }}
+                  type="button"
+                  className="transform rounded-md bg-white px-3 py-2 text-sm capitalize tracking-wide text-zinc-800 ring-1 ring-gray-200 transition-colors duration-200 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring focus:ring-zinc-300 focus:ring-opacity-50"
+                >
+                  Cancel
+                </button>
+
+                {((!startIndexInvalid && !endIndexInvalid) ||
+                  startIndexNotApplicable ||
+                  !rowData?.startIndex ||
+                  (type === 'stop' && reasonSelected)) &&
+                  !postLive && (
+                    <button
+                      onClick={() => {
+                        handleConfirm()
+                        setIsShown(false)
+                      }}
+                      type="button"
+                      className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
+                    >
+                      Ok
+                    </button>
+                  )}
+              </div>
+            )}
+
+            {type === 'expand' && (
+              <div className="mt-6 flex flex-row justify-end space-x-5">
+                <button
+                  onClick={() => {
+                    setIsShown(false)
+                  }}
+                  type="button"
+                  className="transform rounded-md bg-white px-3 py-2 text-sm capitalize tracking-wide text-zinc-800 ring-1 ring-gray-200 transition-colors duration-200 hover:bg-gray-50 focus:bg-white focus:outline-none focus:ring focus:ring-zinc-300 focus:ring-opacity-50"
+                >
+                  Done
+                </button>
+              </div>
+            )}
 
             {/* <ToastContainer /> */}
           </div>

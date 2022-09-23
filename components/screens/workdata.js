@@ -677,7 +677,11 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
+      `${url}/works/filtered/${pageNumber}?userProject=${
+        user.assignedProject?.prjDescription
+      }&userType=${user.userType}&companyName=${
+        user.company?.name
+      }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
         searchProject
       )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
       {
@@ -745,6 +749,168 @@ export default function Workdata() {
       .catch((err) => setSubmitting(false))
   }
 
+  function approveDailyWork(dailyWork, index) {
+    dailyWork.toConfirm = true
+    dailyWork.toBeApproved = true
+    let _row = { ...row }
+    _row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[index] = dailyWork
+    setRow(_row)
+    setRowIndex(parseInt(index))
+    // setExpandSwModalIsShown(false)
+  }
+
+  function confirmApproveDailyWork(dailyWork, index) {
+    // approveDailyWork/:id
+
+    dailyWork.status = 'confirming'
+    dailyWork.toConfirm = null
+    dailyWork.toBeApproved = null
+    dailyWork.toBeRejected = null
+    let _row = { ...row }
+
+    _row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex] = dailyWork
+    setRow(_row)
+
+    let pDate = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['date']
+
+    let approvedRevenue = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['totalRevenue']
+
+    let approvedExpenditure = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['totalRevenue']
+
+    let approvedDuration = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['duration']
+
+    fetch(`${url}/works/approveDailyWork/${row._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+      body: JSON.stringify({
+        postingDate: pDate,
+        approvedBy: user._id,
+        approvedRevenue,
+        approvedDuration,
+        approvedExpenditure,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        dailyWork.status = 'approved'
+
+        let _row = { ...row }
+
+        _row.dailyWork.filter((d) => {
+          return d.pending === false
+        })[rowIndex] = dailyWork
+        setRow(_row)
+      })
+      .catch((err) => console.log(err))
+  }
+
+  function rejectDailyWork(dailyWork, index) {
+    dailyWork.toConfirm = true
+    dailyWork.toBeRejected = true
+    let _row = { ...row }
+
+    setReasonForRejection('')
+
+    _row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[index] = dailyWork
+    setRow(_row)
+    setRowIndex(parseInt(index))
+    // setExpandSwModalIsShown(false)
+  }
+
+  function confirmRejectDailyWork(dailyWork, index) {
+    // approveDailyWork/:id
+
+    dailyWork.status = 'confirming'
+    dailyWork.toConfirm = null
+    dailyWork.toBeApproved = null
+    dailyWork.toBeRejected = null
+    let _row = { ...row }
+
+    _row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex] = dailyWork
+    setRow(_row)
+
+    let pDate = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['date']
+
+    let rejectedRevenue = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['totalRevenue']
+
+    let rejectedExpenditure = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['totalRevenue']
+
+    let rejectedDuration = row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[rowIndex]['duration']
+
+    fetch(`${url}/works/rejectDailyWork/${row._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+      body: JSON.stringify({
+        postingDate: pDate,
+        rejectedBy: user._id,
+        rejectedRevenue,
+        rejectedDuration,
+        rejectedExpenditure,
+        reason: reasonForRejection,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        dailyWork.status = 'rejected'
+
+        let _row = { ...row }
+
+        _row.dailyWork.filter((d) => {
+          return d.pending === false
+        })[rowIndex] = dailyWork
+        setRow(_row)
+      })
+      .catch((err) => console.log(err))
+  }
+
+  function discardDailyWork(dailyWork, index) {
+    dailyWork.toConfirm = null
+    dailyWork.toBeApproved = null
+    dailyWork.toBeRejected = null
+    let _row = { ...row }
+
+    _row.dailyWork.filter((d) => {
+      return d.pending === false
+    })[index] = dailyWork
+    setRow(_row)
+    setRowIndex(parseInt(index))
+    // setExpandSwModalIsShown(false)
+  }
+  // useEffect(() => {
+  //   setExpandSwModalIsShown(true)
+  //   setRow(row)
+  // }, [row])
+
   function bulkApprove() {
     setLoadingData(true)
     let promises = []
@@ -764,6 +930,13 @@ export default function Workdata() {
         refresh()
       })
       .catch((err) => {})
+  }
+
+  function bulkApproveDailyWorks() {
+    setLoadingData(true)
+    let promises = []
+
+    console.log(row)
   }
 
   function _setRecallRow(row, index, pageStartIndex) {
@@ -1419,7 +1592,11 @@ export default function Workdata() {
   function download() {
     setDownloadingData(true)
     fetch(
-      `${url}/works/detailed/${canViewRenues}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
+      `${url}/works/detailed/${canViewRenues}?userType=${
+        user.userType
+      }&companyName=${
+        user.company?.name
+      }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
       )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
       {
@@ -1477,7 +1654,11 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
-      `${url}/works/filtered/${pageNumber}?startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
+      `${url}/works/filtered/${pageNumber}?userProject=${
+        user.assignedProject?.prjDescription
+      }&userType=${user.userType}&companyName=${
+        user.company?.name
+      }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
       )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
       {
@@ -2785,7 +2966,14 @@ export default function Workdata() {
           body="Please select which dates to approve or reject."
           isShown={expandSwModalIsShown}
           setIsShown={setExpandSwModalIsShown}
-          handleConfirm={approve}
+          handleConfirmApproval={confirmApproveDailyWork}
+          handleConfirmRejection={confirmRejectDailyWork}
+          handleApproveDailyWork={approveDailyWork}
+          handleRejectDailyWork={rejectDailyWork}
+          handleDiscardDailyWork={discardDailyWork}
+          handleSetReason={setReasonForRejection}
+          rowData={row}
+          type="expand"
         />
       )}
     </>

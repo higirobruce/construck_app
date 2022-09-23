@@ -75,31 +75,7 @@ export default function Users() {
 
   useEffect(() => {
     setLoadingProjects(true)
-    fetch(`${url}/users/`, {
-      headers: {
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (isCustomer) {
-          setUsers(
-            res.filter((r) => {
-              return r?.company?._id === user?.company?._id
-            })
-          )
-          setOgUsersList(
-            res.filter((r) => {
-              return r?.company?._id === user?.company?._id
-            })
-          )
-        } else {
-          setUsers(res)
-          setOgUsersList(res)
-        }
-        setLoading(false)
-      })
-      .catch((err) => toast.error('Error occured!'))
+    getUsers()
 
     fetch(`${url}/projects/v2`, {
       headers: {
@@ -165,7 +141,7 @@ export default function Users() {
     }
   }, [search])
 
-  function refresh() {
+  function getUsers() {
     setLoading(true)
     fetch(`${url}/users/`, {
       headers: {
@@ -174,15 +150,34 @@ export default function Users() {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         if (isCustomer) {
           setUsers(
             res.filter((r) => {
-              return r?.company?._id === user?.company?._id
+              return (
+                (r?.company?._id === user?.company?._id && r?.company) ||
+                (r?.company?.name === user?.assignedProject?.customer &&
+                  r?.company) ||
+                (r?.assignedProject?.customer ===
+                  user?.assignedProject?.customer &&
+                  r.assignedProject) ||
+                (r?.assignedProject?.customer === user?.company?.name &&
+                  r.assignedProject)
+              )
             })
           )
           setOgUsersList(
             res.filter((r) => {
-              return r?.company?._id === user?.company?._id
+              return (
+                (r?.company?._id === user?.company?._id && r?.company) ||
+                (r?.company?.name === user?.assignedProject?.customer &&
+                  r?.company) ||
+                (r?.assignedProject?.customer ===
+                  user?.assignedProject?.customer &&
+                  r.assignedProject) ||
+                (r?.assignedProject?.customer === user?.company?.name &&
+                  r.assignedProject)
+              )
             })
           )
         } else {
@@ -206,7 +201,7 @@ export default function Users() {
       .then((res) => res.json)
       .then((res) => {
         toast.success('Password reset successfully!')
-        refresh()
+        getUsers()
       })
       .catch((err) => toast.error('Error occured!'))
   }
@@ -241,10 +236,13 @@ export default function Users() {
         } else {
           setViewPort('list')
           setSubmitting(false)
-          refresh()
+          getUsers()
         }
       })
-      .catch((err) => toast.error('Error occured!'))
+      .catch((err) => {
+        toast.error('Error occured!')
+        setSubmitting(false)
+      })
   }
 
   function _setUserToUpdate(data) {
@@ -287,7 +285,7 @@ export default function Users() {
         } else {
           setViewPort('list')
           setSubmitting(false)
-          refresh()
+          getUsers()
         }
       })
       .catch((err) => {
@@ -379,7 +377,7 @@ export default function Users() {
               />
             )}
             <MSubmitButton
-              submit={refresh}
+              submit={getUsers}
               intent="neutral"
               icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
               label="Refresh"
@@ -391,7 +389,7 @@ export default function Users() {
           <MSubmitButton
             submit={() => {
               setViewPort('list')
-              refresh()
+              getUsers()
             }}
             intent="primary"
             icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
@@ -625,7 +623,8 @@ export default function Users() {
                 </div>
               </div>
 
-              {role == 'customer-project-manager' && (
+              {(role == 'customer-project-manager' ||
+                role == 'customer-site-manager') && (
                 <div className="flex flex-col">
                   <div className="flex flex-row items-center">
                     <MTextView content="Assign to Project" />
