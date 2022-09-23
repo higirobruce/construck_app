@@ -333,6 +333,7 @@ export default function Projects() {
               {projects.map((e) => {
                 return (
                   <ProjectCard
+                    key={e.prjDescription}
                     data={{
                       prjDescription: e.prjDescription,
                       status: e.status,

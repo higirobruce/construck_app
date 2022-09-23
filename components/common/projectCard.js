@@ -11,7 +11,9 @@ import {
   FolderOpenIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/solid'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { Loader } from 'semantic-ui-react'
+import MTextView from './mTextView'
 
 const MStatusIndicator = ({ status }) => {
   if (status === 'available')
@@ -72,26 +74,80 @@ const MStatusIndicator = ({ status }) => {
     )
   }
 }
+
 export default function ProjectCard({ intent, data, icon, handleChange }) {
+  let url = process.env.NEXT_PUBLIC_BKEND_URL
+  let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+  let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+
+  let [loadingApprovedRev, setLoadingApprovedRev] = useState(true)
+  let [approvedRevenue, setApprovedRevenue] = useState(0)
+  let [loadingRejectedRev, setLoadingRejectedRev] = useState(true)
+  let [rejectedRevenue, setRejectedRevenue] = useState(0)
+
   function getClassFromStatus(intent) {
     if (intent == 'available') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
+      return 'flex flex-col space-y-5 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
     } else if (intent == 'assigned to job') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-gray-200  w-full'
+      return 'flex flex-col space-y-5 px-3 py-1 rounded bg-gray-200  w-full'
     } else if (intent == 'warning') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-200  w-full'
+      return 'flex flex-col space-y-5 px-3 py-1 rounded bg-red-200  w-full'
     } else if (intent == 'danger') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-red-400  w-full'
+      return 'flex flex-col space-y-5 px-3 py-1 rounded bg-red-400  w-full'
     } else if (intent == 'normal') {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded bg-green-200  w-full'
+      return 'flex flex-col space-y-5 px-3 py-1 rounded bg-green-200  w-full'
     } else {
-      return 'flex flex-col space-y-10 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
+      return 'flex flex-col space-y-5 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
     }
   }
+  function getApprovedRevenue(prjDescription) {
+    fetch(
+      `${url}/projects/approvedRevenue/${encodeURIComponent(prjDescription)}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(apiUsername + ':' + apiPassword),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        let result = res[0]
+        console.log(res)
+        setLoadingApprovedRev(false)
+        setApprovedRevenue(result?.totalRevenue ? result?.totalRevenue : 0)
+      })
+  }
+
+  function getRejectedRevenue(prjDescription) {
+    fetch(
+      `${url}/projects/rejectedRevenue/${encodeURIComponent(prjDescription)}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(apiUsername + ':' + apiPassword),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        let result = res[0]
+        console.log(res)
+        setLoadingRejectedRev(false)
+        setRejectedRevenue(result?.totalRevenue ? result?.totalRevenue : 0)
+      })
+  }
+
+  useEffect(() => {
+    setLoadingApprovedRev(true)
+    setLoadingRejectedRev(true)
+    getApprovedRevenue(data.prjDescription)
+    getRejectedRevenue(data.prjDescription)
+  }, [approvedRevenue])
   return (
     <div className={getClassFromStatus(intent)}>
       <div className="flex flex-row items-start justify-between py-1">
-        <div className="flex flex-col">
+        <div className="flex flex-col space-y-1">
           <div className="flex flex-row items-center space-x-3">
             <div
               className="cursor-pointer text-lg font-semibold text-gray-700"
@@ -124,6 +180,26 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
                 : 'h-5 w-5 cursor-pointer text-blue-400'
             }
           />
+        </div>
+      </div>
+
+      <div className="flex flex-row justify-between">
+        <div className="text-sm font-semibold text-gray-500">
+          {loadingApprovedRev && <Loader active size="tiny" inline />}
+          {!loadingApprovedRev && (
+            <div className="text-sm font-semibold text-green-500">
+              {'RWF ' + approvedRevenue.toLocaleString()}
+            </div>
+          )}
+        </div>
+
+        <div className="text-sm font-semibold text-gray-500">
+          {loadingRejectedRev && <Loader active size="tiny" inline />}
+          {!loadingRejectedRev && (
+            <div className="text-sm font-semibold text-red-500">
+              {'RWF ' + rejectedRevenue.toLocaleString()}
+            </div>
+          )}
         </div>
       </div>
     </div>
