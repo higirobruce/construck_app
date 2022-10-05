@@ -39,7 +39,6 @@ export default function Reversals() {
     )
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         if (!res.error) {
           setTransactions(res)
           setLoading(false)

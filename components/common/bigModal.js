@@ -137,7 +137,6 @@ export default function BigModal({
       _dailyWork.toConfirm = true
 
       _siteWorkDetails[workIndex] = _work
-      console.log(_dailyWork)
 
       setWorkDetails(_siteWorkDetails)
       setSelectedWork({

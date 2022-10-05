@@ -816,7 +816,7 @@ export default function Workdata() {
         })[rowIndex] = dailyWork
         setRow(_row)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {})
   }
 
   function rejectDailyWork(dailyWork, index) {
@@ -890,7 +890,7 @@ export default function Workdata() {
         })[rowIndex] = dailyWork
         setRow(_row)
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {})
   }
 
   function discardDailyWork(dailyWork, index) {
