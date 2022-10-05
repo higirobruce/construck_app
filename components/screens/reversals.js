@@ -39,6 +39,7 @@ export default function Reversals() {
     )
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         if (!res.error) {
           setTransactions(res)
           setLoading(false)
@@ -182,7 +183,7 @@ export default function Reversals() {
                 <MTitle content="Actions" />
               </div>
 
-              {transactions.map((t) => {
+              {transactions?.map((t) => {
                 return (
                   <div className="round-sm grid grid-cols-10 items-center bg-white p-2 shadow-sm">
                     {/* Plate NUmber */}

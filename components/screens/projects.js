@@ -21,6 +21,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 
 import moment from 'moment'
+import BigModal from '../common/bigModal'
 
 export default function Projects() {
   let { user, setUser } = useContext(UserContext)
@@ -39,6 +40,11 @@ export default function Projects() {
   let [selectedCustomer, setSelectedCustomer] = useState(null)
   let [projectDescription, setProjectDescription] = useState('')
   let [submitting, setSubmitting] = useState(false)
+
+  let [selectedProject, setSelectedProject] = useState(null)
+  let [workDetails, setWorkDetails] = useState(null)
+
+  let [validationModalIsShown, setValidationModalIsShown] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
@@ -49,6 +55,7 @@ export default function Projects() {
   let [customerId, setCustomerId] = useState('')
 
   useEffect(() => {
+    setValidationModalIsShown(false)
     fetch(`${url}/projects/v2`, {
       headers: {
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
@@ -85,6 +92,7 @@ export default function Projects() {
 
   useEffect(() => {
     setLoading(true)
+    setValidationModalIsShown(false)
     if (search.length >= 3) {
       let projList = projects.filter((w) => {
         let _search = search?.toLocaleLowerCase()
@@ -116,6 +124,12 @@ export default function Projects() {
       setStatusFilter('all')
     } else setStatusFilter(filterBy)
   }, [filterBy])
+
+  function showDetails(data, workDetails) {
+    setSelectedProject(data.prjDescription)
+    setWorkDetails(workDetails)
+    setValidationModalIsShown(true)
+  }
 
   function refresh() {
     setLoading(true)
@@ -274,168 +288,182 @@ export default function Projects() {
   }
 
   return (
-    <div className="my-5 flex flex-col space-y-5 px-10">
-      <div className="text-2xl font-semibold">Projects</div>
-      <div className="flex w-full flex-row items-center justify-between space-x-4">
-        {viewPort === 'list' && canCreateData && (
-          <MSubmitButton
-            submit={() => setViewPort('new')}
-            intent="primary"
-            icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
-            label="New"
-          />
-        )}
-
-        {viewPort === 'list' && (
-          <div className="mx-auto flex flex-grow flex-col px-40">
-            <TextInput placeholder="Search..." setValue={setSearch} />
-          </div>
-        )}
-
-        {(viewPort === 'new' || viewPort === 'change') && (
-          <MSubmitButton
-            submit={() => {
-              setViewPort('list')
-              refresh()
-            }}
-            intent="primary"
-            icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
-            label="Back"
-          />
-        )}
-
-        {viewPort === 'list' && (
-          <div className="flex flex-row items-center space-x-5">
-            {downloadingData ? (
-              <div>
-                <Loader active size="tiny" inline className="ml-5" />
-              </div>
-            ) : (
-              <ArrowDownTrayIcon
-                className="h-5 w-5 cursor-pointer"
-                onClick={() => download()}
-              />
-            )}
-            <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
+    <>
+      <div className="my-5 flex flex-col space-y-5 px-10">
+        <div className="text-2xl font-semibold">Projects</div>
+        <div className="flex w-full flex-row items-center justify-between space-x-4">
+          {viewPort === 'list' && canCreateData && (
             <MSubmitButton
-              submit={refresh}
-              intent="neutral"
-              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
-              label="Refresh"
+              submit={() => setViewPort('new')}
+              intent="primary"
+              icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
+              label="New"
             />
+          )}
+
+          {viewPort === 'list' && (
+            <div className="mx-auto flex flex-grow flex-col px-40">
+              <TextInput placeholder="Search..." setValue={setSearch} />
+            </div>
+          )}
+
+          {(viewPort === 'new' || viewPort === 'change') && (
+            <MSubmitButton
+              submit={() => {
+                setViewPort('list')
+              }}
+              intent="primary"
+              icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
+              label="Back"
+            />
+          )}
+
+          {viewPort === 'list' && (
+            <div className="flex flex-row items-center space-x-5">
+              {downloadingData ? (
+                <div>
+                  <Loader active size="tiny" inline className="ml-5" />
+                </div>
+              ) : (
+                <ArrowDownTrayIcon
+                  className="h-5 w-5 cursor-pointer"
+                  onClick={() => download()}
+                />
+              )}
+              <DocumentDuplicateIcon className="h-5 w-5 cursor-pointer" />
+              <MSubmitButton
+                submit={refresh}
+                intent="neutral"
+                icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
+                label="Refresh"
+              />
+            </div>
+          )}
+        </div>
+        {viewPort === 'list' && (
+          <>
+            {!loading && projects.length > 0 && (
+              <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-4 md:gap-y-6">
+                {projects.map((e) => {
+                  return (
+                    <ProjectCard
+                      key={e.prjDescription}
+                      data={{
+                        prjDescription: e.prjDescription,
+                        status: e.status,
+                        customer: e.customer,
+                        id: e._id,
+                        customerId: e.customerId,
+                      }}
+                      handleChange={_setPrjToUpdate}
+                      handleShowDetails={showDetails}
+                    />
+                  )
+                })}
+              </div>
+            )}
+
+            {(loading || projects.length === 0) && (
+              <div className="mx-auto h-full">
+                <Loader active />
+              </div>
+            )}
+          </>
+        )}
+
+        {viewPort === 'new' && (
+          <div className="flex items-start">
+            <div className="flex flex-col space-y-5">
+              <div className="grid-col grid grid-cols-2 gap-5">
+                {/* Inputs col1 */}
+                <div className="flex flex-col items-start space-y-5">
+                  {/* Plate number */}
+                  <TextInputLogin
+                    label="Project Description"
+                    placeholder="Project description"
+                    type="text"
+                    setValue={setProjectDescription}
+                    isRequired
+                  />
+
+                  {/* Eq Description */}
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Customer" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={customersOptions}
+                      placeholder="Select customer"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setSelectedCustomer(data.value)
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {projectDescription.length >= 4 && selectedCustomer && (
+                <div>
+                  {submitting ? (
+                    <Loader inline size="small" active />
+                  ) : (
+                    <MSubmitButton submit={submit} />
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         )}
-      </div>
-      {viewPort === 'list' && (
-        <>
-          {!loading && projects.length > 0 && (
-            <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-4 md:gap-y-6">
-              {projects.map((e) => {
-                return (
-                  <ProjectCard
-                    key={e.prjDescription}
-                    data={{
-                      prjDescription: e.prjDescription,
-                      status: e.status,
-                      customer: e.customer,
-                      id: e._id,
-                      customerId: e.customerId,
-                    }}
-                    handleChange={_setPrjToUpdate}
-                  />
-                )
-              })}
-            </div>
-          )}
 
-          {(loading || projects.length === 0) && (
-            <div className="mx-auto h-full">
-              <Loader active />
-            </div>
-          )}
-        </>
-      )}
-
-      {viewPort === 'new' && (
-        <div className="flex items-start">
-          <div className="flex flex-col space-y-5">
-            <div className="grid-col grid grid-cols-2 gap-5">
-              {/* Inputs col1 */}
-              <div className="flex flex-col items-start space-y-5">
-                {/* Plate number */}
-                <TextInputLogin
-                  label="Project Description"
-                  placeholder="Project description"
-                  type="text"
-                  setValue={setProjectDescription}
-                  isRequired
-                />
-
-                {/* Eq Description */}
-                <div className="flex flex-col space-y-1">
-                  <div className="flex flex-1 flex-row items-center">
-                    <MTextView content="Customer" />
-                    <div className="text-sm text-red-600">*</div>
-                  </div>
-                  <Dropdown
-                    options={customersOptions}
-                    placeholder="Select customer"
-                    fluid
-                    search
-                    selection
-                    onChange={(e, data) => {
-                      setSelectedCustomer(data.value)
-                    }}
+        {viewPort === 'change' && (
+          <div className="flex items-start">
+            <div className="flex flex-col space-y-5">
+              <div className="grid-col grid grid-cols-2 gap-5">
+                {/* Inputs col1 */}
+                <div className="flex flex-col items-start space-y-5">
+                  {/* Plate number */}
+                  <TextInputLogin
+                    label="Project Description"
+                    placeholder="Project description"
+                    type="text"
+                    setValue={setProjectDescription}
+                    value={projectDescription}
+                    isRequired
                   />
                 </div>
               </div>
+
+              {projectDescription.length >= 4 && (
+                <div>
+                  {submitting ? (
+                    <Loader inline size="small" active />
+                  ) : (
+                    <MSubmitButton submit={updateProject} />
+                  )}
+                </div>
+              )}
             </div>
-
-            {projectDescription.length >= 4 && selectedCustomer && (
-              <div>
-                {submitting ? (
-                  <Loader inline size="small" active />
-                ) : (
-                  <MSubmitButton submit={submit} />
-                )}
-              </div>
-            )}
           </div>
-        </div>
+        )}
+
+        <ToastContainer />
+      </div>
+
+      {/* recall modal */}
+      {validationModalIsShown && (
+        <BigModal
+          title={`Work validation for work done at ${selectedProject}`}
+          body="Are you sure you want to recall this job?"
+          isShown={validationModalIsShown}
+          setIsShown={setValidationModalIsShown}
+          data={workDetails}
+          handleConfirm={() => {}}
+        />
       )}
-
-      {viewPort === 'change' && (
-        <div className="flex items-start">
-          <div className="flex flex-col space-y-5">
-            <div className="grid-col grid grid-cols-2 gap-5">
-              {/* Inputs col1 */}
-              <div className="flex flex-col items-start space-y-5">
-                {/* Plate number */}
-                <TextInputLogin
-                  label="Project Description"
-                  placeholder="Project description"
-                  type="text"
-                  setValue={setProjectDescription}
-                  value={projectDescription}
-                  isRequired
-                />
-              </div>
-            </div>
-
-            {projectDescription.length >= 4 && (
-              <div>
-                {submitting ? (
-                  <Loader inline size="small" active />
-                ) : (
-                  <MSubmitButton submit={updateProject} />
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <ToastContainer />
-    </div>
+    </>
   )
 }

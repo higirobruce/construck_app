@@ -75,7 +75,13 @@ const MStatusIndicator = ({ status }) => {
   }
 }
 
-export default function ProjectCard({ intent, data, icon, handleChange }) {
+export default function ProjectCard({
+  intent,
+  data,
+  icon,
+  handleChange,
+  handleShowDetails,
+}) {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
@@ -84,6 +90,8 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
   let [approvedRevenue, setApprovedRevenue] = useState(0)
   let [loadingRejectedRev, setLoadingRejectedRev] = useState(true)
   let [rejectedRevenue, setRejectedRevenue] = useState(0)
+  let [loadingDetails, setLoadingDetails] = useState(true)
+  let [workDetails, setWorkDetails] = useState(null)
 
   function getClassFromStatus(intent) {
     if (intent == 'available') {
@@ -100,6 +108,7 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
       return 'flex flex-col space-y-5 px-3 py-1 rounded shadow-lg ring-1 ring-zinc-200 w-full'
     }
   }
+
   function getApprovedRevenue(prjDescription) {
     fetch(
       `${url}/projects/approvedRevenue/${encodeURIComponent(prjDescription)}`,
@@ -136,14 +145,36 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
       })
   }
 
+  function getWorksToBeValidated(prjDescription) {
+    setLoadingDetails(true)
+    fetch(
+      `${url}/projects/worksToBeValidated/${encodeURIComponent(
+        prjDescription
+      )}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(apiUsername + ':' + apiPassword),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        setLoadingDetails(false)
+        setWorkDetails(res)
+      })
+  }
+
   useEffect(() => {
     setLoadingApprovedRev(true)
     setLoadingRejectedRev(true)
     getApprovedRevenue(data.prjDescription)
     getRejectedRevenue(data.prjDescription)
+    getWorksToBeValidated(data.prjDescription)
   }, [approvedRevenue])
+
   return (
-    <div className={getClassFromStatus(intent)}>
+    <div className={getClassFromStatus(intent)} key={workDetails?._id}>
       <div className="flex flex-row items-start justify-between py-1">
         <div className="flex flex-col space-y-1">
           <div className="flex flex-row items-center space-x-3">
@@ -164,20 +195,19 @@ export default function ProjectCard({ intent, data, icon, handleChange }) {
           </div>
         </div>
         <div className="mt-1 flex flex-row space-x-3">
-          <PencilSquareIcon
-            className={
-              intent === 'available'
-                ? 'h-5 w-5 cursor-pointer text-yellow-600'
-                : 'h-5 w-5 cursor-pointer text-yellow-600'
-            }
-          />
-          <FolderOpenIcon
-            className={
-              intent === 'available'
-                ? 'h-5 w-5 cursor-pointer text-blue-500'
-                : 'h-5 w-5 cursor-pointer text-blue-400'
-            }
-          />
+          {!loadingApprovedRev &&
+            !loadingRejectedRev &&
+            !loadingDetails &&
+            workDetails?.length > 0 && (
+              <FolderOpenIcon
+                onClick={() => handleShowDetails(data, workDetails)}
+                className={
+                  intent === 'available'
+                    ? 'h-5 w-5 cursor-pointer text-blue-500'
+                    : 'h-5 w-5 cursor-pointer text-blue-400'
+                }
+              />
+            )}
         </div>
       </div>
 

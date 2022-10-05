@@ -268,6 +268,7 @@ export default function WorkListTable({
                 )}
 
                 <Table.HeaderCell>Status</Table.HeaderCell>
+                <Table.HeaderCell>Actions</Table.HeaderCell>
                 <Table.HeaderCell>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
@@ -291,7 +292,7 @@ export default function WorkListTable({
                   </div>
                 </Table.HeaderCell>
                 <Table.HeaderCell>Customer</Table.HeaderCell>
-                <Table.HeaderCell>Actions</Table.HeaderCell>
+
                 {/* <Table.HeaderCell>Created on</Table.HeaderCell>
             <Table.HeaderCell>Created by</Table.HeaderCell>
             <Table.HeaderCell>Permit</Table.HeaderCell>
@@ -431,45 +432,6 @@ export default function WorkListTable({
                     <Table.Cell>
                       <MStatusIndicator status={row.status} />
                     </Table.Cell>
-                    <Table.Cell singleLine>
-                      <MTextView
-                        content={
-                          row.driver
-                            ? row.driver?.firstName + ' ' + row.driver?.lastName
-                            : row.equipment?.eqOwner
-                        }
-                      />
-                    </Table.Cell>
-
-                    <Table.Cell>
-                      <MTextView content={row.driver?.phone} />
-                    </Table.Cell>
-
-                    <Table.Cell>
-                      {row.siteWork ? (
-                        <div>
-                          <MTextView content="N/A" />
-                        </div>
-                      ) : (
-                        <Tooltip
-                          title={
-                            row?.dispatch?.targetTrips
-                              ? 'Target trips: ' + row?.dispatch?.targetTrips
-                              : 'NA'
-                          }
-                        >
-                          <div>
-                            <MTextView
-                              content={row?.tripsDone ? row?.tripsDone : 0}
-                            />
-                          </div>
-                        </Tooltip>
-                      )}
-                    </Table.Cell>
-
-                    <Table.Cell>
-                      <MTextView content={row?.project?.customer} />
-                    </Table.Cell>
 
                     <Table.Cell>
                       <div className="mr-2 flex flex-row">
@@ -603,6 +565,46 @@ export default function WorkListTable({
                           )}
                       </div>
                     </Table.Cell>
+                    <Table.Cell singleLine>
+                      <MTextView
+                        content={
+                          row.driver
+                            ? row.driver?.firstName + ' ' + row.driver?.lastName
+                            : row.equipment?.eqOwner
+                        }
+                      />
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <MTextView content={row.driver?.phone} />
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      {row.siteWork ? (
+                        <div>
+                          <MTextView content="N/A" />
+                        </div>
+                      ) : (
+                        <Tooltip
+                          title={
+                            row?.dispatch?.targetTrips
+                              ? 'Target trips: ' + row?.dispatch?.targetTrips
+                              : 'NA'
+                          }
+                        >
+                          <div>
+                            <MTextView
+                              content={row?.tripsDone ? row?.tripsDone : 0}
+                            />
+                          </div>
+                        </Tooltip>
+                      )}
+                    </Table.Cell>
+
+                    <Table.Cell singleLine>
+                      <MTextView content={row?.project?.customer} />
+                    </Table.Cell>
+
                     {/* <Table.Cell>{row.createdOn}</Table.Cell>
                 <Table.Cell>{row.createdBy}</Table.Cell>
                 <Table.Cell>{row.permit}</Table.Cell>
