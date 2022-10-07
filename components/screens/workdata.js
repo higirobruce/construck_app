@@ -157,6 +157,10 @@ export default function Workdata() {
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   useEffect(() => {
+    if (duration < 5) setComment(null)
+  }, [duration])
+
+  useEffect(() => {
     let targetTrips = parseInt(workList?.rowIndex?.dispatch?.targetTrips)
 
     if (targetTrips > tripsDone) setShowReasonField(true)
@@ -723,6 +727,7 @@ export default function Workdata() {
         setEqType('')
         setLoadingData(false)
         setSubmitting(false)
+        setComment(null)
       })
       .catch((err) => {
         toast.error(err)
@@ -2866,7 +2871,7 @@ export default function Workdata() {
           rowData={workList[rowIndex]}
           showReasonField={
             tripsDone < workList[rowIndex]?.dispatch?.targetTrips ||
-            (workList[rowIndex]?.equipment?.uom === 'hour' && duration < 5)
+            duration < 5
           }
           type="stop"
           startIndexInvalid={false}
@@ -2880,7 +2885,7 @@ export default function Workdata() {
               ? 'End Index can not be empty or zero!'
               : 'End Index should not be lesser than the Start Index!'
           }
-          reasonSelected={(duration < 5 && comment) || duration > 5}
+          reasonSelected={(duration < 5 && comment) || duration >= 5}
           isSiteWork={workList[rowIndex]?.siteWork}
           handleSetPostingDate={setPostingDate}
           dailyWorks={workList[rowIndex]?.dailyWork}
@@ -2923,6 +2928,8 @@ export default function Workdata() {
           }
           handleSetPostingDate={setPostingDate}
           dailyWorks={workList[rowIndex]?.dailyWork}
+          reasonSelected={true}
+          showReasonField={false}
         />
       )}
 

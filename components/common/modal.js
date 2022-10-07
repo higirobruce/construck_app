@@ -134,9 +134,11 @@ export default function Modal({
   let uom = rowData?.equipment?.uom
   let [startIndexNotApplicable, setStartIndxNotApp] = useState(false)
   let [pDate, setPDate] = useState(moment().format('DD-MMM-YYYY'))
-  let [siteWorkPosted, setSiteWPosted] = useState(null)
+  let [siteWorkPosted, setSiteWPosted] = useState(false)
   let [pendingRecord, setPedingRecord] = useState(null)
   let [postLive, setPostLive] = useState(false)
+
+  console.log(reasonSelected)
 
   useEffect(() => {
     let _siteWorkPosted = _.find(dailyWorks, {
@@ -182,7 +184,6 @@ export default function Modal({
             x-cloak
             onClick={() => {
               setIsShown(false)
-              handleSetReason(null)
             }}
             x-show={isShown}
             x-transitionEnter="transition ease-out duration-300 transform"
@@ -505,22 +506,22 @@ export default function Modal({
                   Cancel
                 </button>
 
-                {((!startIndexInvalid && !endIndexInvalid) ||
-                  startIndexNotApplicable ||
-                  !rowData?.startIndex ||
-                  (type === 'stop' && reasonSelected)) &&
-                  !postLive && (
-                    <button
-                      onClick={() => {
-                        handleConfirm()
-                        setIsShown(false)
-                      }}
-                      type="button"
-                      className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
-                    >
-                      Ok
-                    </button>
-                  )}
+                {((reasonSelected && type === 'stop') ||
+                  ((startIndexNotApplicable || !startIndexInvalid) &&
+                    !siteWorkPosted &&
+                    !postLive &&
+                    type === 'start')) && (
+                  <button
+                    onClick={() => {
+                      handleConfirm()
+                      setIsShown(false)
+                    }}
+                    type="button"
+                    className="transform rounded-md bg-red-400 px-3 py-2 text-sm capitalize tracking-wide text-white transition-colors duration-200 hover:bg-red-600 focus:bg-red-400 focus:outline-none focus:ring focus:ring-red-300 focus:ring-opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 dark:focus:bg-zinc-700"
+                  >
+                    Ok
+                  </button>
+                )}
               </div>
             )}
 
