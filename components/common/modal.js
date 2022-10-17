@@ -344,6 +344,84 @@ export default function Modal({
               </div>
             )}
 
+            {type === 'amend' && (
+              <div className="grid grid-cols-2 gap-x-2">
+                <div className="mb-3 flex flex-col space-y-4">
+                  {isSiteWork && (
+                    <div className="flex w-1/2 flex-col space-y-4">
+                      <MTextView content="Posting date" />
+                      <DatePicker
+                        defaultValue={moment(rowData?.dispatchDate)}
+                        value={moment(rowData?.dispatchDate)}
+                        disabled
+                        // onChange={(d, dateString) => {
+                        //   setPDate(moment(dateString).format('DD-MMM-YYYY'))
+                        //   handleSetPostingDate(dateString)
+                        // }}
+                      />
+                    </div>
+                  )}
+
+                  <TextInputLogin
+                    label="Duration (Hrs)"
+                    placeholder="0"
+                    setValue={handleSetDuration}
+                    type="number"
+                    isRequired
+                  />
+
+                  {parseInt(rowData.targetTrips) > 0 && (
+                    <TextInputLogin
+                      label={`Trips done out of ` + rowData.targetTrips}
+                      placeholder="0"
+                      setValue={handleSetTripsDone}
+                      type="number"
+                    />
+                  )}
+
+                  {/* <TextInputLogin
+                  label="Comment"
+                  placeholder="0"
+                  setValue={handleSetComment}
+                  type="text"
+                /> */}
+                </div>
+
+                {showReasonField && (
+                  <div className="flex flex-col space-y-3">
+                    <div>
+                      <div className="mb-1 flex flex-row items-center">
+                        <MTextView content="Reason" />
+                      </div>
+                      <Dropdown
+                        options={reasons}
+                        placeholder="Select reason"
+                        search
+                        compact
+                        selection
+                        onChange={(e, data) => {
+                          handleSetReason(data.value)
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <div className="mb-1 flex flex-row items-center">
+                        <MTextView content="Comment" />
+                      </div>
+                      <textarea
+                        onChange={(e) => handleSetMoreComment(e.target.value)}
+                        className="form-control m-0 block w-full rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition
+                                      ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+                        id="exampleFormControlTextarea1"
+                        rows="3"
+                        placeholder="Your comment"
+                      ></textarea>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {type === 'start' && (
               <div className="flex flex-col space-y-3">
                 {isSiteWork && (
@@ -507,6 +585,8 @@ export default function Modal({
                 </button>
 
                 {((reasonSelected && type === 'stop') ||
+                  type === 'reject' ||
+                  (reasonSelected && type === 'amend') ||
                   ((startIndexNotApplicable || !startIndexInvalid) &&
                     !siteWorkPosted &&
                     !postLive &&

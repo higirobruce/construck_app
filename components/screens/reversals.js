@@ -1,5 +1,9 @@
-import { ArrowRightIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
-import React, { useContext, useState } from 'react'
+import {
+  ArrowRightIcon,
+  ArrowPathIcon,
+  PencilIcon,
+} from '@heroicons/react/24/outline'
+import React, { useContext, useEffect, useState } from 'react'
 import TextInput from '../common/TextIput'
 import { DatePicker, Descriptions } from 'antd'
 import moment from 'moment'
@@ -23,8 +27,39 @@ export default function Reversals() {
   let [loading, setLoading] = useState(false)
   let [reverseTransaction, setReverseTransaction] = useState(false)
   let [params, setParams] = useState({})
+  let [amendModalIsShown, setAmenModalIsShown] = useState(false)
+  let [row, setRow] = useState(null)
+  let [duration, setDuration] = useState(0)
+  let [tripsDone, setTripsDone] = useState(0)
+  let [comment, setComment] = useState('')
+  let [moreComment, setMoreComment] = useState('')
+  let [reasonList, setReasonList] = useState([])
+  let [postingDate, setPostingDate] = useState('')
 
   let { user, setUser } = useContext(UserContext)
+
+  useEffect(() => {
+    fetch(`${url}/reasons`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let list = resp
+        let reasonOptions = list.map((p) => {
+          return {
+            key: p._id,
+            value: p.descriptionRw,
+            text: p.description,
+          }
+        })
+        setReasonList(reasonOptions)
+      })
+      .catch((err) => {
+        toast.error(err)
+      })
+  }, [])
 
   function getTransactions() {
     setLoading(true)
@@ -68,7 +103,7 @@ export default function Reversals() {
       .catch((err) => setLoading(false))
   }
 
-  function _confirmReverse(
+  function _reverse(
     siteWork,
     id,
     dispatchDate,
@@ -87,7 +122,7 @@ export default function Reversals() {
     setReverseTransaction(true)
   }
 
-  function reverse() {
+  function confirmReverse() {
     if (params.siteWork) {
       fetch(
         `${url}/works/swreverse/${params.id}?date=${params.dispatchDate}&totalRevenue=${params.totalRevenue}&totalExpenditure=${params.totalExpenditure}&duration=${params.duration}`,
@@ -125,6 +160,107 @@ export default function Reversals() {
           refresh()
         })
         .catch((err) => setLoading(false))
+    }
+  }
+
+  function _setReason(value) {
+    setComment(value)
+  }
+
+  function _amend(
+    siteWork,
+    id,
+    dispatchDate,
+    duration = 0,
+    totalRevenue = 0,
+    totalExpenditure = 0
+  ) {
+    setParams({
+      siteWork,
+      id,
+      dispatchDate,
+      duration,
+      totalRevenue,
+      totalExpenditure,
+    })
+    setAmenModalIsShown(true)
+  }
+
+  function _swamend(
+    siteWork,
+    id,
+    dispatchDate,
+    duration = 0,
+    totalRevenue = 0,
+    totalExpenditure = 0
+  ) {
+    setParams({
+      siteWork,
+      id,
+      dispatchDate,
+      duration,
+      totalRevenue,
+      totalExpenditure,
+    })
+    setAmenModalIsShown(true)
+  }
+
+  function confirmAmend() {
+    if (!row.siteWork) {
+      fetch(`${url}/works/amend/${row._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+        body: JSON.stringify({
+          tripsDone,
+          comment,
+          moreComment,
+          amendedBy: user._id,
+          duration,
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res)
+          refresh()
+        })
+        .catch((err) => {
+          console.log(err)
+          refresh()
+        })
+    } else {
+      console.log(moment(params.dispatchDate).format('DD-MMM-YYYY'))
+      fetch(`${url}/works/swamend/${row._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+        body: JSON.stringify({
+          tripsDone,
+          comment,
+          moreComment,
+          amendedBy: user._id,
+          duration,
+          prevDuration: row.duration,
+          prevTotalRevenue: row.totalRevenue,
+          prevTotalExpenditure: row.totalExpenditure,
+          postingDate: moment(params.dispatchDate).format('DD-MMM-YYYY'),
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res)
+          refresh()
+        })
+        .catch((err) => {
+          console.log(err)
+          refresh()
+        })
     }
   }
 
@@ -204,23 +340,67 @@ export default function Reversals() {
                       }
                     />
 
-                    <div
-                      onClick={() =>
-                        _confirmReverse(
-                          t?.siteWork,
-                          t?._id,
-                          t?.dispatchDate,
-                          t?.equipment?.uom === 'day'
-                            ? t?.duration
-                            : t?.duration * (1000 * 60 * 60),
-                          t?.totalRevenue,
-                          t?.totalExpenditure
-                        )
-                      }
-                      className="flex h-8 w-8 cursor-pointer items-center justify-center rounded bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 active:bg-red-500"
-                    >
-                      <ArrowPathIcon className="h-5 w-5" />
-                    </div>
+                    {t.status === 'stopped' && (
+                      <div className="flex flex-row items-center space-x-2">
+                        <div
+                          onClick={() => {
+                            setRow(t)
+                            _swamend(
+                              t?.siteWork,
+                              t?._id,
+                              t?.dispatchDate,
+                              t?.equipment?.uom === 'day'
+                                ? t?.duration
+                                : t?.duration * (1000 * 60 * 60),
+                              t?.totalRevenue,
+                              t?.totalExpenditure
+                            )
+                          }}
+                          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </div>
+
+                        <div
+                          onClick={() =>
+                            _reverse(
+                              t?.siteWork,
+                              t?._id,
+                              t?.dispatchDate,
+                              t?.equipment?.uom === 'day'
+                                ? t?.duration
+                                : t?.duration * (1000 * 60 * 60),
+                              t?.totalRevenue,
+                              t?.totalExpenditure
+                            )
+                          }
+                          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 active:bg-red-500"
+                        >
+                          <ArrowPathIcon className="h-5 w-5" />
+                        </div>
+                      </div>
+                    )}
+
+                    {t.status === 'rejected' && (
+                      <div
+                        onClick={() => {
+                          setRow(t)
+                          _amend(
+                            t?.siteWork,
+                            t?._id,
+                            t?.dispatchDate,
+                            t?.equipment?.uom === 'day'
+                              ? t?.duration
+                              : t?.duration * (1000 * 60 * 60),
+                            t?.totalRevenue,
+                            t?.totalExpenditure
+                          )
+                        }}
+                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
+                      >
+                        <PencilIcon className="h-5 w-5" />
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -234,7 +414,30 @@ export default function Reversals() {
           body="Are you sure you want to reverse this transaction? Please note that this is IRREVERSIBLE!"
           isShown={reverseTransaction}
           setIsShown={setReverseTransaction}
-          handleConfirm={reverse}
+          handleConfirm={confirmReverse}
+        />
+      )}
+
+      {amendModalIsShown && (
+        <Modal
+          title="Amend job"
+          body="Are you sure you want to amend this job?"
+          isShown={amendModalIsShown}
+          setIsShown={setAmenModalIsShown}
+          handleConfirm={confirmAmend}
+          handleSetDuration={setDuration}
+          handleSetTripsDone={setTripsDone}
+          handleSetComment={setComment}
+          handleSetMoreComment={setMoreComment}
+          handleSetReason={_setReason}
+          reasons={reasonList}
+          rowData={row}
+          showReasonField={tripsDone < row?.targetTrips || duration < 5}
+          type="amend"
+          reasonSelected={(duration < 5 && comment) || duration >= 5}
+          isSiteWork={row?.siteWork}
+          handleSetPostingDate={setPostingDate}
+          dailyWorks={row?.dailyWork}
         />
       )}
     </div>

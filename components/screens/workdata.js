@@ -746,6 +746,9 @@ export default function Workdata() {
       headers: {
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
+      body: JSON.stringify({
+        approvedBy: user._id,
+      }),
     })
       .then((resp) => resp.json())
       .then((resp) => {
@@ -894,6 +897,33 @@ export default function Workdata() {
           return d.pending === false
         })[rowIndex] = dailyWork
         setRow(_row)
+
+        //Send email
+        fetch(`${url}/email/send`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization:
+              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+          },
+          body: JSON.stringify({
+            workPayload: {
+              equipment: row.equipment,
+              project: row.project,
+              postingDate: dailyWork.date,
+              reasonForRejection,
+            },
+            from: 'appinfo@construck.rw',
+            to: 'bhigiro@cvl.co.rw',
+            subject: 'Work rejected',
+            messageType: 'workRejected',
+          }),
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((err) => console.log(err))
       })
       .catch((err) => {})
   }
@@ -926,6 +956,9 @@ export default function Workdata() {
           Authorization:
             'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
         },
+        body: JSON.stringify({
+          approvedBy: user._id,
+        }),
       })
       promises.push(p)
     })
@@ -1110,11 +1143,40 @@ export default function Workdata() {
       },
       body: JSON.stringify({
         reasonForRejection,
+        rejectedBy: user._id,
       }),
     })
       .then((resp) => resp.json())
       .then((resp) => {
         getData(false)
+        //Send email
+        fetch(`${url}/email/send`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization:
+              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+          },
+          body: JSON.stringify({
+            workPayload: {
+              equipment: _workList[rowIndex].equipment,
+              project: _workList[rowIndex].project,
+              postingDate: moment(_workList[rowIndex].workStartDate).format(
+                'DD-MMM-YYYY'
+              ),
+              reasonForRejection: reasonForRejection,
+            },
+            from: 'appinfo@construck.rw',
+            to: 'bhigiro@cvl.co.rw',
+            subject: 'Work rejected',
+            messageType: 'workRejected',
+          }),
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((err) => console.log(err))
       })
       .catch((err) => setSubmitting(false))
   }
@@ -1626,6 +1688,7 @@ export default function Workdata() {
       })
       .catch((err) => {
         toast.error('Error occured!')
+        console.log(err)
         setDownloadingData(false)
       })
 

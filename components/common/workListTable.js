@@ -325,9 +325,10 @@ export default function WorkListTable({
                             title={
                               <>
                                 <div>Date(s) posted</div>
-                                {row?.dailyWork.map((d) => {
-                                  return <div>{d.date}</div>
+                                {row?.dailyWork.map((d, index) => {
+                                  if (index <= 31) return <div>{d.date}</div>
                                 })}
+                                {row?.dailyWork?.length > 31 && <div>...</div>}
                               </>
                             }
                           >
