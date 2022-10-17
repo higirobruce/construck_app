@@ -1167,7 +1167,7 @@ export default function Workdata() {
               reasonForRejection: reasonForRejection,
             },
             from: 'appinfo@construck.rw',
-            to: 'bhigiro@cvl.co.rw',
+            to: ['bhigiro@cvl.co.rw', 'tiradukunda@construck.rw'], // TODO
             subject: 'Work rejected',
             messageType: 'workRejected',
           }),
