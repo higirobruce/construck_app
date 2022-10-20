@@ -29,6 +29,7 @@ import {
   PlayIcon,
   ExclamationTriangleIcon,
   ReceiptRefundIcon,
+  CheckBadgeIcon,
 } from '@heroicons/react/24/solid'
 const MStatusIndicator = ({ status }) => {
   if (status === 'approved')
@@ -90,6 +91,15 @@ const MStatusIndicator = ({ status }) => {
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
           <ReceiptRefundIcon className="h-5 w-5 text-zinc-600" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'validated') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <CheckBadgeIcon className="h-5 w-5 text-green-600" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>

@@ -138,8 +138,6 @@ export default function Modal({
   let [pendingRecord, setPedingRecord] = useState(null)
   let [postLive, setPostLive] = useState(false)
 
-  console.log(reasonSelected)
-
   useEffect(() => {
     let _siteWorkPosted = _.find(dailyWorks, {
       date: pDate,
@@ -586,6 +584,8 @@ export default function Modal({
 
                 {((reasonSelected && type === 'stop') ||
                   type === 'reject' ||
+                  !type ||
+                  type === 'end' ||
                   (reasonSelected && type === 'amend') ||
                   ((startIndexNotApplicable || !startIndexInvalid) &&
                     !siteWorkPosted &&
