@@ -168,6 +168,12 @@ export default function Workdata() {
   }, [tripsDone])
 
   useEffect(() => {
+    setLoadingEquipments(true)
+    let dispDate =
+      siteWork === true
+        ? moment(workStartDate).format('YYYY-MM-DD')
+        : dispatchDate
+
     fetch(`${url}/projects/v2`, {
       headers: {
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
@@ -349,6 +355,66 @@ export default function Workdata() {
         )
       })
       .catch((err) => {})
+    fetch(
+      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
+    )
+      .then((resp) => resp.json())
+      .then((resp) => {
+        setLoadingEquipments(false)
+        let list = resp
+        // ?.filter((r) => r.eqDescription !== 'LOWBED')
+        let listLowbeds = resp?.filter((r) => r.eqDescription === 'LOWBED')
+
+        let equipmentsFullOptions = list
+          // .filter((r) => r.eqDescription !== 'LOWBED')
+          .map((l) => {
+            return {
+              key: l._id,
+              value: l._id,
+              text:
+                l.eqOwner === 'Construck'
+                  ? l.plateNumber
+                  : l.plateNumber + ' - ' + l.eqOwner,
+            }
+          })
+
+        if (resp && list.length > 0) {
+          let equipmentsOptions = listLowbeds.map((l) => {
+            return {
+              key: l._id,
+              value: l._id,
+              text: l.plateNumber,
+            }
+          })
+
+          let lowbedsOptions = listLowbeds
+            .filter((r) => r.eqDescription === 'LOWBED')
+            .map((l) => {
+              return {
+                key: l._id,
+                value: l._id,
+                text: l.plateNumber,
+              }
+            })
+          setLowbedList(lowbedsOptions)
+          setOgLowbedList(listLowbeds)
+          setEquipmentsOgFull(list)
+          setEquipmentFullList(equipmentsFullOptions)
+          let _eqLists = [equipmentsFullOptions]
+          setEquipmentFullLists(_eqLists)
+        } else {
+          setLowbedList([])
+        }
+      })
+      .catch((err) => {
+        setLoadingEquipments(false)
+      })
   }, [viewPort])
 
   useEffect(() => {
@@ -920,9 +986,7 @@ export default function Workdata() {
           }),
         })
           .then((res) => res.json())
-          .then((res) => {
-            console.log(res)
-          })
+          .then((res) => {})
           .catch((err) => console.log(err))
       })
       .catch((err) => {})
@@ -1173,9 +1237,7 @@ export default function Workdata() {
           }),
         })
           .then((res) => res.json())
-          .then((res) => {
-            console.log(res)
-          })
+          .then((res) => {})
           .catch((err) => console.log(err))
       })
       .catch((err) => setSubmitting(false))
@@ -1688,7 +1750,6 @@ export default function Workdata() {
       })
       .catch((err) => {
         toast.error('Error occured!')
-        console.log(err)
         setDownloadingData(false)
       })
 
