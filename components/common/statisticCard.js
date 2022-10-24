@@ -2,10 +2,19 @@ import {
   ArrowDownTrayIcon,
   ReceiptRefundIcon,
   ListBulletIcon,
+  CheckIcon,
+  ChatBubbleBottomCenterTextIcon,
+  NoSymbolIcon,
 } from '@heroicons/react/24/outline'
 import React from 'react'
 
-export default function StatisticCard({ intent, data, icon }) {
+export default function StatisticCard({
+  intent,
+  data,
+  icon,
+  canBeApproved,
+  handleRelease,
+}) {
   function getClassFromIntent(intent) {
     if (intent == 'primary') {
       return 'flex flex-col space-y-10 p-2 rounded bg-blue-200  w-full'
@@ -26,6 +35,20 @@ export default function StatisticCard({ intent, data, icon }) {
       <div className="flex flex-row justify-between">
         <div className="text-lg font-semibold text-gray-700">{data.title}</div>
         <div className="flex flex-row space-x-3">
+          {canBeApproved && (
+            <CheckIcon
+              className="h-4 w-4 cursor-pointer text-green-500"
+              onClick={() => handleRelease(data.month, data.year)}
+            />
+          )}
+
+          {canBeApproved && (
+            <ChatBubbleBottomCenterTextIcon className="h-4 w-4 cursor-pointer text-zinc-500" />
+          )}
+
+          {canBeApproved && (
+            <NoSymbolIcon className="h-4 w-4 cursor-pointer text-red-500" />
+          )}
           <ListBulletIcon className="h-4 w-4 cursor-pointer text-blue-300" />
           <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer text-blue-300" />
           {data.title === 'Final Revenues' && (

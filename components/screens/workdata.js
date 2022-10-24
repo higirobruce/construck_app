@@ -1213,32 +1213,6 @@ export default function Workdata() {
       .then((resp) => resp.json())
       .then((resp) => {
         getData(false)
-        //Send email
-        fetch(`${url}/email/send`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization:
-              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-          },
-          body: JSON.stringify({
-            workPayload: {
-              equipment: _workList[rowIndex].equipment,
-              project: _workList[rowIndex].project,
-              postingDate: moment(_workList[rowIndex].workStartDate).format(
-                'DD-MMM-YYYY'
-              ),
-              reasonForRejection: reasonForRejection,
-            },
-            from: 'appinfo@construck.rw',
-            to: ['bhigiro@cvl.co.rw', 'tiradukunda@construck.rw'], // TODO
-            subject: 'Work rejected',
-            messageType: 'workRejected',
-          }),
-        })
-          .then((res) => res.json())
-          .then((res) => {})
-          .catch((err) => console.log(err))
       })
       .catch((err) => setSubmitting(false))
   }

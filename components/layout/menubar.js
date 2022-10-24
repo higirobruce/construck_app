@@ -12,6 +12,7 @@ import {
   UserIcon,
   UsersIcon,
   QueueListIcon,
+  BanknotesIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
@@ -47,6 +48,8 @@ export default function MenuBar() {
     role === 'customer-admin' ||
     role === 'customer-project-manager' ||
     role === 'customer-site-manager'
+
+  let isProjectManager = role === 'customer-project-manager'
 
   function logout() {
     localStorage.removeItem('user')
@@ -88,6 +91,20 @@ export default function MenuBar() {
             <div className="hidden w-1/2 font-semibold md:block">
               Dispatch Forms
             </div>
+          </div>
+        )}
+
+        {isProjectManager && (
+          <div
+            className={
+              screen === 'costs'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('costs')}
+          >
+            <BanknotesIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Costs</div>
           </div>
         )}
 

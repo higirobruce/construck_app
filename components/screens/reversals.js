@@ -224,7 +224,6 @@ export default function Reversals() {
       })
         .then((res) => res.json())
         .then((res) => {
-          console.log(res)
           refresh()
         })
         .catch((err) => {
@@ -232,7 +231,6 @@ export default function Reversals() {
           refresh()
         })
     } else {
-      console.log(moment(params.dispatchDate).format('DD-MMM-YYYY'))
       fetch(`${url}/works/swamend/${row._id}`, {
         method: 'PUT',
         headers: {
@@ -254,7 +252,6 @@ export default function Reversals() {
       })
         .then((res) => res.json())
         .then((res) => {
-          console.log(res)
           refresh()
         })
         .catch((err) => {

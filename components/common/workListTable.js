@@ -20,8 +20,10 @@ import {
   EllipsisHorizontalIcon,
   FolderOpenIcon,
   PrinterIcon,
+  ReceiptPercentIcon,
   TrashIcon,
   XMarkIcon,
+  HandThumbUpIcon,
 } from '@heroicons/react/24/outline'
 
 import {
@@ -100,6 +102,15 @@ const MStatusIndicator = ({ status }) => {
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
           <CheckBadgeIcon className="h-5 w-5 text-green-600" />
+          {/* <MTextView content={status} /> */}
+        </div>
+      </Tooltip>
+    )
+  } else if (status === 'released') {
+    return (
+      <Tooltip title={status}>
+        <div className="flex flex-row items-center justify-center">
+          <HandThumbUpIcon className="h-5 w-5 text-indigo-500" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
