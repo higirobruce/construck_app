@@ -324,7 +324,8 @@ export default function BigModal({
                       detail.dailyWork.map((d, index) => {
                         return (
                           d.status &&
-                          d.status !== 'validated' && (
+                          // d.status !== 'validated' &&
+                          d.status !== 'released' && (
                             <div
                               key={d.date}
                               className="grid grid-cols-5 rounded p-3 shadow-sm"
