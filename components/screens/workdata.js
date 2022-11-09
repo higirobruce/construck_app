@@ -36,7 +36,11 @@ export default function Workdata() {
   let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
   let canStartAndStopJob =
     user.userType === 'revenue' || user.userType === 'admin'
-  let canViewRenues = user.userType === 'revenue' || user.userType === 'admin'
+  let canViewRenues =
+    user.userType === 'revenue' ||
+    user.userType === 'admin' ||
+    user.userType === 'revenue-admin' ||
+    user.userType === 'dispatch'
   let isVendor = user.userType === 'vendor'
 
   let [dataSize, setDataSize] = useState(0)

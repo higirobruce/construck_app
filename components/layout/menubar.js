@@ -42,7 +42,7 @@ export default function MenuBar() {
   let canSeeSettings = role === 'admin'
   let canSeeDrivers = role === 'admin'
   let canSeeVendors = role === 'admin'
-  let canReverseTransactions = role === 'admin'
+  let canReverseTransactions = role === 'admin' || role === 'revenue'
   let isVendor = role === 'vendor'
   let isCustomer =
     role === 'customer-admin' ||
