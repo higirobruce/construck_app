@@ -307,7 +307,6 @@ export default function Reversals() {
                 <MTitle content="Driver" />
                 <MTitle content="Owner" />
                 <MTitle content="Dispatch date" />
-                <MTitle content="Shift" />
                 <MTitle content="Project" />
                 <MTitle content="Customer" />
                 <MTitle content="Site Work" />
