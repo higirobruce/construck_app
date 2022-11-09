@@ -307,6 +307,7 @@ export default function Reversals() {
                 <MTitle content="Driver" />
                 <MTitle content="Owner" />
                 <MTitle content="Dispatch date" />
+                <MTitle content="Shift" />
                 <MTitle content="Project" />
                 <MTitle content="Customer" />
                 <MTitle content="Site Work" />
@@ -323,8 +324,13 @@ export default function Reversals() {
                     <MTextView content={t?.driverName ? t?.driverName : '-'} />
                     <MTextView content={t?.owner} />
                     <MTextView
-                      content={moment(t?.dispatchDate).format('DD-MMM-YYYY')}
+                      content={
+                        moment(t?.dispatchDate).format('DD-MMM-YYYY') +
+                        ' ' +
+                        t?.shift
+                      }
                     />
+
                     <MTextView content={t?.project?.prjDescription} />
                     <MTextView content={t?.project?.customer} />
                     <MTextView content={t?.siteWork ? 'Yes' : 'No'} />
