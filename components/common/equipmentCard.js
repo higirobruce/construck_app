@@ -82,6 +82,7 @@ export default function EquipmentType({
   handleDispose,
   canMoveAssets,
   handleChange,
+  canCreateData,
 }) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
@@ -107,12 +108,24 @@ export default function EquipmentType({
       <div className="grid grid-cols-3 py-1">
         <div className="col-span-2 flex flex-col">
           <div className="flex flex-row items-center">
-            <div
-              className="cursor-pointer text-lg font-semibold text-gray-700"
-              onClick={() => handleChange(data)}
-            >
-              {data.plateNumber}
-            </div>
+            {canCreateData && (
+              <div
+                className="cursor-pointer text-lg font-semibold text-gray-700"
+                onClick={() => handleChange(data)}
+              >
+                {data.plateNumber}
+              </div>
+            )}
+
+            {!canCreateData && (
+              <div
+                className="text-lg font-semibold text-gray-700"
+                // onClick={() => handleChange(data)}
+              >
+                {data.plateNumber}
+              </div>
+            )}
+
             {/* <MStatusIndicator status={data.eqStatus} /> */}
           </div>
 

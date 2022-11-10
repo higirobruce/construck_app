@@ -436,6 +436,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         let data = res?.map((d) => {
           let myAssistants = d['Drivers']
           let nAssistants = myAssistants.length
@@ -475,7 +476,11 @@ export default function Dashboard() {
         )
         setDownloadingDrivers(false)
       })
-      .catch((err) => {})
+      .catch((err) => {
+        toast.error(err)
+        console.log('Error', err)
+        setDownloadingDrivers(false)
+      })
   }
 
   return (

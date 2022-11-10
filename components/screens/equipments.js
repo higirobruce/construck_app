@@ -921,6 +921,7 @@ export default function Equipments() {
                       handleDispose={_setDisposeRow}
                       handleChange={_setToChange}
                       canMoveAssets={canMoveAssets}
+                      canCreateData={canCreateData}
                     />
                   )
                 })}

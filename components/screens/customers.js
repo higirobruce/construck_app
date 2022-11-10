@@ -271,6 +271,7 @@ export default function Customers() {
                     nProjects: c.projects?.length,
                   }}
                   updateMe={setCustomerToUpdate}
+                  canCreateData={canCreateData}
                 />
               )
             })}

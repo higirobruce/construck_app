@@ -5,7 +5,13 @@ import {
 } from '@heroicons/react/24/outline'
 import React from 'react'
 
-export default function CustomerCard({ intent, data, icon, updateMe }) {
+export default function CustomerCard({
+  intent,
+  data,
+  icon,
+  updateMe,
+  canCreateData,
+}) {
   function getClassFromIntent(intent) {
     if (intent == 'primary') {
       return 'flex flex-col space-y-10 p-2 rounded bg-blue-200  w-full'
@@ -24,12 +30,20 @@ export default function CustomerCard({ intent, data, icon, updateMe }) {
   return (
     <div className={getClassFromIntent(intent)}>
       <div className="flex flex-row items-center justify-between">
-        <div
-          className="cursor-pointer text-lg font-semibold text-gray-700"
-          onClick={() => updateMe(data)}
-        >
-          {data.name + '  (' + data.nProjects + ')'}
-        </div>
+        {canCreateData && (
+          <div
+            className="cursor-pointer text-lg font-semibold text-gray-700"
+            onClick={() => updateMe(data)}
+          >
+            {data.name + '  (' + data.nProjects + ')'}
+          </div>
+        )}
+
+        {!canCreateData && (
+          <div className="text-lg font-semibold text-gray-700">
+            {data.name + '  (' + data.nProjects + ')'}
+          </div>
+        )}
         {/* <div className="flex flex-row space-x-3">
           <PencilSquareIcon className="h-5 w-5 cursor-pointer text-yellow-600" />
           <FolderOpenIcon className="h-5 w-5 cursor-pointer text-blue-500" />

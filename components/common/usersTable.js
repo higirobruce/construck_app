@@ -64,6 +64,7 @@ export default function UsersTable({
   handelUpdateStatus,
   handleResetPassword,
   handleChange,
+  canCreateData,
 }) {
   const { user, setUSer } = useContext(UserContext)
   const [pageSize, setPageSize] = useState(10)
@@ -72,8 +73,6 @@ export default function UsersTable({
   let isCustomer =
     user.userType === 'customer-admin' ||
     user.userType === 'customer-project-manager'
-
-  console.log(data)
 
   if (user.userType === 'customer-project-manager')
     filteredData = data.filter((data) => {

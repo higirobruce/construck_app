@@ -357,6 +357,7 @@ export default function Projects() {
                       }}
                       handleChange={_setPrjToUpdate}
                       handleShowDetails={showDetails}
+                      canCreateData={canCreateData}
                     />
                   )
                 })}

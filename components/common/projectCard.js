@@ -81,6 +81,7 @@ export default function ProjectCard({
   icon,
   handleChange,
   handleShowDetails,
+  canCreateData,
 }) {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
@@ -178,12 +179,20 @@ export default function ProjectCard({
       <div className="flex flex-row items-start justify-between py-1">
         <div className="flex flex-col space-y-1">
           <div className="flex flex-row items-center space-x-3">
-            <div
-              className="cursor-pointer text-lg font-semibold text-gray-700"
-              onClick={() => handleChange(data)}
-            >
-              {data.prjDescription}
-            </div>
+            {canCreateData && (
+              <div
+                className="cursor-pointer text-lg font-semibold text-gray-700"
+                onClick={() => handleChange(data)}
+              >
+                {data.prjDescription}
+              </div>
+            )}
+
+            {!canCreateData && (
+              <div className="text-lg font-semibold text-gray-700">
+                {data.prjDescription}
+              </div>
+            )}
             {/* <MStatusIndicator status={data.status} /> */}
           </div>
 
