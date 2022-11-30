@@ -127,6 +127,7 @@ export default function Equipments() {
     { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
   ]
 
+  
   let assetTypeOptions = [
     { key: 1, text: 'Machine', value: 'Machine' },
     { key: 2, text: 'Truck', value: 'Truck' },
