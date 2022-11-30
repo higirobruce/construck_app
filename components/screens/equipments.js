@@ -92,6 +92,7 @@ export default function Equipments() {
     { key: 6, text: 'DUMP TRUCK', value: 'DUMP TRUCK' },
     { key: 7, text: 'TRAILER TRUCK', value: 'TRAILER TRUCK' },
     { key: 8, text: 'HOWO TRAILER TRUCKS', value: 'HOWO TRAILER TRUCKS' },
+    
   ]
 
   let equipmentTypeOptions = [
@@ -123,6 +124,7 @@ export default function Equipments() {
     { key: 22, text: 'WALK-BEHIND', value: 'WALK-BEHIND' },
     { key: 23, text: 'WATER TANK TRUCK', value: 'WATER TANK TRUCK' },
     { key: 24, text: 'WHEEL LOADER', value: 'WHEEL LOADER' },
+    { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
   ]
 
   let assetTypeOptions = [
