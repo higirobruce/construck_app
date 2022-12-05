@@ -4,6 +4,7 @@ import {
   ArrowTrendingUpIcon,
   TruckIcon,
   BanknotesIcon,
+  WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline'
 import React, { useEffect, useState } from 'react'
 import StatisticCard from '../common/statisticCard'
@@ -19,6 +20,7 @@ import moment from 'moment'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import { toast, ToastContainer } from 'react-toastify'
+import * as _ from 'lodash'
 
 const CUT_OVER_DATE = new Date('01-JUN-2022')
 
@@ -39,14 +41,18 @@ export default function Dashboard() {
   let [totalDays, setTotalDays] = useState(0)
   let [assetUtilization, setAssetUtilization] = useState(0)
   let [assetAvailability, setAssetAvailability] = useState(0)
-  let [averageDownTime, setAverageDowntime] = useState(0)
+  let [averageDownTimeTrucks, setAverageDowntimeTrucks] = useState(0)
+  let [averageDownTimeMachines, setAverageDowntimeMachines] = useState(0)
 
   let [loadingFinalRev, setLoadingFinalRev] = useState(true)
   let [loadingProvisionalRev, setLoadingProvisionalRev] = useState(true)
   let [loadingTotalDays, setLoadingTotalDays] = useState(true)
   let [loadingAvailability, setLoadingAvailability] = useState(true)
   let [loadingAssetUtilization, setLoadingAssetUtilization] = useState(true)
-  let [loadingAverageDownTime, setLoadingAverageDownTime] = useState(true)
+  let [loadingAverageDownTimeTrucks, setLoadingAverageDownTimeTrucks] =
+    useState(true)
+  let [loadingAverageDownTimeMachines, setLoadingAverageDownTimeMachines] =
+    useState(true)
   let [downloadingDrivers, setDownloadingDrivers] = useState(false)
   let [nAvailable, setNAvailable] = useState(0)
   let [nAssigned, setNAssigned] = useState(0)
@@ -112,7 +118,7 @@ export default function Dashboard() {
       })
       .catch((err) => toast.error('Error Occured!'))
 
-    fetch(`${url}/downtimes/getAnalytics`, {
+    fetch(`${url}/downtimes/trucks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -127,8 +133,30 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setLoadingAverageDownTime(false)
-        setAverageDowntime(res.avgHours)
+        console.log(res)
+        setLoadingAverageDownTimeTrucks(false)
+        setAverageDowntimeTrucks(_.round(res[0].downtime, 2).toLocaleString())
+      })
+      .catch((err) => toast.error('Error Occured!'))
+
+    fetch(`${url}/downtimes/machines`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? startDate
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate ? endDate : Date.today(),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setLoadingAverageDownTimeMachines(false)
+        setAverageDowntimeMachines(_.round(res[0].downtime, 2).toLocaleString())
       })
       .catch((err) => toast.error('Error Occured!'))
   }, [])
@@ -140,7 +168,8 @@ export default function Dashboard() {
     setLoadingTotalDays(true)
     setLoadingAvailability(true)
     setLoadingAssetUtilization(true)
-    setLoadingAverageDownTime(true)
+    setLoadingAverageDownTimeTrucks(true)
+    setLoadingAverageDownTimeMachines(true)
 
     fetch(`${url}/works/getAnalytics`, {
       method: 'POST',
@@ -197,7 +226,7 @@ export default function Dashboard() {
       })
       .catch((err) => toast.error('Error Occured!'))
 
-    fetch(`${url}/downtimes/getAnalytics`, {
+    fetch(`${url}/downtimes/trucks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -212,8 +241,30 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
-        setLoadingAverageDownTime(false)
-        setAverageDowntime(res.avgHours)
+        console.log(res)
+        setLoadingAverageDownTimeTrucks(false)
+        setAverageDowntimeTrucks(_.round(res[0].downtime, 2).toLocaleString())
+      })
+      .catch((err) => toast.error('Error Occured!'))
+
+    fetch(`${url}/downtimes/machines`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+      body: JSON.stringify({
+        startDate: startDate
+          ? startDate
+          : Date.today().clearTime().moveToFirstDayOfMonth(),
+        endDate: endDate ? endDate : Date.today(),
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res)
+        setLoadingAverageDownTimeMachines(false)
+        setAverageDowntimeMachines(_.round(res[0].downtime, 2).toLocaleString())
       })
       .catch((err) => toast.error('Error Occured!'))
   }, [startDate, endDate])
@@ -530,7 +581,8 @@ export default function Dashboard() {
         </div>
       </div>
       <div className="mt-5 sm:mr-5">
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-5">
+        <div className="mb-5 text-xl font-semibold">Key Indicators</div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
           <StatisticCard
             data={{
               title: 'Projected Revenues',
@@ -576,22 +628,39 @@ export default function Dashboard() {
             }}
             icon={<TruckIcon className="h-5 w-5 text-yellow-500" />}
           />
-
-          <StatisticCard
-            // intent="danger"
-            data={{
-              title: 'Average Downtime',
-              content: loadingAverageDownTime ? (
-                <Loader active inline size="mini" />
-              ) : (
-                averageDownTime + ' hours'
-              ),
-            }}
-            icon={<ClockIcon className="h-5 w-5 text-red-500" />}
-          />
         </div>
       </div>
 
+      <div className="pt-10 text-xl font-semibold">Equipment Downtime</div>
+      <div className="mt-5 grid grid-cols-1 gap-6 sm:mr-5 md:grid-cols-4">
+        <StatisticCard
+          // intent="danger"
+          data={{
+            title: 'Trucks - Average Downtime',
+            content: loadingAverageDownTimeTrucks ? (
+              <Loader active inline size="mini" />
+            ) : (
+              averageDownTimeTrucks + ' hours'
+            ),
+          }}
+          icon={<TruckIcon className="h-5 w-5 text-red-500" />}
+        />
+
+        <StatisticCard
+          // intent="danger"
+          data={{
+            title: 'Machines - Average Downtime',
+            content: loadingAverageDownTimeMachines ? (
+              <Loader active inline size="mini" />
+            ) : (
+              averageDownTimeMachines + ' hours'
+            ),
+          }}
+          icon={<WrenchScrewdriverIcon className="h-5 w-5 text-red-500" />}
+        />
+      </div>
+
+      <div className="pt-10 text-xl font-semibold">Downloads</div>
       <div className="mb-5 flex flex-row space-x-5 py-5">
         <div className="flex cursor-pointer flex-row items-center space-x-2 text-sm font-semibold hover:underline">
           {downloadingDrivers ? (
