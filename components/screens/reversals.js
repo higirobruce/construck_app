@@ -282,7 +282,7 @@ export default function Reversals() {
           />
         </div>
 
-        {plateNumber.length >= 3 && (
+        {plateNumber.length >= 3 && startDate && endDate && (
           <div
             onClick={() => getTransactions()}
             className="flex cursor-pointer items-center justify-center rounded-full bg-white p-2 text-red-500 shadow-lg active:shadow-none"
