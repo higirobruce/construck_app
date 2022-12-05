@@ -6,6 +6,7 @@ import {
   StopIcon,
   CogIcon,
   ArchiveBoxXMarkIcon,
+  ListBulletIcon,
 } from '@heroicons/react/24/outline'
 import {
   FolderOpenIcon,
@@ -81,6 +82,7 @@ export default function ProjectCard({
   icon,
   handleChange,
   handleShowDetails,
+  handleShowReleased,
   canCreateData,
 }) {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -89,10 +91,15 @@ export default function ProjectCard({
 
   let [loadingApprovedRev, setLoadingApprovedRev] = useState(true)
   let [approvedRevenue, setApprovedRevenue] = useState(0)
+
   let [loadingRejectedRev, setLoadingRejectedRev] = useState(true)
   let [rejectedRevenue, setRejectedRevenue] = useState(0)
+
   let [loadingDetails, setLoadingDetails] = useState(true)
   let [workDetails, setWorkDetails] = useState(null)
+
+  let [loadingReleased, setLoadingReleased] = useState(true)
+  let [releasedMonthlyWorks, setReleasedMonthlyWorks] = useState(null)
 
   function getClassFromStatus(intent) {
     if (intent == 'available') {
@@ -146,6 +153,23 @@ export default function ProjectCard({
       })
   }
 
+  function getReleasedMonthly(prjDescription) {
+    fetch(
+      `${url}/projects/releasedRevenue/${encodeURIComponent(prjDescription)}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(apiUsername + ':' + apiPassword),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        setLoadingReleased(false)
+        setReleasedMonthlyWorks(res)
+      })
+  }
+
   function getWorksToBeValidated(prjDescription) {
     setLoadingDetails(true)
     fetch(
@@ -171,6 +195,7 @@ export default function ProjectCard({
     setLoadingRejectedRev(true)
     getApprovedRevenue(data.prjDescription)
     getRejectedRevenue(data.prjDescription)
+    getReleasedMonthly(data.prjDescription)
     getWorksToBeValidated(data.prjDescription)
   }, [approvedRevenue])
 
@@ -217,6 +242,22 @@ export default function ProjectCard({
                 }
               />
             )}
+          {loadingReleased && (
+            <div className="pl-2">
+              {' '}
+              <Loader active size="tiny" inline />
+            </div>
+          )}
+          {!loadingReleased && (
+            <ListBulletIcon
+              onClick={() => handleShowReleased(data, releasedMonthlyWorks)}
+              className={
+                intent === 'available'
+                  ? 'h-5 w-5 cursor-pointer text-blue-500'
+                  : 'h-5 w-5 cursor-pointer text-blue-400'
+              }
+            />
+          )}
         </div>
       </div>
 
