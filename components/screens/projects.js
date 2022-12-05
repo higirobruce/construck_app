@@ -21,7 +21,8 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 
 import moment from 'moment'
-import BigModal from '../common/bigModal'
+import ModalApprovalRejections from '../common/projectModalApvlRjct'
+import ModalRelease from '../common/projectModalReleased'
 
 export default function Projects() {
   let { user, setUser } = useContext(UserContext)
@@ -43,8 +44,10 @@ export default function Projects() {
 
   let [selectedProject, setSelectedProject] = useState(null)
   let [workDetails, setWorkDetails] = useState(null)
+  let [releasedData, setReleasedData] = useState(null)
 
   let [validationModalIsShown, setValidationModalIsShown] = useState(false)
+  let [releasedModalIsShown, setReleasedModalIsShown] = useState(false)
   let url = process.env.NEXT_PUBLIC_BKEND_URL
 
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
@@ -129,6 +132,12 @@ export default function Projects() {
     setSelectedProject(data.prjDescription)
     setWorkDetails(workDetails)
     setValidationModalIsShown(true)
+  }
+
+  function showReleased(data, releasedMonthlyWorks) {
+    setSelectedProject(data.prjDescription)
+    setReleasedData(releasedMonthlyWorks)
+    setReleasedModalIsShown(true)
   }
 
   function refresh() {
@@ -357,6 +366,7 @@ export default function Projects() {
                       }}
                       handleChange={_setPrjToUpdate}
                       handleShowDetails={showDetails}
+                      handleShowReleased={showReleased}
                       canCreateData={canCreateData}
                     />
                   )
@@ -456,12 +466,23 @@ export default function Projects() {
 
       {/* recall modal */}
       {validationModalIsShown && (
-        <BigModal
+        <ModalApprovalRejections
           title={`Work validation for work done at ${selectedProject}`}
           body="Are you sure you want to recall this job?"
           isShown={validationModalIsShown}
           setIsShown={setValidationModalIsShown}
           data={workDetails}
+          handleConfirm={() => {}}
+        />
+      )}
+
+      {releasedModalIsShown && (
+        <ModalRelease
+          title={`Released revenues at ${selectedProject}`}
+          body=""
+          isShown={releasedModalIsShown}
+          setIsShown={setReleasedModalIsShown}
+          data={releasedData}
           handleConfirm={() => {}}
         />
       )}
