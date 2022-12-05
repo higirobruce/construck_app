@@ -66,7 +66,7 @@ export default function Workdata() {
   let [eqType, setEqType] = useState('')
   let [dayShift, setDayShift] = useState(true)
   let [search, setSearch] = useState('')
-  let [dispatchDate, setDispatchDate] = useState(Date.now())
+  let [dispatchDate, setDispatchDate] = useState(moment().utcOffset(0).set({hour:0,minute:0,second:0,millisecond:0}).toISOString())
   let [dispatchDates, setDispatchDates] = useState(null)
   let [siteWork, setSiteWork] = useState(false)
   let [lowbedWork, setLowbedWork] = useState(false)
@@ -159,6 +159,11 @@ export default function Workdata() {
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+
+
+  useEffect(()=>{
+    console.log(dispatchDate)
+  },[])
 
   useEffect(() => {
     if (duration < 5) setComment(null)
