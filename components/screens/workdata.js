@@ -39,8 +39,12 @@ export default function Workdata() {
   let canViewRenues =
     user.userType === 'revenue' ||
     user.userType === 'admin' ||
-    user.userType === 'revenue-admin' ||
-    user.userType === 'dispatch'
+    user.userType === 'revenue-admin'
+
+  let canDownloadDispatches = user.userType === 'revenue' ||
+  user.userType === 'admin' ||
+  user.userType === 'revenue-admin' ||
+  user.userType ==='dispatch'
   let isVendor = user.userType === 'vendor'
 
   let [dataSize, setDataSize] = useState(0)
@@ -1938,7 +1942,7 @@ export default function Workdata() {
                   <Loader active size="tiny" inline className="ml-5" />
                 </div>
               ) : (
-                canViewRenues && (
+                canDownloadDispatches && (
                   <ArrowDownTrayIcon
                     className="h-5 w-5 cursor-pointer"
                     onClick={() => download()}
