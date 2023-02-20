@@ -34,6 +34,7 @@ export default function Drivers() {
   let [phone, setPhone] = useState('')
   let [email, setEmail] = useState('')
   let [title, setTitle] = useState('display')
+  let [employmentStatus, setEmploymentStatus] = useState('');
   let [loadingProjects, setLoadingProjects] = useState(false)
   let [submitting, setSubmitting] = useState(false)
   let [projectList, setProjectList] = useState([])
@@ -328,6 +329,7 @@ export default function Drivers() {
         userType: title,
         title,
         status: 'active',
+        employmentStatus
       }),
     })
       .then((res) => res.json())
@@ -351,9 +353,11 @@ export default function Drivers() {
     setPhone(row.phone)
     setEmail(row.email)
     setTitle(row.title)
+    setEmploymentStatus(row.employmentStatus)
   }
 
   function updateDriver() {
+    
     fetch(`${url}/employees/${idToUpdate}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -368,6 +372,7 @@ export default function Drivers() {
         phone,
         userType: title,
         title,
+        employmentStatus
       }),
     })
       .then((res) => res.json())
@@ -506,6 +511,7 @@ export default function Drivers() {
           )}
         </>
       )}
+
       {viewPort === 'new' && (
         <>
           <div className="flex flex-col space-y-5">
@@ -574,6 +580,36 @@ export default function Drivers() {
                   />
                 </div>
               </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Employment type" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <div className="">
+                  <Dropdown
+                    options={[
+                      {
+                        text:'PERMANENT',
+                        value:'PERMANENT'
+                      },
+                      {
+                        text:'CASUAL',
+                        value:'CASUAL'
+                      }
+                    ]}
+                    placeholder="Select employment type"
+                    fluid
+                    search
+                    selection
+                    onChange={(e, data) => {
+                      setEmploymentStatus(data.value)
+                    }}
+                  />
+                </div>
+              </div>
+
+              
 
               {isCustomer && (
                 <div className="flex flex-col">
@@ -680,6 +716,35 @@ export default function Drivers() {
                     value={title}
                     onChange={(e, data) => {
                       setTitle(data.value)
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center">
+                  <MTextView content="Employment type" />
+                  {<div className="text-sm text-red-600">*</div>}
+                </div>
+                <div className="">
+                  <Dropdown
+                    options={[
+                      {
+                        text:'PERMANENT',
+                        value:'PERMANENT'
+                      },
+                      {
+                        text:'CASUAL',
+                        value:'CASUAL'
+                      }
+                    ]}
+                    placeholder="Select employment type"
+                    fluid
+                    search
+                    selection
+                    value={employmentStatus}
+                    onChange={(e, data) => {
+                      setEmploymentStatus(data.value)
                     }}
                   />
                 </div>
