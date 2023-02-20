@@ -56,7 +56,7 @@ export default function MenuBar() {
     setUser({})
   }
   return (
-    <div className="flex min-h-screen w-20 flex-col items-center justify-between overflow-y-auto bg-slate-200 md:w-60">
+    <div className="flex min-h-screen w-30 flex-col items-center justify-between overflow-y-auto bg-slate-200 md:w-72">
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
