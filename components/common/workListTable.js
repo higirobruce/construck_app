@@ -24,6 +24,7 @@ import {
   TrashIcon,
   XMarkIcon,
   HandThumbUpIcon,
+  PencilSquareIcon,
 } from '@heroicons/react/24/outline'
 
 import {
@@ -174,6 +175,7 @@ export default function WorkListTable({
   handlePageChange,
   dataCount,
   pageNumber,
+  handleEdit
 }) {
   const [pageSize, setPageSize] = useState(15)
   const { user, setUser } = useContext(UserContext)
@@ -585,6 +587,13 @@ export default function WorkListTable({
                               <TrashIcon className="h-5 w-5 text-red-600" />
                             </div>
                           )}
+
+                        <div
+                          onClick={() => handleEdit(row, index, pageStartIndex)}
+                          className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                        >
+                          <PencilSquareIcon className="h-5 w-5 text-blue-500" />
+                        </div>
                       </div>
                     </Table.Cell>
                     <Table.Cell singleLine>

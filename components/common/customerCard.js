@@ -14,17 +14,17 @@ export default function CustomerCard({
 }) {
   function getClassFromIntent(intent) {
     if (intent == 'primary') {
-      return 'flex flex-col space-y-10 p-2 rounded bg-blue-200  w-full'
+      return 'flex flex-col space-y-5 p-5 rounded bg-blue-200  w-full'
     } else if (intent == 'secondary') {
-      return 'flex flex-col space-y-10 p-2 rounded bg-yellow-200  w-full'
+      return 'flex flex-col space-y-5 p-5 rounded bg-yellow-200  w-full'
     } else if (intent == 'warning') {
-      return 'flex flex-col space-y-10 p-2 rounded bg-red-200  w-full'
+      return 'flex flex-col space-y-5 p-5 rounded bg-red-200  w-full'
     } else if (intent == 'danger') {
-      return 'flex flex-col space-y-10 p-2 rounded bg-red-400  w-full'
+      return 'flex flex-col space-y-5 p-5 rounded bg-red-400  w-full'
     } else if (intent == 'normal') {
-      return 'flex flex-col space-y-10 p-2 rounded bg-green-200  w-full'
+      return 'flex flex-col space-y-5 p-5 rounded bg-green-200  w-full'
     } else {
-      return 'flex flex-col space-y-10 p-2 rounded bg-grey-400 shadow-lg ring-1 ring-zinc-200 w-full'
+      return 'flex flex-col space-y-5 p-5 rounded bg-grey-400 shadow-lg ring-1 ring-zinc-200 w-full'
     }
   }
   return (
@@ -32,10 +32,11 @@ export default function CustomerCard({
       <div className="flex flex-row items-center justify-between">
         {canCreateData && (
           <div
-            className="cursor-pointer text-lg font-semibold text-gray-700"
+            className="cursor-pointer "
             onClick={() => updateMe(data)}
           >
-            {data.name + '  (' + data.nProjects + ')'}
+            <div className='text-lg font-semibold text-gray-700'>{data.name}</div> 
+            <div className='text-md text-gray-500'>{data.nProjects} Project(s)</div>
           </div>
         )}
 
@@ -51,22 +52,22 @@ export default function CustomerCard({
       </div>
 
       <div className="flex flex-col space-y-1">
-        <div className="flex flex-row items-center justify-between text-base font-normal text-gray-500">
+        <div className="flex flex-row items-center justify-start space-x-5 text-base font-normal text-gray-500">
           <div>
-            <PhoneIcon className="h-5 w-5 text-gray-800" />
+            <PhoneIcon className="h-5 w-5 text-blue-400" />
           </div>
           <div>{data.phone}</div>
         </div>
-        <div className="flex flex-row items-center justify-between text-base font-normal text-gray-500">
+        <div className="flex flex-row items-center justify-start space-x-5 text-base font-normal text-gray-500">
           <div>
-            <EnvelopeOpenIcon className="h-5 w-5 text-gray-800" />
+            <EnvelopeOpenIcon className="h-5 w-5 text-blue-400" />
           </div>
           <div>{data.email}</div>
         </div>
 
-        <div className="flex flex-row items-center justify-between text-base font-normal text-gray-500">
+        <div className="flex flex-row items-center justify-start space-x-5 text-base font-normal text-gray-500">
           <div>
-            <ReceiptRefundIcon className="h-5 w-5 text-gray-800" />
+            <ReceiptRefundIcon className="h-5 w-5 text-green-400" />
           </div>
           <div>{data.tinNumber}</div>
         </div>

@@ -41,10 +41,11 @@ export default function Workdata() {
     user.userType === 'admin' ||
     user.userType === 'revenue-admin'
 
-  let canDownloadDispatches = user.userType === 'revenue' ||
-  user.userType === 'admin' ||
-  user.userType === 'revenue-admin' ||
-  user.userType ==='dispatch'
+  let canDownloadDispatches =
+    user.userType === 'revenue' ||
+    user.userType === 'admin' ||
+    user.userType === 'revenue-admin' ||
+    user.userType === 'dispatch'
   let isVendor = user.userType === 'vendor'
 
   let [dataSize, setDataSize] = useState(0)
@@ -70,12 +71,19 @@ export default function Workdata() {
   let [eqType, setEqType] = useState('')
   let [dayShift, setDayShift] = useState(true)
   let [search, setSearch] = useState('')
-  let [dispatchDate, setDispatchDate] = useState(moment().utcOffset(0).set({hour:0,minute:0,second:0,millisecond:0}).toISOString())
+  let [dispatchDate, setDispatchDate] = useState(
+    moment()
+      .utcOffset(0)
+      .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+      .toDate()
+  )
+  let [driver, setDriver] = useState('')
   let [dispatchDates, setDispatchDates] = useState(null)
   let [siteWork, setSiteWork] = useState(false)
   let [lowbedWork, setLowbedWork] = useState(false)
   let [loadingEquipments, setLoadingEquipments] = useState(false)
   let [downloadingData, setDownloadingData] = useState(false)
+  let [dailyWork, setDailyWork] = useState([])
 
   let [projects, setProjects] = useState(null)
 
@@ -121,6 +129,7 @@ export default function Workdata() {
   let [orderModalIsShown, setOrderModalIsShown] = useState(false)
   let [endModalIsShown, setEndModalIsShown] = useState(false)
   let [showReasonField, setShowReasonField] = useState(false)
+  let [editModalIsShown, setEditModalIsShown] = useState(false)
 
   let [row, setRow] = useState()
   let [rowIndex, setRowIndex] = useState()
@@ -164,10 +173,9 @@ export default function Workdata() {
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
-
-  useEffect(()=>{
+  useEffect(() => {
     console.log(dispatchDate)
-  },[])
+  }, [])
 
   useEffect(() => {
     if (duration < 5) setComment(null)
@@ -259,6 +267,12 @@ export default function Workdata() {
         //   value: 'NA',
         //   text: 'Not applicable',
         // })
+        if (viewPort === 'edit')
+          userOptions?.push({
+            key: row?.driver?._id,
+            value: row?.driver?._id,
+            text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
+          })
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
@@ -434,9 +448,12 @@ export default function Workdata() {
     setLoadingEquipments(true)
     let dispDate = siteWork === true ? workStartDate : dispatchDate
     fetch(
-      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
+      `${url}/employees/${dispDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }`,
       {
         headers: {
+          'Content-Type': 'application/json',
           Authorization:
             'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
         },
@@ -499,7 +516,7 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
+      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
       {
         headers: {
           Authorization:
@@ -587,7 +604,7 @@ export default function Workdata() {
         }
       })
       .catch((err) => {})
-  }, [eqType, dispatchDate, dayShift, workStartDate])
+  }, [eqType, dispatchDate, dayShift, workStartDate, siteWork, workEndDate])
 
   // useEffect(() => {
   //   if (workList && workList?.length >= 1) {
@@ -1070,6 +1087,34 @@ export default function Workdata() {
     setEndModalIsShown(true)
   }
 
+  function _setEditRow(row, index, pageStartIndex) {
+    setRow(row)
+    setRowIndex(parseInt(index) + parseInt(pageStartIndex))
+    setViewPort('edit')
+    setSiteWork(row?.siteWork)
+    setDayShift(row?.dispatch?.shift === 'dayShift')
+    setWorkStartDate(moment(row?.workStartDate))
+    setDriver(row?.driver?._id)
+    setJobType(row?.workDone?._id)
+    setDrivers(row?.dispatch?.drivers)
+    setAstDrivers(row?.dispatch?.astDriver)
+    setSelEquipments([row?.equipment])
+    setDuration(row?.duration)
+    setDailyWork(row?.dailyWork)
+    setTripsDone(row?.tripsDone)
+    setProject(row?.project)
+    setEquipments([
+      {
+        key: row?.equipment?._id,
+        value: row?.equipment?._id,
+        text: row?.equipment?.plateNumber,
+      },
+    ])
+
+    // if(row?.eqType === 'Truck') setJobTypeListsbyRow(jobTypeListTrucks)
+    // else setJobTypeListsbyRow(jobTypeListMachines)
+  }
+
   function _setStartRow(row, index, pageStartIndex) {
     setRow(row)
     setRowIndex(parseInt(index) + parseInt(pageStartIndex))
@@ -1419,6 +1464,198 @@ export default function Workdata() {
         if (lowbedWork) {
           await fetch(`${url}/works`, {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+            body: JSON.stringify({
+              project: toProjects[0],
+              equipment: lowbed[0],
+              workDone: '62690b97cf45ad62aa6144e2',
+              driver:
+                lowbed[0]?.eqOwner === 'Construck' ? lowbedOperator : null,
+              startTime: Date.now(),
+              status: 'created',
+              createdOn: Date.now(),
+              siteWork,
+              workStartDate: dispatchDate,
+              workEndDate: dispatchDate,
+              workDurationDays:
+                moment(workEndDate).diff(moment(workStartDate), 'days') + 1,
+              dispatch: {
+                otherJobType: otherJobType ? otherJobType : '',
+                project: toProjects[0],
+                fromSite: fromProjects[0],
+                toSite: toProjects[0],
+                targetTrips,
+                equipments: lowbed,
+                drivers: [],
+                astDrivers: [],
+                jobType: '62690b97cf45ad62aa6144e2',
+                shift: dayShift ? 'dayShift' : 'nightShift',
+                createdOn: new Date().toISOString(),
+                date: new Date(movementDate),
+              },
+              createdBy: user._id,
+            }),
+          }).then(async (res) => {
+            await Promise.all(promises).then(() => {
+              setSubmitting(false)
+              refresh()
+              setViewPort('list')
+            })
+          })
+        } else {
+          await Promise.all(promises).then(() => {
+            setSubmitting(false)
+            refresh()
+            setViewPort('list')
+          })
+        }
+      } else {
+        setSubmitting(false)
+      }
+    }
+  }
+
+  async function update() {
+    if (eqType === 'Truck' && (targetTrips == 0 || !targetTrips)) {
+      toast.error('Target trips are mandatory for this entry!')
+    } else {
+      if (selEquipments.length === drivers.length) {
+        setSubmitting(true)
+        let posted = 0
+        let promises = []
+        for (let i = 0; i < selEquipments.length; i++) {
+          if (lowbedWork) {
+            promises.push(
+              fetch(`${url}/works/${row?._id}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization:
+                    'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                },
+                body: JSON.stringify({
+                  project: toProjects[i],
+                  equipment: selEquipments[i],
+                  workDone: selJobTypes[i],
+                  driver: drivers[i],
+                  startTime: Date.now(),
+                  status: 'created',
+                  createdOn: Date.now(),
+                  siteWork:
+                    moment(dispatchDates[i][1]).diff(
+                      moment(dispatchDates[i][0])
+                    ) > 1
+                      ? true
+                      : false,
+                  workStartDate: new Date(dispatchDates[i][0]),
+                  workEndDate: new Date(dispatchDates[i][1]),
+                  workDurationDays:
+                    moment(dispatchDates[i][1]).diff(
+                      moment(dispatchDates[i][0]),
+                      'days'
+                    ) + 1,
+                  dispatch: {
+                    otherJobType: otherJobType ? otherJobType : '',
+                    project: toProjects[i],
+                    fromSite,
+                    toSite,
+                    targetTrips: selTargetTrips[i],
+                    equipments: selEquipments,
+                    drivers,
+                    astDriver: astDrivers ? astDrivers : [],
+                    jobType: selJobTypes[i],
+                    shift: dayShift ? 'dayShift' : 'nightShift',
+                    createdOn: new Date().toISOString(),
+                    date: dispatchDates
+                      ? new Date(dispatchDates[i][0])
+                      : new Date().toISOString(),
+                  },
+                  createdBy: user._id,
+                  duration: row?.duration,
+                  dailyWork: row?.dailyWork,
+                  tripsDone: row?.tripsDone,
+                  totalRevenue: row?.totalRevenue,
+                  totalExpenditure: row?.totalExpenditure,
+                  projectedRevenue: row?.projectedRevenue,
+                  startIndex: row?.startIndex,
+                  endIndex: row?.endIndex,
+                  status: row?.status,
+                }),
+              })
+            )
+          }
+
+          if (!lowbedWork) {
+            promises.push(
+              fetch(`${url}/works/${row?._id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization:
+                    'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                },
+                body: JSON.stringify({
+                  project,
+                  equipment: selEquipments[i],
+                  workDone: selJobTypes[i],
+                  driver: drivers[i],
+                  startTime: Date.now(),
+                  status: 'created',
+                  createdOn: Date.now(),
+                  siteWork,
+                  workStartDate: siteWork
+                    ? workStartDate
+                    : dispatchDates
+                    ? new Date(dispatchDates[i][0])
+                    : dispatchDate,
+                  workEndDate: siteWork
+                    ? workEndDate
+                    : dispatchDates
+                    ? new Date(dispatchDates[i][0])
+                    : dispatchDate,
+                  workDurationDays: siteWork
+                    ? moment(workEndDate).diff(moment(workStartDate), 'days') +
+                      1
+                    : 1,
+                  dispatch: {
+                    otherJobType: selJobTypesOthers[i]
+                      ? selJobTypesOthers[i]
+                      : '',
+                    project,
+                    fromSite: selFromSite[i],
+                    toSite: selToSite[i],
+                    targetTrips: selTargetTrips[i],
+                    equipments: selEquipments[i],
+                    drivers,
+                    astDriver: astDrivers,
+                    jobType: selJobTypes[i],
+                    shift: dayShift ? 'dayShift' : 'nightShift',
+                    createdOn: new Date().toISOString(),
+                    date: new Date(dispatchDate),
+                  },
+                  createdBy: user._id,
+                  duration: row?.duration,
+                  dailyWork: row?.dailyWork,
+                  tripsDone: row?.tripsDone,
+                  totalRevenue: row?.totalRevenue,
+                  totalExpenditure: row?.totalExpenditure,
+                  projectedRevenue: row?.projectedRevenue,
+                  startIndex: row?.startIndex,
+                  endIndex: row?.endIndex,
+                  status: row?.status,
+                }),
+              })
+            )
+          }
+        }
+
+        if (lowbedWork) {
+          await fetch(`${url}/works/${row?._id}`, {
+            method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               Authorization:
@@ -1827,9 +2064,13 @@ export default function Workdata() {
   return (
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
-        <div className="text-2xl font-semibold">
-          Dispatch Forms ({workList ? dataCount : 0})
-        </div>
+        {viewPort !== 'edit' ? (
+          <div className="text-2xl font-semibold">
+            Dispatch Forms ({workList ? dataCount : 0})
+          </div>
+        ) : (
+          <div className="text-2xl font-semibold">Edit Form ({row?._id})</div>
+        )}
         <div className="grid w-full grid-cols-1 gap-1 md:flex md:flex-row md:items-center md:justify-between md:space-x-10">
           {viewPort === 'list' && canDispatch && (
             <div className="hidden md:block">
@@ -1904,7 +2145,7 @@ export default function Workdata() {
             </div>
           )}
 
-          {viewPort === 'new' && (
+          {(viewPort === 'new' || viewPort === 'edit') && (
             <MSubmitButton
               submit={() => {
                 setViewPort('list')
@@ -1988,6 +2229,7 @@ export default function Workdata() {
                   dataCount={dataCount}
                   loading
                   pageNumber={pageNumber}
+                  handleEdit={_setEditRow}
                 />
               ))}
           </>
@@ -2244,7 +2486,7 @@ export default function Workdata() {
                     </div>
                   </div> */}
 
-                    {(jobType === '62690bbacf45ad62aa6144e6' ||
+                    {/* {(jobType === '62690bbacf45ad62aa6144e6' ||
                       jobType === '62690b67cf45ad62aa6144d8') && (
                       <TextInput
                         label="Specify Job Type"
@@ -2253,7 +2495,7 @@ export default function Workdata() {
                         type="text"
                         isRequired
                       />
-                    )}
+                    )} */}
 
                     {eqType === 'Truck' && (
                       <>
@@ -2951,6 +3193,949 @@ export default function Workdata() {
           </div>
         )}
 
+        {viewPort === 'edit' && (
+          <div className="flex flex-col">
+            <div className="mt-5 flex flex-row items-center space-x-2">
+              <div class="form-check">
+                <input
+                  class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
+                  type="radio"
+                  name="flexRadioDefault"
+                  id="flexRadioDefault1"
+                  checked={dayShift}
+                  onChange={() => {
+                    setDayShift(!dayShift)
+                  }}
+                />
+                <label
+                  class="form-check-label inline-block text-zinc-800"
+                  for="flexRadioDefault1"
+                >
+                  Day Shift
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
+                  type="radio"
+                  name="flexRadioDefault"
+                  id="flexRadioDefault2"
+                  checked={!dayShift}
+                  onChange={() => {
+                    setDayShift(!dayShift)
+                  }}
+                />
+                <label
+                  class="form-check-label inline-block text-zinc-800"
+                  for="flexRadioDefault2"
+                >
+                  Night shift
+                </label>
+              </div>
+            </div>
+            <div className="mt-5 flex flex-row items-center space-x-10">
+              <div class="form-check">
+                <input
+                  class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
+                  type="checkbox"
+                  name="check"
+                  id="checkLowbed"
+                  onChange={() => {
+                    setSelEquipments([])
+                    setSelJobTypes([])
+                    setAstDrivers([[]])
+                    setDispatchDates(null)
+                    setFromProjects([])
+                    settoProjects([])
+                    setDrivers([])
+                    setNJobs(1)
+                    setNAstDrivers(1)
+                    setSelectedWorks(null)
+                    setNJobs(1)
+                    setNMachinesToMove(1)
+                    let _eqLists = [equipmentFullLists[0]]
+                    setEquipmentFullLists(_eqLists)
+                    setLowbedWork(!lowbedWork)
+                  }}
+                />
+                <label
+                  class="form-check-label inline-block text-zinc-800"
+                  for="checkLowbed"
+                >
+                  Machine dispatch (by Lowbed)
+                </label>
+              </div>
+            </div>
+
+            {!lowbedWork && (
+              <div className="mt-5 flex flex-row items-center space-x-10">
+                <div class="form-check">
+                  <input
+                    class="form-check-input float-left mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
+                    type="checkbox"
+                    name="check"
+                    checked={siteWork}
+                    id="check1"
+                    onChange={() => {
+                      setSiteWork(!siteWork)
+                      setDispatchDate(moment())
+                    }}
+                  />
+                  <label
+                    class="form-check-label inline-block text-zinc-800"
+                    for="check1"
+                  >
+                    Site work
+                  </label>
+                </div>
+
+                <RangePicker
+                  onChange={(values, dateStrings) => {
+                    setWorkStartDate(dateStrings[0])
+                    setWorkEndDate(dateStrings[1])
+                  }}
+                  defaultValue={[moment(workStartDate), moment(workEndDate)]}
+                  disabledDate={disabledDate}
+                  disabled={!siteWork}
+                />
+              </div>
+            )}
+
+            {lowbedWork && (
+              <div className="mt-5 flex flex-row space-x-10">
+                <div className="mt-5 flex w-2/5 flex-col space-y-5">
+                  <div className="flex flex-row items-center justify-between">
+                    <div className="items-cente flex flex-row">
+                      <MTextView content="Lowbed" />
+                      {<div className="text-sm text-red-600">*</div>}
+                    </div>
+                    <div className="w-4/5">
+                      <Dropdown
+                        options={lowbedList}
+                        placeholder="Select Lowbed"
+                        fluid
+                        search
+                        selection
+                        onChange={(e, data) => {
+                          setLowbed(
+                            ogLowbedList.filter((l) => l._id == data.value)
+                          )
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {lowbed[0]?.eqOwner === 'Construck' && (
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="items-cente flex flex-1 flex-row">
+                        <MTextView content="Lowbed Driver" />
+                        {<div className="text-sm text-red-600">*</div>}
+                      </div>
+                      <div className="w-4/5">
+                        <Dropdown
+                          options={lowBedDriverList}
+                          placeholder="Select Driver      "
+                          fluid
+                          search
+                          selection
+                          onChange={(e, data) => {
+                            setLowbedOperator(data.value)
+                            let _drList = lowBedDriverList.filter(
+                              (d) => d.value !== data.value
+                            )
+                            setDriverList(_drList)
+                            setDriverLists([_drList])
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-row items-center justify-between">
+                    <div className="flex flex-row items-center">
+                      <MTextView content="Movement Date" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <div className="w-4/5">
+                      <DatePicker
+                        size={20}
+                        disabledDate={disabledDate}
+                        defaultValue={moment()}
+                        onChange={(date, dateString) => {
+                          setMovementDate(dateString)
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-5 flex flex-row space-x-10">
+              {!lowbedWork && (
+                <>
+                  <div className="mt-5 flex w-1/4 flex-col space-y-5">
+                    <MTitle content="Dispatch data" />
+
+                    {/* Project */}
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="flex flex-row items-center">
+                        <MTextView content="Project" />
+                        {<div className="text-sm text-red-600">*</div>}
+                      </div>
+                      <div className="w-4/5">
+                        <Dropdown
+                          options={projectList}
+                          placeholder="Project"
+                          fluid
+                          search
+                          selection
+                          defaultValue={row?.project?._id}
+                          onChange={(e, data) => {
+                            setProject(
+                              projects.filter((p) => p._id === data.value)[0]
+                            )
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Equipment type */}
+                    {/* <div className="mt-5 flex flex-row items-center justify-between">
+                    <div className="flex flex-row items-center">
+                      <MTextView content="Equipment Type" />
+                      {<div className="text-sm text-red-600">*</div>}
+                    </div>
+                    <div className="w-4/5">
+                      <Dropdown
+                        options={[
+                          {
+                            key: '1',
+                            value: 'Truck',
+                            text: 'Trucks',
+                          },
+                          {
+                            key: '2',
+                            value: 'Machine',
+                            text: 'Machines',
+                          },
+                        ]}
+                        placeholder="Equipment Type"
+                        fluid
+                        search
+                        selection
+                        onChange={(e, data) => setEqType(data.value)}
+                      />
+                    </div>
+                  </div> */}
+
+                    {/* Job type */}
+                    {/* <div className="mt-5 flex flex-row items-center justify-between">
+                    <div className="flex flex-row items-center">
+                      <MTextView content="Job Type" />
+                      {<div className="text-sm text-red-600">*</div>}
+                    </div>
+                    <div className="w-4/5">
+                      <Dropdown
+                        options={jobTypeList}
+                        placeholder="Select Job type"
+                        fluid
+                        search
+                        selection
+                        onChange={(e, data) => setJobType(data.value)}
+                      />
+                    </div>
+                  </div> */}
+
+                    {/* <TextInput isRequired={true} label="Date" placeholder="Day" /> */}
+
+                    <div className="flex flex-row items-center justify-between">
+                      <div className="flex flex-row items-center">
+                        <MTextView content="Date" />
+                        <div className="text-sm text-red-600">*</div>
+                      </div>
+                      <div className="w-4/5">
+                        <DatePicker
+                          size={20}
+                          disabledDate={disabledDate}
+                          defaultValue={moment(row?.dispatch?.date)}
+                          onChange={(date, dateString) => {
+                            setDispatchDate(dateString)
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Equipment Data */}
+                  <div className="mt-5 flex w-3/5 flex-col space-y-5">
+                    <div className="flex flex-row items-center space-x-5">
+                      <MTitle content="Equipment & Driver data" />
+                      {loadingEquipments && (
+                        <div className="mb-2">
+                          <Loader active size="tiny" inline />
+                        </div>
+                      )}
+                    </div>
+                    {[...Array(nJobs)].map((e, i) => (
+                      <div className="bg-zinc-100 p-3">
+                        <div className="mb-2 grid grid-cols-3 gap-2">
+                          {/* Equipment */}
+                          <div className="flex flex-col justify-start space-y-1">
+                            <div className="items-cente flex flex-row">
+                              <MTextView content="Equipment" />
+                              {<div className="text-sm text-red-600">*</div>}
+                              {row?.equipment && (
+                                <div className="ml-2 rounded shadow-md">
+                                  <MTextView
+                                    content={row?.equipment.eqDescription}
+                                    selected
+                                  />
+                                </div>
+                              )}
+                            </div>
+                            <Dropdown
+                              options={equipmentFullLists[i]}
+                              placeholder={row?.equipment?.plateNumber}
+                              fluid
+                              search
+                              selection
+                              defaultValue={row?.equipment?._id}
+                              onChange={(e, data) => {
+                                let selecteObj = _.find(equipments, (e) => {
+                                  return e._id === data.value
+                                })
+
+                                if (!selecteObj) {
+                                  let _eq = selEquipments
+                                    ? [...selEquipments]
+                                    : []
+                                  _eq[i] = equipmentsOgFull.filter(
+                                    (e) => e._id === data.value
+                                  )[0]
+                                  if (row?.equipment?.eqtype === 'Truck') {
+                                    let _jList = [...jobTypeListsbyRow]
+                                    _jList[i] = jobTypeListTrucks
+                                    setJobTypeListsbyRow(_jList)
+                                  } else {
+                                    let _jList = [...jobTypeListsbyRow]
+                                    _jList[i] = jobTypeListMachines
+                                    setJobTypeListsbyRow(_jList)
+                                  }
+                                  let _eqLists = [...equipmentFullLists]
+                                  let filteredEqList = equipmentFullList.filter(
+                                    (e) => {
+                                      let _eqId = e.value
+                                      let _seleEqIds = _eq.map((s) => s._id)
+                                      return !_seleEqIds.includes(_eqId)
+                                    }
+                                  )
+
+                                  if (row?.equipment?.eqOwner !== 'Construck') {
+                                    let _drOw = drivers ? [...drivers] : []
+                                    _drOw[i] = 'NA'
+                                    setDrivers(_drOw)
+                                    let _dr = drivers ? [...drivers] : []
+
+                                    let _drLists = [...driverLists]
+                                    let filteredDrList = driverList.filter(
+                                      (e) => {
+                                        let _drId = e.value
+                                        let _seleDrIds = _dr.map((s) => s)
+                                        return !_seleDrIds.includes(_drId)
+                                      }
+                                    )
+
+                                    _drLists[i + 1] = filteredDrList
+                                    setDriverLists(_drLists)
+                                  }
+
+                                  _eqLists[i + 1] = filteredEqList
+                                  setEquipmentFullLists(_eqLists)
+
+                                  setSelEquipments(_eq)
+                                } else {
+                                  toast.warning('Already selected!')
+                                  // if (nJobs === 1) {
+                                  // } else {
+                                  //   setNJobs(nJobs - 1)
+                                  // }
+                                }
+                              }}
+                            />
+                          </div>
+
+                          {/* Driver */}
+                          {row?.equipment?.eqOwner === 'Construck' && (
+                            <div className="flex flex-col justify-start space-y-1">
+                              <div className="items-cente flex flex-row">
+                                <MTextView content="Driver" />
+                                {<div className="text-sm text-red-600">*</div>}
+                              </div>
+                              <Dropdown
+                                options={driverLists[i]}
+                                placeholder={
+                                  row?.driver?.firstName +
+                                  ' ' +
+                                  row?.driver?.lastName
+                                }
+                                fluid
+                                search
+                                selection
+                                defaultValue={driver}
+                                onChange={(e, data) => {
+                                  let selectedDr = _.find(drivers, (d) => {
+                                    return d === data.value
+                                  })
+
+                                  if (!selectedDr) {
+                                    let _dr = drivers ? [...drivers] : []
+                                    _dr[i] = data.value
+
+                                    let _drLists = [...driverLists]
+                                    let filteredDrList = driverList.filter(
+                                      (e) => {
+                                        let _drId = e.value
+                                        let _seleDrIds = _dr.map((s) => s)
+                                        return !_seleDrIds.includes(_drId)
+                                      }
+                                    )
+
+                                    _drLists[i + 1] = filteredDrList
+                                    setDriverLists(_drLists)
+                                    setDrivers(_dr)
+                                  } else {
+                                    toast.error('Already selected!')
+                                  }
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          {/* Job Type */}
+                          <div className="flex flex-col justify-start space-y-1">
+                            <div className="flex flex-row items-center">
+                              <MTextView content="Job Type" />
+                              {<div className="text-sm text-red-600">*</div>}
+                            </div>
+                            <div className="w-full">
+                              <Dropdown
+                                options={
+                                  row?.equipment?.eqtype === 'Truck'
+                                    ? jobTypeListTrucks
+                                    : jobTypeListMachines
+                                }
+                                placeholder="Select Job type"
+                                fluid
+                                search
+                                selection
+                                defaultValue={jobType}
+                                onChange={(_e, data) => {
+                                  let _selJT = [...selJobTypes]
+                                  _selJT[i] = data.value
+                                  setSelJobTypes(_selJT)
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <>
+                          <div className="grid grid-cols-4 gap-2">
+                            {(row?.workDone?._id ===
+                              '62690bbacf45ad62aa6144e6' ||
+                              row?.workDone?._id ===
+                                '62690b67cf45ad62aa6144d8') && (
+                              <TextInput
+                                // label="Specify Job Type"
+                                placeholder="Job type..."
+                                setValue={(e) => {
+                                  let _othJTypes = [...selJobTypesOthers]
+                                  _othJTypes[i] = e
+                                  setSelJobTypesOthers(_othJTypes)
+                                }}
+                                type="text"
+                                isRequired
+                              />
+                            )}
+
+                            {selEquipments &&
+                              row?.equipment?.eqtype === 'Truck' && (
+                                <>
+                                  <TextInput
+                                    // label="Site origin"
+                                    placeholder="From which site?"
+                                    setValue={(e) => {
+                                      let _lset = [...selFromSite]
+                                      _lset[i] = e
+                                      setSelFromSite(_lset)
+                                    }}
+                                    type="text"
+                                  />
+                                  <TextInput
+                                    // label="Site Destination"
+                                    placeholder="To which site?"
+                                    setValue={(e) => {
+                                      let _lset = [...selToSite]
+                                      _lset[i] = e
+                                      setSelToSite(_lset)
+                                    }}
+                                    type="text"
+                                  />
+
+                                  {!siteWork && (
+                                    <TextInput
+                                      // label="Target Trips"
+                                      placeholder="Target trips"
+                                      type="number"
+                                      setValue={(e) => {
+                                        let _lset = [...selTargetTrips]
+                                        _lset[i] = e
+                                        setSelTargetTrips(_lset)
+                                      }}
+                                    />
+                                  )}
+                                </>
+                              )}
+                          </div>
+                        </>
+
+                        {row?.equipment?.eqOwner === 'Construck' && (
+                          <div className="mt-2 flex flex-col items-start space-y-1">
+                            <div className="ml-1">
+                              <MTextView content="Assistant Driver / Turn boys" />
+                            </div>
+                            <div className="flex w-full flex-row justify-between">
+                              <div className="flex w-1/2 flex-col space-y-1">
+                                {[...Array(nAstDrivers)].map((e, i) => (
+                                  <div className="flex flex-row items-center space-x-5">
+                                    <Dropdown
+                                      options={driverList}
+                                      placeholder="Select Driver"
+                                      fluid
+                                      search
+                                      multiple
+                                      selection
+                                      onChange={(e, data) => {
+                                        let _set = astDrivers
+                                          ? [...astDrivers]
+                                          : []
+                                        _set[i] = data.value
+                                        setAstDrivers(_set)
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* <div className="mt-3 flex flex-row space-x-10">
+                            <PlusIcon
+                              className="h-5 w-5 cursor-pointer text-teal-600"
+                              onClick={() => setNAstDrivers(nAstDrivers + 1)}
+                            />
+                            <TrashIcon
+                              className="h-5 w-5 cursor-pointer text-red-500"
+                              onClick={() => {
+                                if (nAstDrivers === 1) {
+                                } else {
+                                  setNAstDrivers(nAstDrivers - 1)
+                                }
+                              }}
+                            />
+                          </div> */}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* <div className="flex flex-row space-x-10">
+                    <PlusIcon
+                      className="mt-5 h-5 w-5 cursor-pointer text-teal-600"
+                      onClick={() => setNJobs(nJobs + 1)}
+                    />
+                    <TrashIcon
+                      className="mt-5 h-5 w-5 cursor-pointer text-red-500"
+                      onClick={() => {
+                        if (nJobs === 1) {
+                        } else {
+                          setNJobs(nJobs - 1)
+                          equipmentFullLists.pop()
+                          selEquipments.pop()
+                          driverLists.pop()
+                        }
+                      }}
+                    />
+                  </div> */}
+                </>
+              )}
+
+              {lowbedWork && (
+                <>
+                  <div className="mt-5 flex min-w-full flex-col space-y-5">
+                    <MTitle content="Dispatch data" />
+                    <div className="flex min-w-full flex-row justify-between">
+                      <div className="flex flex-1 flex-col space-y-2">
+                        {[...Array(nMachinesToMove)].map((e, i) => (
+                          <div className="flex flex-row items-center space-x-2">
+                            {/* Equipment */}
+                            <div className="flex w-1/6 flex-col justify-start space-y-1">
+                              <div className="flex flex-row items-center">
+                                <MTextView content="Equipment" />
+                                {<div className="text-sm text-red-600">*</div>}
+                                <div className="ml-2 shadow-md">
+                                  <MTextView
+                                    selected
+                                    content={selEquipments[i]?.eqDescription}
+                                  />
+                                </div>
+                              </div>
+                              <Dropdown
+                                options={equipmentFullLists[i]}
+                                placeholder="Select Equipment"
+                                fluid
+                                search
+                                selection
+                                onChange={(e, data) => {
+                                  let selecteObj = _.find(
+                                    selEquipments,
+                                    (e) => {
+                                      return e._id === data.value
+                                    }
+                                  )
+                                  if (!selecteObj) {
+                                    let _eq = selEquipments
+                                      ? [...selEquipments]
+                                      : []
+                                    _eq[i] = equipmentsOgFull.filter(
+                                      (e) => e._id === data.value
+                                    )[0]
+                                    if (_eq[i].eqtype === 'Truck') {
+                                      let _jList = [...jobTypeListsbyRow]
+                                      _jList[i] = jobTypeListTrucks
+                                      setJobTypeListsbyRow(_jList)
+                                    } else {
+                                      let _jList = [...jobTypeListsbyRow]
+                                      _jList[i] = jobTypeListMachines
+                                      setJobTypeListsbyRow(_jList)
+                                    }
+                                    let _eqLists = [...equipmentFullLists]
+                                    let filteredEqList =
+                                      equipmentFullList.filter((e) => {
+                                        let _eqId = e.value
+                                        let _seleEqIds = _eq.map((s) => s._id)
+                                        return !_seleEqIds.includes(_eqId)
+                                      })
+
+                                    _eqLists[i + 1] = filteredEqList
+                                    setEquipmentFullLists(_eqLists)
+
+                                    if (_eq[i].eqOwner !== 'Construck') {
+                                      let _drOw = drivers ? [...drivers] : []
+                                      _drOw[i] = 'NA'
+                                      setDrivers(_drOw)
+                                      let _dr = drivers ? [...drivers] : []
+
+                                      let _drLists = [...driverLists]
+                                      let filteredDrList = driverList.filter(
+                                        (e) => {
+                                          let _drId = e.value
+                                          let _seleDrIds = _dr.map((s) => s)
+                                          return !_seleDrIds.includes(_drId)
+                                        }
+                                      )
+
+                                      _drLists[i + 1] = filteredDrList
+                                      setDriverLists(_drLists)
+                                    }
+                                    setSelEquipments(_eq)
+                                  } else {
+                                    toast.error('Already selected!')
+                                    // if (nMachinesToMove === 1) {
+                                    // } else {
+                                    //   setNMachinesToMove(nMachinesToMove - 1)
+                                    // }
+                                  }
+                                }}
+                              />
+                            </div>
+
+                            {selEquipments[i]?.eqOwner === 'Construck' && (
+                              <div className="flex w-1/6 flex-col justify-start space-y-1">
+                                <div className="flex flex-row items-center">
+                                  <MTextView content="Driver" />
+                                  {
+                                    <div className="text-sm text-red-600">
+                                      *
+                                    </div>
+                                  }
+                                </div>
+                                <Dropdown
+                                  options={driverLists[i]}
+                                  placeholder="Select Driver      "
+                                  fluid
+                                  search
+                                  selection
+                                  onChange={(e, data) => {
+                                    let selectedDr = _.find(drivers, (d) => {
+                                      return d === data.value
+                                    })
+                                    if (!selectedDr) {
+                                      let _dr = drivers ? [...drivers] : []
+                                      _dr[i] = data.value
+
+                                      let _drLists = [...driverLists]
+                                      let filteredDrList = driverList.filter(
+                                        (e) => {
+                                          let _drId = e.value
+                                          let _seleDrIds = _dr.map((s) => s)
+                                          return !_seleDrIds.includes(_drId)
+                                        }
+                                      )
+
+                                      _drLists[i + 1] = filteredDrList
+                                      setDriverLists(_drLists)
+                                      setDrivers(_dr)
+                                    } else {
+                                      toast.error('Already selected!')
+                                      if (nMachinesToMove === 1) {
+                                      } else {
+                                        let _e = [...selEquipments]
+                                        _e.pop()
+                                        setSelEquipments(_e)
+                                        setNMachinesToMove(nMachinesToMove - 1)
+                                      }
+                                    }
+                                  }}
+                                />
+                              </div>
+                            )}
+
+                            {/* From Project */}
+                            <div className="flex w-1/6 flex-col justify-start space-y-1">
+                              <div className="flex flex-row items-center">
+                                <MTextView content="From" />
+                                {<div className="text-sm text-red-600">*</div>}
+                              </div>
+                              <div className="w-full">
+                                <Dropdown
+                                  options={projectList}
+                                  placeholder="Project"
+                                  fluid
+                                  search
+                                  selection
+                                  onChange={(e, data) => {
+                                    let selectedPr = _.find(
+                                      fromProjects,
+                                      (d) => {
+                                        return d === data.value
+                                      }
+                                    )
+                                    if (!selectedPr) {
+                                      let _dr = fromProjects
+                                        ? [...fromProjects]
+                                        : []
+                                      _dr[i] = projects.filter(
+                                        (p) => p._id === data.value
+                                      )[0]
+                                      setFromProjects(_dr)
+                                    } else {
+                                      toast.error('Already selected!')
+                                      if (nMachinesToMove === 1) {
+                                      } else {
+                                        let _e = fromProjects
+                                          ? [...fromProjects]
+                                          : []
+                                        _e.pop()
+                                        setFromProjects(_e)
+                                        setNMachinesToMove(nMachinesToMove - 1)
+                                      }
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* To Project */}
+                            <div className="flex w-1/6 flex-col justify-start space-y-1">
+                              <div className="flex flex-row items-center">
+                                <MTextView content="To" />
+                                {<div className="text-sm text-red-600">*</div>}
+                              </div>
+                              <div className="w-full">
+                                <Dropdown
+                                  options={projectList}
+                                  placeholder="Project"
+                                  fluid
+                                  search
+                                  selection
+                                  onChange={(e, data) => {
+                                    let selectedPr = _.find(toProjects, (d) => {
+                                      return d === data.value
+                                    })
+                                    if (!selectedPr) {
+                                      let _dr = toProjects
+                                        ? [...toProjects]
+                                        : []
+                                      _dr[i] = projects.filter(
+                                        (p) => p._id === data.value
+                                      )[0]
+                                      settoProjects(_dr)
+                                    } else {
+                                      toast.error('Already selected!')
+                                      if (nMachinesToMove === 1) {
+                                      } else {
+                                        let _e = toProjects
+                                          ? [...toProjects]
+                                          : []
+                                        _e.pop()
+                                        settoProjects(_e)
+                                        setNMachinesToMove(nMachinesToMove - 1)
+                                      }
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Job Type */}
+                            <div className="flex w-1/6 flex-col justify-start space-y-1">
+                              <div className="flex flex-row items-center">
+                                <MTextView content="Job Type" />
+                                {<div className="text-sm text-red-600">*</div>}
+                              </div>
+                              <div className="w-full">
+                                <Dropdown
+                                  options={jobTypeListsbyRow[i]}
+                                  placeholder="Select Job type"
+                                  fluid
+                                  search
+                                  selection
+                                  onChange={(e, data) => {
+                                    let _selJT = [...selJobTypes]
+                                    _selJT[i] = data.value
+                                    setSelJobTypes(_selJT)
+                                  }}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Date */}
+                            <div className="flex flex-col justify-start space-y-1">
+                              <div className="flex flex-row items-center">
+                                <MTextView content="Date" />
+                                <div className="text-sm text-red-600">*</div>
+                              </div>
+                              <div className="w-full">
+                                <RangePicker
+                                  size={20}
+                                  defaultValue={moment()}
+                                  disabledDate={disabledDate}
+                                  onChange={(date, dateString) => {
+                                    let _dispDates = dispatchDates
+                                      ? [...dispatchDates]
+                                      : []
+
+                                    _dispDates[i] = dateString
+
+                                    setDispatchDates(_dispDates)
+                                    // setDispatchDate(dateString)
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            {selEquipments[i]?.eqType === 'Truck' && (
+                              <div className="flex flex-col justify-start space-y-1">
+                                <div className="flex flex-row items-center">
+                                  <MTextView content="Target trips" />
+                                  {
+                                    <div className="text-sm text-red-600">
+                                      *
+                                    </div>
+                                  }
+                                </div>
+                                {/* Target trips */}
+                                <TextInput
+                                  // label="Target Trips"
+                                  placeholder="Target trips"
+                                  type="number"
+                                  setValue={(e) => {
+                                    let _lset = [...selTargetTrips]
+                                    _lset[i] = e
+                                    setSelTargetTrips(_lset)
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 ml-5 flex flex-row space-x-5">
+                        <PlusIcon
+                          className="h-5 w-5 cursor-pointer text-teal-600"
+                          onClick={() => {
+                            let nSelEq = selEquipments.length
+
+                            if (nSelEq == nMachinesToMove) {
+                              setNMachinesToMove(nMachinesToMove + 1)
+                            }
+                          }}
+                        />
+                        <TrashIcon
+                          className="h-5 w-5 cursor-pointer text-red-500"
+                          onClick={() => {
+                            if (nMachinesToMove === 1) {
+                            } else {
+                              let nSelEq = selEquipments.length
+                              if (
+                                nSelEq <= nMachinesToMove &&
+                                nMachinesToMove !== 1
+                              ) {
+                                setNMachinesToMove(nMachinesToMove - 1)
+                                if (nSelEq > 1) {
+                                  selEquipments.pop()
+                                  equipmentFullLists.pop()
+                                }
+                              }
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {((dispatchDate &&
+              project &&
+              selEquipments?.length > 0 &&
+              drivers?.length > 0) ||
+              lowbedWork) && (
+              <div className="mt-10 self-center">
+                <MSubmitButton
+                  icon={
+                    !submitting && (
+                      <CheckIcon className="h-5 w-5 text-zinc-800" />
+                    )
+                  }
+                  intent={submitting ? 'disabled' : 'primary'}
+                  label={
+                    submitting ? (
+                      <Loader active inline size="tiny" />
+                    ) : (
+                      'Update Form'
+                    )
+                  }
+                  submit={() => update()}
+                  disabled={submitting}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         <ToastContainer />
       </div>
 
@@ -3088,6 +4273,19 @@ export default function Workdata() {
           handleSetReason={setReasonForRejection}
           rowData={row}
           type="expand"
+        />
+      )}
+
+      {editModalIsShown && (
+        <Modal
+          title="Edit"
+          body="Please fill the info to edit the job! "
+          isShown={editModalIsShown}
+          setIsShown={setEditModalIsShown}
+          rowData={workList[rowIndex]}
+          type="edit"
+          isSiteWork={workList[rowIndex]?.siteWork}
+          endIndexInvalid={false}
         />
       )}
     </>

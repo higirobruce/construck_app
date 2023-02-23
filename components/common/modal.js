@@ -569,6 +569,13 @@ export default function Modal({
               </div>
             )}
 
+            {type === 'edit' && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>Grid1</div>
+                <div>Grid2</div>
+              </div>
+            )}
+
             {type !== 'expand' && (
               <div className="mt-6 flex flex-row justify-end space-x-5">
                 <button
@@ -585,7 +592,7 @@ export default function Modal({
                 {((reasonSelected && type === 'stop') ||
                   type === 'reject' ||
                   !type ||
-                  type === 'end' ||
+                  type === 'end' || type==='edit' ||
                   (reasonSelected && type === 'amend') ||
                   ((startIndexNotApplicable || !startIndexInvalid) &&
                     !siteWorkPosted &&
