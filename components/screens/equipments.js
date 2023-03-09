@@ -17,7 +17,7 @@ import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
 import { Dropdown, Loader } from 'semantic-ui-react'
-import { Tooltip } from 'antd'
+import { DatePicker, Tooltip } from 'antd'
 import Modal from '../common/modal'
 import { UserContext } from '../../contexts/UserContext'
 import EqStatusCard from '../common/eqStatusCard'
@@ -64,6 +64,7 @@ export default function Equipments() {
   let [rate, setRate] = useState(0)
   let [supplierRate, setSupplierRate] = useState(0)
   let [uom, setUom] = useState('')
+  let [effectiveDate,setEffectiveDate] = useState(null)
 
   let [downloadingData, setDownloadingData] = useState(false)
 
@@ -92,7 +93,6 @@ export default function Equipments() {
     { key: 6, text: 'DUMP TRUCK', value: 'DUMP TRUCK' },
     { key: 7, text: 'TRAILER TRUCK', value: 'TRAILER TRUCK' },
     { key: 8, text: 'HOWO TRAILER TRUCKS', value: 'HOWO TRAILER TRUCKS' },
-    
   ]
 
   let equipmentTypeOptions = [
@@ -127,7 +127,6 @@ export default function Equipments() {
     { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
   ]
 
-  
   let assetTypeOptions = [
     { key: 1, text: 'Machine', value: 'Machine' },
     { key: 2, text: 'Truck', value: 'Truck' },
@@ -524,6 +523,7 @@ export default function Equipments() {
         rate,
         supplierRate,
         uom,
+        effectiveDate
       }),
     })
       .then((res) => res.json())
@@ -1215,6 +1215,19 @@ export default function Equipments() {
                       }}
                     />
                   </div>
+                  <div className="flex flex-col space-y-1">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Effective date" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <DatePicker
+                      size={20}
+                      defaultValue={moment()}
+                      onChange={(date, dateString) => {
+                        setEffectiveDate(dateString)
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1224,6 +1237,7 @@ export default function Equipments() {
                 eqDescription.length > 1 &&
                 eqOwner.length > 1 &&
                 rate >= 1 &&
+                effectiveDate&&
                 uom.length > 1 && (
                   <div>
                     {submitting ? (
