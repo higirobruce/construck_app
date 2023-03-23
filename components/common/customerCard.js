@@ -35,41 +35,41 @@ export default function CustomerCard({
             className="cursor-pointer "
             onClick={() => updateMe(data)}
           >
-            <div className='text-lg font-semibold text-gray-700'>{data.name}</div> 
+            <div className='text-md font-semibold text-gray-700'>{data.name}</div> 
             <div className='text-md text-gray-500'>{data.nProjects} Project(s)</div>
           </div>
         )}
 
         {!canCreateData && (
-          <div className="text-lg font-semibold text-gray-700">
+          <div className="text-md font-semibold text-gray-700">
             {data.name + '  (' + data.nProjects + ')'}
           </div>
         )}
         {/* <div className="flex flex-row space-x-3">
-          <PencilSquareIcon className="h-5 w-5 cursor-pointer text-yellow-600" />
-          <FolderOpenIcon className="h-5 w-5 cursor-pointer text-blue-500" />
+          <PencilSquareIcon className="h-4 w-4 cursor-pointer text-yellow-600" />
+          <FolderOpenIcon className="h-4 w-4 cursor-pointer text-blue-500" />
         </div> */}
       </div>
 
       <div className="flex flex-col space-y-1">
-        <div className="flex flex-row items-center justify-start space-x-5 text-base font-normal text-gray-500">
+        <div className="flex flex-row items-center justify-start space-x-2 text-base font-normal text-gray-500">
           <div>
-            <PhoneIcon className="h-5 w-5 text-blue-400" />
+            <PhoneIcon className="h-4 w-4 text-blue-400" />
           </div>
-          <div>{data.phone}</div>
+          <div className="text-sm ">{data.phone}</div>
         </div>
-        <div className="flex flex-row items-center justify-start space-x-5 text-base font-normal text-gray-500">
+        <div className="flex flex-row items-center justify-start space-x-2 text-base font-normal text-gray-500">
           <div>
-            <EnvelopeOpenIcon className="h-5 w-5 text-blue-400" />
+            <EnvelopeOpenIcon className="h-4 w-4 text-blue-400" />
           </div>
-          <div>{data.email}</div>
+          <div className="text-sm ">{data.email}</div>
         </div>
 
-        <div className="flex flex-row items-center justify-start space-x-5 text-base font-normal text-gray-500">
+        <div className="flex flex-row items-center justify-start space-x-2 text-base font-normal text-gray-500">
           <div>
-            <ReceiptRefundIcon className="h-5 w-5 text-green-400" />
+            <ReceiptRefundIcon className="h-4 w-4 text-green-400" />
           </div>
-          <div>{data.tinNumber}</div>
+          <div className="text-sm ">{data.tinNumber}</div>
         </div>
       </div>
     </div>

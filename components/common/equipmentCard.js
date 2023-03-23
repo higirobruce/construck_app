@@ -110,7 +110,7 @@ export default function EquipmentType({
           <div className="flex flex-row items-center">
             {canCreateData && (
               <div
-                className="cursor-pointer text-lg font-semibold text-gray-700"
+                className="cursor-pointer text-md font-semibold text-gray-700"
                 onClick={() => handleChange(data)}
               >
                 {data.plateNumber}
@@ -119,7 +119,7 @@ export default function EquipmentType({
 
             {!canCreateData && (
               <div
-                className="text-lg font-semibold text-gray-700"
+                className="text-md font-semibold text-gray-700"
                 // onClick={() => handleChange(data)}
               >
                 {data.plateNumber}

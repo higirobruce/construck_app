@@ -56,7 +56,7 @@ export default function MenuBar() {
     setUser({})
   }
   return (
-    <div className="flex min-h-screen w-30 flex-col items-center justify-between overflow-y-auto bg-slate-200 md:w-72">
+    <div className="flex min-h-screen w-30 flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
@@ -68,7 +68,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'dashboard'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-neutral-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
             onClick={() => setScreen('dashboard')}
@@ -82,7 +82,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'workData'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
             onClick={() => setScreen('workData')}
@@ -98,7 +98,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'costs'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
             onClick={() => setScreen('costs')}
@@ -113,7 +113,7 @@ export default function MenuBar() {
             <div
               className={
                 screen === 'customers'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                   : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
               }
               onClick={() => setScreen('customers')}
@@ -127,7 +127,7 @@ export default function MenuBar() {
             <div
               className={
                 screen === 'equipments'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                   : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
               }
               onClick={() => setScreen('equipments')}
@@ -141,7 +141,7 @@ export default function MenuBar() {
             <div
               className={
                 screen === 'projects'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                   : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
               }
               onClick={() => setScreen('projects')}
@@ -155,7 +155,7 @@ export default function MenuBar() {
             <div
               className={
                 screen === 'profile'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                   : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
               }
               onClick={() => setScreen('profile')}
@@ -171,7 +171,7 @@ export default function MenuBar() {
             <div
               className={
                 screen === 'users'
-                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                   : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
               }
               onClick={() => setScreen('users')}
@@ -186,7 +186,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'drivers'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
             onClick={() => setScreen('drivers')}
@@ -200,7 +200,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'vendors'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
             onClick={() => setScreen('vendors')}
@@ -214,7 +214,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'settings'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
             onClick={() => setScreen('settings')}
@@ -228,7 +228,7 @@ export default function MenuBar() {
           <div
             className={
               screen === 'reversals'
-                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-red-700'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-red-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-red-700'
             }
             onClick={() => setScreen('reversals')}
