@@ -11,6 +11,7 @@ import {
 import {
   FolderOpenIcon,
   ExclamationTriangleIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import React, { useState, useEffect } from 'react'
 import { Loader } from 'semantic-ui-react'
@@ -206,7 +207,11 @@ export default function ProjectCard({
           <div className="flex flex-row items-center space-x-3">
             {canCreateData && (
               <div
+<<<<<<< HEAD
+                className="text-md cursor-pointer font-semibold text-gray-700"
+=======
                 className="cursor-pointer text-lg font-semibold text-gray-700"
+>>>>>>> parent of 03f79d2 (updates)
                 onClick={() => handleChange(data)}
               >
                 {data.prjDescription}
@@ -229,6 +234,24 @@ export default function ProjectCard({
           </div>
         </div>
         <div className="mt-1 flex flex-row space-x-3">
+<<<<<<< HEAD
+          <ArrowPathIcon
+            onClick={() => {
+              setLoadingApprovedRev(true)
+              setLoadingRejectedRev(true)
+              getApprovedRevenue(data.prjDescription)
+              getRejectedRevenue(data.prjDescription)
+              getReleasedMonthly(data.prjDescription)
+              getWorksToBeValidated(data.prjDescription)
+            }}
+            className={
+              intent === 'available'
+                ? 'h-5 w-5 cursor-pointer text-blue-500'
+                : 'h-5 w-5 cursor-pointer text-blue-400'
+            }
+          />
+=======
+>>>>>>> parent of 03f79d2 (updates)
           {!loadingApprovedRev &&
             !loadingRejectedRev &&
             !loadingDetails &&
@@ -264,7 +287,7 @@ export default function ProjectCard({
       <div className="flex flex-row justify-between">
         <div className="text-sm font-semibold text-gray-500">
           {loadingApprovedRev && <Loader active size="tiny" inline />}
-          {!loadingApprovedRev && (
+          {!loadingApprovedRev &&  workDetails?.length > 0  &&(
             <div className="text-sm font-semibold text-green-500">
               {'RWF ' + approvedRevenue.toLocaleString()}
             </div>
@@ -273,7 +296,7 @@ export default function ProjectCard({
 
         <div className="text-sm font-semibold text-gray-500">
           {loadingRejectedRev && <Loader active size="tiny" inline />}
-          {!loadingRejectedRev && (
+          {!loadingRejectedRev &&  workDetails?.length > 0 && (
             <div className="text-sm font-semibold text-red-500">
               {'RWF ' + rejectedRevenue.toLocaleString()}
             </div>
