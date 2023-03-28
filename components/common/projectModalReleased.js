@@ -76,11 +76,11 @@ export default function ModalReleased({
             x-cloak
             x-show={isShown}
             x-transitionEnter="transition ease-out duration-300 transform"
-            x-transitionEnter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            x-transitionEnter-end="opacity-100 translate-y-0 sm:scale-100"
+            x-transitionEnter-start="opacity-0 trangray-y-4 sm:trangray-y-0 sm:scale-95"
+            x-transitionEnter-end="opacity-100 trangray-y-0 sm:scale-100"
             x-transitionLeave="transition ease-in duration-200 transform"
-            x-transitionLeave-start="opacity-100 translate-y-0 sm:scale-100"
-            x-transitionLeave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            x-transitionLeave-start="opacity-100 trangray-y-0 sm:scale-100"
+            x-transitionLeave-end="opacity-0 trangray-y-4 sm:trangray-y-0 sm:scale-95"
             className="my-20 inline-block w-full max-w-xl transform overflow-auto rounded-lg bg-white p-8 text-left shadow-xl transition-all 2xl:max-w-5xl"
           >
             <div className="mb-5 flex items-center justify-between space-x-4">
