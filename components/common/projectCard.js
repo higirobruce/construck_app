@@ -11,6 +11,7 @@ import {
 import {
   FolderOpenIcon,
   ExclamationTriangleIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import React, { useState, useEffect } from 'react'
 import { Loader } from 'semantic-ui-react'
@@ -264,7 +265,7 @@ export default function ProjectCard({
       <div className="flex flex-row justify-between">
         <div className="text-sm font-semibold text-gray-500">
           {loadingApprovedRev && <Loader active size="tiny" inline />}
-          {!loadingApprovedRev && (
+          {!loadingApprovedRev &&  workDetails?.length > 0  &&(
             <div className="text-sm font-semibold text-green-500">
               {'RWF ' + approvedRevenue.toLocaleString()}
             </div>
@@ -273,7 +274,7 @@ export default function ProjectCard({
 
         <div className="text-sm font-semibold text-gray-500">
           {loadingRejectedRev && <Loader active size="tiny" inline />}
-          {!loadingRejectedRev && (
+          {!loadingRejectedRev &&  workDetails?.length > 0 && (
             <div className="text-sm font-semibold text-red-500">
               {'RWF ' + rejectedRevenue.toLocaleString()}
             </div>

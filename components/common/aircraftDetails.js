@@ -1,7 +1,6 @@
 import {
   DocumentTextIcon,
   ExclamationTriangleIcon,
-  StopIcon,
 } from '@heroicons/react/24/outline'
 import ms from 'ms'
 import React from 'react'
