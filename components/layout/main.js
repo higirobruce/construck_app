@@ -16,7 +16,7 @@ export default function Main() {
   let { screen, setScreen } = useContext(ScreenContext)
 
   return (
-    <div className="flex h-screen flex-1 flex-col overflow-auto bg-slate-50">
+    <div className="flex h-screen flex-1 flex-col overflow-auto bg-neutral-50">
       {screen === 'workData' && <WorkData />}
       {screen === 'settings' && <Settings />}
       {screen === 'dashboard' && <Dashboard />}

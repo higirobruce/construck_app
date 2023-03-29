@@ -11,6 +11,7 @@ import {
 import {
   FolderOpenIcon,
   ExclamationTriangleIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import React, { useState, useEffect } from 'react'
 import { Loader } from 'semantic-ui-react'
@@ -89,16 +90,16 @@ export default function ProjectCard({
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
-  let [loadingApprovedRev, setLoadingApprovedRev] = useState(true)
+  let [loadingApprovedRev, setLoadingApprovedRev] = useState(false)
   let [approvedRevenue, setApprovedRevenue] = useState(0)
 
-  let [loadingRejectedRev, setLoadingRejectedRev] = useState(true)
+  let [loadingRejectedRev, setLoadingRejectedRev] = useState(false)
   let [rejectedRevenue, setRejectedRevenue] = useState(0)
 
-  let [loadingDetails, setLoadingDetails] = useState(true)
+  let [loadingDetails, setLoadingDetails] = useState(false)
   let [workDetails, setWorkDetails] = useState(null)
 
-  let [loadingReleased, setLoadingReleased] = useState(true)
+  let [loadingReleased, setLoadingReleased] = useState(false)
   let [releasedMonthlyWorks, setReleasedMonthlyWorks] = useState(null)
 
   function getClassFromStatus(intent) {
@@ -191,12 +192,12 @@ export default function ProjectCard({
   }
 
   useEffect(() => {
-    setLoadingApprovedRev(true)
-    setLoadingRejectedRev(true)
-    getApprovedRevenue(data.prjDescription)
-    getRejectedRevenue(data.prjDescription)
-    getReleasedMonthly(data.prjDescription)
-    getWorksToBeValidated(data.prjDescription)
+    // setLoadingApprovedRev(true)
+    // setLoadingRejectedRev(true)
+    // getApprovedRevenue(data.prjDescription)
+    // getRejectedRevenue(data.prjDescription)
+    // getReleasedMonthly(data.prjDescription)
+    // getWorksToBeValidated(data.prjDescription)
   }, [approvedRevenue])
 
   return (
@@ -206,7 +207,7 @@ export default function ProjectCard({
           <div className="flex flex-row items-center space-x-3">
             {canCreateData && (
               <div
-                className="cursor-pointer text-lg font-semibold text-gray-700"
+                className="text-md cursor-pointer font-semibold text-gray-700"
                 onClick={() => handleChange(data)}
               >
                 {data.prjDescription}
@@ -214,7 +215,7 @@ export default function ProjectCard({
             )}
 
             {!canCreateData && (
-              <div className="text-lg font-semibold text-gray-700">
+              <div className="text-md font-semibold text-gray-700">
                 {data.prjDescription}
               </div>
             )}
@@ -229,6 +230,21 @@ export default function ProjectCard({
           </div>
         </div>
         <div className="mt-1 flex flex-row space-x-3">
+          <ArrowPathIcon
+            onClick={() => {
+              setLoadingApprovedRev(true)
+              setLoadingRejectedRev(true)
+              getApprovedRevenue(data.prjDescription)
+              getRejectedRevenue(data.prjDescription)
+              getReleasedMonthly(data.prjDescription)
+              getWorksToBeValidated(data.prjDescription)
+            }}
+            className={
+              intent === 'available'
+                ? 'h-5 w-5 cursor-pointer text-blue-500'
+                : 'h-5 w-5 cursor-pointer text-blue-400'
+            }
+          />
           {!loadingApprovedRev &&
             !loadingRejectedRev &&
             !loadingDetails &&
@@ -264,7 +280,7 @@ export default function ProjectCard({
       <div className="flex flex-row justify-between">
         <div className="text-sm font-semibold text-gray-500">
           {loadingApprovedRev && <Loader active size="tiny" inline />}
-          {!loadingApprovedRev && (
+          {!loadingApprovedRev &&  workDetails?.length > 0  &&(
             <div className="text-sm font-semibold text-green-500">
               {'RWF ' + approvedRevenue.toLocaleString()}
             </div>
@@ -273,7 +289,7 @@ export default function ProjectCard({
 
         <div className="text-sm font-semibold text-gray-500">
           {loadingRejectedRev && <Loader active size="tiny" inline />}
-          {!loadingRejectedRev && (
+          {!loadingRejectedRev &&  workDetails?.length > 0 && (
             <div className="text-sm font-semibold text-red-500">
               {'RWF ' + rejectedRevenue.toLocaleString()}
             </div>

@@ -669,7 +669,7 @@ export default function Equipments() {
                     ? 'available'
                     : ''
                 }
-                icon={<CheckIcon className="h-5 w-5" />}
+                icon={<CheckIcon className="h-4 w-4" />}
                 onClick={() =>
                   filterBy === 'available'
                     ? setFilterBy('all')
@@ -684,7 +684,7 @@ export default function Equipments() {
                     ? 'dispatched'
                     : ''
                 }
-                icon={<ExclamationTriangleIcon className="h-5 w-5" />}
+                icon={<ExclamationTriangleIcon className="h-4 w-4" />}
                 onClick={() =>
                   filterBy === 'dispatched'
                     ? setFilterBy('all')
@@ -697,7 +697,7 @@ export default function Equipments() {
                 intent={
                   filterBy === 'standby' || filterBy === 'all' ? 'standby' : ''
                 }
-                icon={<TruckIcon className="h-5 w-5" />}
+                icon={<TruckIcon className="h-4 w-4" />}
                 onClick={() =>
                   filterBy === 'standby'
                     ? setFilterBy('all')
@@ -712,7 +712,7 @@ export default function Equipments() {
                     ? 'workshop'
                     : ''
                 }
-                icon={<CogIcon className="h-5 w-5" />}
+                icon={<CogIcon className="h-4 w-4" />}
                 onClick={() =>
                   filterBy === 'workshop'
                     ? setFilterBy('all')
@@ -727,7 +727,7 @@ export default function Equipments() {
                     ? 'disposed'
                     : ''
                 }
-                icon={<ArchiveBoxXMarkIcon className="h-5 w-5" />}
+                icon={<ArchiveBoxXMarkIcon className="h-4 w-4" />}
                 onClick={() =>
                   filterBy === 'disposed'
                     ? setFilterBy('all')
@@ -742,7 +742,7 @@ export default function Equipments() {
                     ? 'technicalInsp'
                     : ''
                 }
-                icon={<ShieldCheckIcon className="h-5 w-5" />}
+                icon={<ShieldCheckIcon className="h-4 w-4" />}
                 onClick={() =>
                   filterBy === 'ct' ? setFilterBy('all') : setFilterBy('ct')
                 }
@@ -902,7 +902,7 @@ export default function Equipments() {
             {loading || nRecords < 0 ? (
               <Loader active />
             ) : (
-              <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-6 md:gap-y-6">
+              <div className="grid gap-x-3 gap-y-5 sm:grid-cols-2 md:grid-cols-5 md:gap-y-6">
                 {equipments.map((e) => {
                   return (
                     <EquipmentCard
