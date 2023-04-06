@@ -1,6 +1,6 @@
 import { DatePicker, Tooltip } from 'antd'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MTextView from './mTextView'
 import TextInput from './TextIput'
@@ -24,6 +24,7 @@ import {
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import CheckableTag from 'antd/lib/tag/CheckableTag'
 import MSmallSubmitButton from './mSmallSubmitButton'
+import { UserContext } from '../../contexts/UserContext'
 
 const MStatusIndicator = ({ status }) => {
   if (status === 'approved')
@@ -137,6 +138,7 @@ export default function Modal({
   let [siteWorkPosted, setSiteWPosted] = useState(false)
   let [pendingRecord, setPedingRecord] = useState(null)
   let [postLive, setPostLive] = useState(false)
+  let { user, setUser } = useContext(UserContext)
 
   useEffect(() => {
     let _siteWorkPosted = _.find(dailyWorks, {
@@ -427,7 +429,19 @@ export default function Modal({
                     <MTextView content="Posting date" />
                     <DatePicker
                       defaultValue={moment()}
-                      disabledDate={(current) => !current.isBefore(moment())}
+                      disabledDate={(current) => {
+                        if (user?.userType !== 'admin')
+                          return (
+                            current.isAfter(moment()) ||
+                            current <
+                              moment().subtract(2, 'months').endOf('month')
+                          )
+                        else {
+                          return (
+                            current.isAfter(moment())
+                          )
+                        }
+                      }}
                       onChange={(d, dateString) => {
                         setPDate(moment(dateString).format('DD-MMM-YYYY'))
                         handleSetPostingDate(dateString)
@@ -592,7 +606,8 @@ export default function Modal({
                 {((reasonSelected && type === 'stop') ||
                   type === 'reject' ||
                   !type ||
-                  type === 'end' || type==='edit' ||
+                  type === 'end' ||
+                  type === 'edit' ||
                   (reasonSelected && type === 'amend') ||
                   ((startIndexNotApplicable || !startIndexInvalid) &&
                     !siteWorkPosted &&

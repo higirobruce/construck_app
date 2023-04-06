@@ -39,6 +39,7 @@ export default function Projects() {
   let [customers, setCustomers] = useState([])
   let [customersOptions, setCustomersOptions] = useState([])
   let [selectedCustomer, setSelectedCustomer] = useState(null)
+  let [projectAdmin, setProjectAdmin] = useState(null)
   let [projectDescription, setProjectDescription] = useState('')
   let [submitting, setSubmitting] = useState(false)
 
@@ -56,9 +57,11 @@ export default function Projects() {
   let [downloadingData, setDownloadingData] = useState(false)
   let [idToUpdate, setIdToUpdate] = useState('')
   let [customerId, setCustomerId] = useState('')
+  let [revenueOfficers, setRevenueOfficers] = useState([])
 
   useEffect(() => {
     setValidationModalIsShown(false)
+    getRevenueOfficers()
     fetch(`${url}/projects/v2`, {
       headers: {
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
@@ -128,6 +131,25 @@ export default function Projects() {
     } else setStatusFilter(filterBy)
   }, [filterBy])
 
+  function getRevenueOfficers() {
+    setLoading(true)
+    fetch(`${url}/users/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setRevenueOfficers(
+          res.filter((r) => {
+            return r?.userType === 'revenue'
+          })
+        )
+        setLoading(false)
+      })
+      .catch((err) => toast.error('Error occured!'))
+  }
+
   function showDetails(data, workDetails) {
     setSelectedProject(data.prjDescription)
     setWorkDetails(workDetails)
@@ -169,7 +191,9 @@ export default function Projects() {
         project: {
           prjDescription: projectDescription,
           status: 'ongoing',
+          projectAdmin
         },
+        
       }),
     })
       .then((res) => res.json())
@@ -222,6 +246,7 @@ export default function Projects() {
     setProjectDescription(data.prjDescription)
     setIdToUpdate(data.id)
     setCustomerId(data.customerId)
+    setProjectAdmin(data?.projectAdmin)
   }
 
   function updateProject() {
@@ -236,6 +261,7 @@ export default function Projects() {
       body: JSON.stringify({
         customerId,
         prjDescription: projectDescription,
+        projectAdmin
       }),
     })
       .then((res) => res.json())
@@ -363,6 +389,7 @@ export default function Projects() {
                         customer: e.customer,
                         id: e._id,
                         customerId: e.customerId,
+                        projectAdmin: e.projectAdmin
                       }}
                       handleChange={_setPrjToUpdate}
                       handleShowDetails={showDetails}
@@ -398,7 +425,7 @@ export default function Projects() {
                   />
 
                   {/* Eq Description */}
-                  <div className="flex flex-col space-y-1">
+                  <div className="flex flex-col space-y-1 w-[250px]">
                     <div className="flex flex-1 flex-row items-center">
                       <MTextView content="Customer" />
                       <div className="text-sm text-red-600">*</div>
@@ -411,6 +438,30 @@ export default function Projects() {
                       selection
                       onChange={(e, data) => {
                         setSelectedCustomer(data.value)
+                      }}
+                    />
+                  </div>
+
+                  {/* Responsible */}
+                  <div className="flex flex-col space-y-1 w-[250px]">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Project Admin" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={revenueOfficers?.map((officer) => {
+                        return {
+                          value: officer?._id,
+                          text: officer?.firstName + ' ' + officer?.lastName,
+                          // label: officer?.firstName + ' ' + officer?.lastName,
+                        }
+                      })}
+                      placeholder="Select project admin"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setProjectAdmin(data.value)
                       }}
                     />
                   </div>
@@ -446,6 +497,30 @@ export default function Projects() {
                     isRequired
                   />
                 </div>
+
+                <div className="flex flex-col space-y-1 w-[250px]">
+                    <div className="flex flex-1 flex-row items-center">
+                      <MTextView content="Project Admin" />
+                      <div className="text-sm text-red-600">*</div>
+                    </div>
+                    <Dropdown
+                      options={revenueOfficers?.map((officer) => {
+                        return {
+                          value: officer?._id,
+                          text: officer?.firstName + ' ' + officer?.lastName,
+                          // label: officer?.firstName + ' ' + officer?.lastName,
+                        }
+                      })}
+                      value={projectAdmin?._id}
+                      placeholder="Select project admin"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setProjectAdmin(data.value)
+                      }}
+                    />
+                  </div>
               </div>
 
               {projectDescription.length >= 4 && (
@@ -457,6 +532,8 @@ export default function Projects() {
                   )}
                 </div>
               )}
+
+
             </div>
           </div>
         )}
