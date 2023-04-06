@@ -258,7 +258,7 @@ export default function Customers() {
       </div>
       {viewPort === 'list' &&
         (!loadingCustomers && customers.length > 0 ? (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-5">
             {customers.map((c) => {
               return (
                 <CustomerCard
