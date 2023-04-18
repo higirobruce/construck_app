@@ -222,16 +222,18 @@ export default function Users() {
         phone,
         userType: role,
         company: userCompany ? userCompany : user?.company?._id,
-        assignedProject: projectAssigned
+        assignedProjects: projectAssigned
           ? projectAssigned
-          : user.assignedProject,
+          : user.assignedProjects,
         status: 'active',
       }),
     })
       .then((res) => res.json())
       .then((res) => {
         if (res.error) {
-          toast.error(res.error)
+          console.log(res)
+          setSubmitting(false)
+          toast.error(`${res.error} (${res.key})`)
         } else {
           setViewPort('list')
           setSubmitting(false)
@@ -239,8 +241,8 @@ export default function Users() {
         }
       })
       .catch((err) => {
-        toast.error('Error occured!')
         setSubmitting(false)
+        toast.error('Error occured!')
       })
   }
 
@@ -272,7 +274,7 @@ export default function Users() {
         phone,
         userType: role,
         company: userCompany ? userCompany : user?.company?._id,
-        assignedProject: projectAssigned
+        assignedProjects: projectAssigned
           ? projectAssigned
           : user.assignedProject,
       }),
@@ -280,6 +282,7 @@ export default function Users() {
       .then((res) => res.json())
       .then((res) => {
         if (res.error) {
+          setSubmitting(false)
           toast.error(res.error)
         } else {
           setViewPort('list')
@@ -418,8 +421,8 @@ export default function Users() {
       {viewPort === 'new' && (
         <>
           <div className="flex flex-col space-y-5">
-            <div className="mt-5 flex flex-row items-center space-x-2">
-              <div className="flex flex-col">
+            <div className="mt-5 grid grid-cols-4 gap-5">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="First Name" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -430,7 +433,7 @@ export default function Users() {
                   setValue={setFirstName}
                 />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="Last Name" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -442,7 +445,7 @@ export default function Users() {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="Phone" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -454,7 +457,7 @@ export default function Users() {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="Email" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -466,7 +469,7 @@ export default function Users() {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="User Role" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -485,32 +488,40 @@ export default function Users() {
                 </div>
               </div>
 
-              {role == 'customer-project-manager' && (
-                <div className="flex flex-col">
+              {(role == 'customer-project-manager' || role === 'admin') && (
+                <div className="flex flex-col items-start space-y-1">
                   <div className="flex flex-row items-center">
                     <MTextView content="Assign to Project" />
                     {<div className="text-sm text-red-600">*</div>}
                   </div>
-                  <div>
+                  <div className="w-full">
                     <Dropdown
                       options={projectList}
                       placeholder="Assigned to Project...."
                       fluid
                       search
+                      multiple
                       selection
                       onChange={(e, data) => {
-                        setProjectAssigned(
-                          projects.filter((p) => p._id === data.value)[0]
+                        console.log(
+                          projects.filter((p) => data.value.includes(p?._id))
                         )
-                        setUserCompany(projectAssigned?.customerId)
+                        setProjectAssigned(
+                          projects.filter((p) => data.value.includes(p?._id))
+                        )
+                        let firstProj = projects.filter((p) =>
+                          data.value.includes(p?._id)
+                        )[0]
+                        setUserCompany(firstProj?.customerId)
+                        console.log(firstProj?.customerId)
                       }}
                     />
                   </div>
                 </div>
               )}
 
-              {role == 'customer-admin' && (
-                <div className="flex flex-col">
+              {(role == 'customer-admin' || role === 'admin') && (
+                <div className="flex flex-col items-start space-y-1">
                   <div className="flex flex-row items-center">
                     <MTextView content="Customer" />
                     {<div className="text-sm text-red-600">*</div>}
@@ -550,8 +561,8 @@ export default function Users() {
       {viewPort === 'change' && (
         <>
           <div className="flex flex-col space-y-5">
-            <div className="mt-5 flex flex-row items-center space-x-2">
-              <div className="flex flex-col">
+            <div className="mt-5 grid grid-cols-4 gap-5">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="First Name" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -563,7 +574,7 @@ export default function Users() {
                   setValue={setFirstName}
                 />
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="Last Name" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -576,7 +587,7 @@ export default function Users() {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="Phone" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -589,7 +600,7 @@ export default function Users() {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="Email" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -602,7 +613,7 @@ export default function Users() {
                 />
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start space-y-1">
                 <div className="flex flex-row items-center">
                   <MTextView content="User Role" />
                   {<div className="text-sm text-red-600">*</div>}
@@ -623,24 +634,56 @@ export default function Users() {
               </div>
 
               {(role == 'customer-project-manager' ||
-                role == 'customer-site-manager') && (
-                <div className="flex flex-col">
+                role == 'customer-site-manager' ||
+                role === 'admin') && (
+                <div className="flex flex-col items-start space-y-1">
                   <div className="flex flex-row items-center">
                     <MTextView content="Assign to Project" />
                     {<div className="text-sm text-red-600">*</div>}
                   </div>
-                  <div>
+                  <div className="w-full">
                     <Dropdown
                       options={projectList}
                       placeholder="Assigned to Project...."
                       fluid
                       search
+                      multiple
                       selection
                       onChange={(e, data) => {
-                        setProjectAssigned(
-                          projects.filter((p) => p._id === data.value)[0]
+                        console.log(
+                          projects.filter((p) => data.value.includes(p?._id))
                         )
-                        setUserCompany(projectAssigned?.customerId)
+                        setProjectAssigned(
+                          projects.filter((p) => data.value.includes(p?._id))
+                        )
+                        let firstProj = projects.filter((p) =>
+                          data.value.includes(p?._id)
+                        )[0]
+                        setUserCompany(firstProj?.customerId)
+                        console.log(firstProj?.customerId)
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {(role == 'customer-admin' || role === 'admin') && (
+                <div className="flex flex-col items-start space-y-1">
+                  <div className="flex flex-row items-center">
+                    <MTextView content="Customer" />
+                    {<div className="text-sm text-red-600">*</div>}
+                  </div>
+                  <div>
+                    <Dropdown
+                      options={customerList}
+                      placeholder="Select Customer"
+                      fluid
+                      search
+                      selection
+                      onChange={(e, data) => {
+                        setUserCompany(
+                          customers.filter((c) => c._id === data.value)[0]
+                        )
                       }}
                     />
                   </div>
