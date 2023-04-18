@@ -523,7 +523,7 @@ export default function Projects() {
                   </div>
               </div>
 
-              {projectDescription.length >= 4 && (
+              {projectDescription.length >= 1 && (
                 <div>
                   {submitting ? (
                     <Loader inline size="small" active />
