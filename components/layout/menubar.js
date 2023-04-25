@@ -51,12 +51,18 @@ export default function MenuBar() {
 
   let isProjectManager = role === 'customer-project-manager'
 
+  let isWorkshopUser =
+    role === 'workshop-manager' ||
+    role === 'workshop-supervisor' ||
+    role === 'recording-officer' ||
+    role === 'workshop-team-leader'
+
   function logout() {
     localStorage.removeItem('user')
     setUser({})
   }
   return (
-    <div className="flex min-h-screen w-30 flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
+    <div className="w-30 flex min-h-screen flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
@@ -152,7 +158,7 @@ export default function MenuBar() {
               </div>
             </div>
 
-            <div
+            {/* <div
               className={
                 screen === 'profile'
                   ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
@@ -162,7 +168,7 @@ export default function MenuBar() {
             >
               <UserIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">Profile</div>
-            </div>
+            </div> */}
           </>
         )}
 
@@ -210,7 +216,7 @@ export default function MenuBar() {
           </div>
         )}
 
-        {canSeeSettings && (
+        {/* {canSeeSettings && (
           <div
             className={
               screen === 'settings'
@@ -222,7 +228,7 @@ export default function MenuBar() {
             <CogIcon className="h-5 w-5" />
             <div className="hidden w-1/2 font-semibold md:block">Settings</div>
           </div>
-        )}
+        )} */}
 
         {canReverseTransactions && (
           <div
