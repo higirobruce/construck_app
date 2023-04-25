@@ -1,0 +1,56 @@
+﻿[
+    {
+        "SERVICE": "ENGINE SYSTEM"
+    },
+    {
+        "SERVICE": "BRAKE SYSTEM"
+    },
+    {
+        "SERVICE": "CLUTCH SYSTEM"
+    },
+    {
+        "SERVICE": "SUSPENSION SYSTEM"
+    },
+    {
+        "SERVICE": "TRANSMISSION SYSTEM"
+    },
+    {
+        "SERVICE": "HYDRAULIC SYSTEM"
+    },
+    {
+        "SERVICE": "PNEUMATIC SYSTEM"
+    },
+    {
+        "SERVICE": "FRAME & CHASSIS PART"
+    },
+    {
+        "SERVICE": "CEILING PARTS"
+    },
+    {
+        "SERVICE": "WIRING SYSTEM"
+    },
+    {
+        "SERVICE": "COOLING SYSTEM"
+    },
+    {
+        "SERVICE": "STEERING SYSTEM"
+    },
+    {
+        "SERVICE": "POWER TRAIN"
+    },
+    {
+        "SERVICE": "FRAME & BODY PART"
+    },
+    {
+        "SERVICE": "ENGINE OVERHAULL"
+    },
+    {
+        "SERVICE": "TRANSMISSION OVERHAULL"
+    },
+    {
+        "SERVICE": "PANNEL BEATING AND PAINTING"
+    },
+    {
+        "SERVICE": "TYRES"
+    }
+]
