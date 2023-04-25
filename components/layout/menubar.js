@@ -1,4 +1,5 @@
 import {
+  WrenchIcon,
   ArrowLeftOnRectangleIcon,
   ArrowPathIcon,
   BellIcon,
@@ -13,6 +14,8 @@ import {
   UsersIcon,
   QueueListIcon,
   BanknotesIcon,
+  WrenchScrewdriverIcon,
+  BuildingStorefrontIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
@@ -230,6 +233,42 @@ export default function MenuBar() {
           </div>
         )} */}
 
+        <div
+          className={
+            screen === 'maintenance'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('maintenance')}
+        >
+          <WrenchIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">Maintenance</div>
+        </div>
+
+        {/* <div
+          className={
+            screen === 'repair'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('repair')}
+        >
+          <WrenchScrewdriverIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">My Repairs</div>
+        </div> */}
+        
+        <div
+          className={
+            screen === 'workshop'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('workshop')}
+        >
+          <BuildingStorefrontIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">My Workshop</div>
+        </div>
+
         {canReverseTransactions && (
           <div
             className={
@@ -243,6 +282,7 @@ export default function MenuBar() {
             <div className="hidden w-1/2 font-semibold md:block">Reversals</div>
           </div>
         )}
+        
       </div>
 
       <div className="flex w-full flex-col items-center px-5">
