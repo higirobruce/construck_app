@@ -75,6 +75,7 @@ export default function Users() {
           value: 'customer-project-manager',
           text: 'Project Manager',
         },
+        { key: '14', value: 'logistic-officer', text: 'Logistic Officer' },
       ]
 
   useEffect(() => {

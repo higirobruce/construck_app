@@ -143,7 +143,7 @@ export default function MenuBar() {
             >
               <TruckIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">
-                Equipments
+                Equipment
               </div>
             </div>
 
