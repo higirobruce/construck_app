@@ -368,32 +368,32 @@ const Maintenance = () => {
             })
     }, [])
     
-    // useEffect(() => {
-    //     fetch(`${url}/equipments`, {
-    //         headers: {
-    //             Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-    //         },
-    //     })
-    //        .then((res) => res.json())
-    //        .then(res => {
-    //         let list = res.equipments;
-    //         let eqOptions = list.map((p) => {
-    //             return {
-    //                 key: p._id,
-    //                 value: p._id,
-    //                 text: p.plateNumber,
-    //                 status: p.eqStatus,
-    //                 eqDescription: p.eqDescription,
-    //                 eqStatus: p.eqStatus
-    //             }
-    //         })
-    //         setEqList(eqOptions);
-    //        })
-    //        .catch((err) => {
-    //             toast.error(err)
-    //             // setLoadingData(false)
-    //         })
-    // }, [])
+    useEffect(() => {
+        fetch(`${url}/equipments`, {
+            headers: {
+                Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+        })
+           .then((res) => res.json())
+           .then(res => {
+            let list = res.equipments;
+            let eqOptions = list.map((p) => {
+                return {
+                    key: p._id,
+                    value: p._id,
+                    text: p.plateNumber,
+                    status: p.eqStatus,
+                    eqDescription: p.eqDescription,
+                    eqStatus: p.eqStatus
+                }
+            })
+            setEqList(eqOptions);
+           })
+           .catch((err) => {
+                toast.error(err)
+                // setLoadingData(false)
+            })
+    }, [])
 
     useEffect(() => {
         fetch(`${url}/users`, {
