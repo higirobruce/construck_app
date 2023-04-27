@@ -423,36 +423,36 @@ const Maintenance = () => {
             })
     }, [])
     
-    useEffect(() => {
-        fetch(`${newUrl}/employees`, {
-            headers: {
-                Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-            },
-        })
-           .then((res) => res.json())
-           .then(res => {
-            let list = res;
-            console.log('List Employees', list);
-            let userOptions = 
-                list.map((p) => ( {
-                    key: p._id,
-                    value: p._id,
-                    text: p.firstName + ' ' + p.lastName,
-                    email: p.email,
-                    username: p.username,
-                    title: p.title,
-                    assignedShift: p.assignedShift,
-                    phone: p.phone,
-                    userType: p.type
-                })
-            )
-            setUsers(userOptions);
-           })
-           .catch((err) => {
-                toast.error(err)
-                // setLoadingData(false)
-            })
-    }, [])
+    // useEffect(() => {
+    //     fetch(`${newUrl}/employees`, {
+    //         headers: {
+    //             Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //         },
+    //     })
+    //        .then((res) => res.json())
+    //        .then(res => {
+    //         let list = res;
+    //         console.log('List Employees', list);
+    //         let userOptions = 
+    //             list.map((p) => ( {
+    //                 key: p._id,
+    //                 value: p._id,
+    //                 text: p.firstName + ' ' + p.lastName,
+    //                 email: p.email,
+    //                 username: p.username,
+    //                 title: p.title,
+    //                 assignedShift: p.assignedShift,
+    //                 phone: p.phone,
+    //                 userType: p.type
+    //             })
+    //         )
+    //         setUsers(userOptions);
+    //        })
+    //        .catch((err) => {
+    //             toast.error(err)
+    //             // setLoadingData(false)
+    //         })
+    // }, [])
 
     useEffect(() => {
         populateJobCards();
