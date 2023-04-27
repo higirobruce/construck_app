@@ -3,18 +3,6 @@ import {Select, Space} from 'antd';
 import MTextView from '../common/mTextView';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import itemsPart from '../../public/data/itemParts.json'
-const partsData = [
-    'Wheels',
-    'Honks',
-    'Gear Shifts'
-];
-
-const items = [
-    'Mastic',
-    'Scotch',
-    'White Symoniz',
-    'Hard Pastic Primer'
-]
 
 const PartsRequisition = (props) => {
     const {
@@ -82,8 +70,10 @@ const PartsRequisition = (props) => {
     }
 
     const handleReceivedQty = ({target}, key, inventory, i, item) => {
+        if(target.value > inventoryData[i][key]['qty'])
+            return;
+        
         let newData = [...inventoryData];
-        console.log('target Name ', target.name)
 
         if(newData[i]) {
             newData[i][key][target.name] = target.value;
@@ -113,14 +103,12 @@ const PartsRequisition = (props) => {
 
         setSourceItem(value)
         
-        if(value == 'No parts needed') {
+        if(value == 'No Parts Required') {
             setTimeout(() => {
-                setPage((prevState) => prevState + 1);
-            }, 500)
+                setPage(5);
+            }, 300)
         }
     }
-
-    console.log('Inventory Items ', inventoryItems)
     
     return (
         <div className='flex flex-col space-y-10'>

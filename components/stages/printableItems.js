@@ -16,8 +16,6 @@ const PrintableItems = ({row, setPage}) => {
     const handleAfterPrint = React.useCallback(() => {
         setPage(4)
     }, []);
-
-    console.log('User ', row)
     
     return (
         <div className='flex flex-col items-center space-y-5'>
@@ -36,7 +34,7 @@ const PrintableItems = ({row, setPage}) => {
                 <div className='flex justify-between items-center w-full'>
                     <div />
                     <h3 className='text-xl font-extrabold my-10'>MATERIAL REQUISITION FORM</h3>
-                    <p className='text-sm'><b>S.N</b> </p>
+                    <p className='text-lg'><b>S.N</b> &nbsp;<span className='text-xl'>{row.jobCard_id}</span></p>
                 </div>
                 <div className='flex items-center space-x-4 mt-3'>
                     <h6 className='font-bold'>REQUESTED BY: </h6>
@@ -63,26 +61,27 @@ const PrintableItems = ({row, setPage}) => {
                         <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
                     </tr>
                     {row.inventoryData && row.inventoryData.map((item, i) => (
-                        <tr>
-                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
-                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                {item.map((v, k) => k === item.length - 1 ? v.item : v.item + ', ')}
-                            </td>
-                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                {item.map((v, k) => k === item.length - 1 ? v.qty : v.qty + ', ')}
-                            </td>
-                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                {console.log('Items ', item)}
-                                {console.log('Items More ', itemsPart)}
-                                {item.map((vl, i) => {
-                                    let foundItem = itemsPart.find((v) => v['ITEM & PART'] == vl['item']);
-                                    return i == item.length - 1 ? foundItem['UOM'] : foundItem['UOM'] + ', '
-                                })}
-                                {/* {itemsPart.find((v) => v['ITEM & PART'] == item[i].item)['UOM']} */}
-                            </td>
-                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
-                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
-                        </tr>
+                        <>
+                            {item.map((value) => {
+                                let foundItem = itemsPart.find((v) => v['ITEM & PART'] == value['item']);
+                                return (
+                                    <tr>
+                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                            {value.item}
+                                        </td>
+                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                            {value.qty}
+                                        </td>
+                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                            {foundItem['UOM']}
+                                        </td>
+                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                    </tr>
+                                )}
+                            )}
+                        </>
                     ))}
                 </table>
                 <div className='flex justify-between items-center mt-5'>

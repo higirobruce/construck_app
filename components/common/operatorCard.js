@@ -1,6 +1,7 @@
 import React from 'react'
 import { Checkbox } from 'antd';
-import { LightBulbIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline'
+import { LightBulbIcon, UserIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline'
+import TextInputLogin from './TextIputLogin';
 
 const OperatorCard = (props) => {
 
@@ -9,8 +10,12 @@ const OperatorCard = (props) => {
         role,
         teamApproval,
         operatorApproval,
-        setOperatorApproval
-    } = props
+        setOperatorApproval,
+        mileagesNotApplicable,
+        setMileagesNotApplicable,
+        nextMileages,
+        setNextMileages
+    } = props;
 
     return (
         <>
@@ -21,7 +26,7 @@ const OperatorCard = (props) => {
             </div>}
             {(role == 'workshop-supervisor') && <div className={`${teamApproval == true ? 'bg-green-100 text-green-500' : "bg-red-100 text-red-500"} px-5 py-2 w-1/2`}>
                 <span className='text-center font-normal'>
-                    {teamApproval == true ? '!!! This Job Card has been approved to be released' : '!!! This Job Card haven\'t been approved to be released'}
+                    {teamApproval == true ? '!!! This Job Card has been approved to be released' : '!!! This Job Card isn\'t yet approved to be released'}
                 </span>
             </div>}
             <div className='flex flex-col space-y-5'>
@@ -35,6 +40,33 @@ const OperatorCard = (props) => {
                         <small className='bg-blue-50 text-blue-600 text-sm font-medium mx-2 pb-2 pt-1 px-4'>{item}</small>
                     ))}
                 </span>
+                <div className='flex items-center space-x-2'>
+                    <span className='text-gray-500'>Items Used:</span>
+                </div>
+                <span>
+                    {row.inventoryItems.map((item) => (
+                        
+                        <> 
+                            {console.log('Item ', item)}
+                            {item.value.length > 0 && item.value.map((value) => (
+                                <small className='bg-red-50 text-red-600 text-sm font-medium mx-2 pb-2 pt-1 px-4'>{value}</small>
+                            ))}
+                        </>
+                    ))}
+                </span>
+                <div className='flex items-center space-x-2 pt-5'>
+                    <UserIcon width={14} color={`#344a5c`} />
+                    <span className='text-gray-500'>Mechanics Assigned:</span>
+                </div>
+                <span>
+                    {row.assignIssue.map((item) => (
+                        <>
+                            {item.mech.map((value) => (
+                                <small className='bg-gray-100 text-gray-600 text-sm font-medium mx-2 pb-2 pt-1 px-4'>{value}</small>
+                            ))}
+                        </>
+                    ))}
+                </span>
                 <div>
                     <div className='flex items-center space-x-2 pt-6'>
                         <LightBulbIcon width={14} color={`#fcba03`} />
@@ -44,10 +76,41 @@ const OperatorCard = (props) => {
                 </div>
                 <span>
                     <div className='w-4/5'>
-                        <Checkbox.Group options={row.mechanicalInspections.map((item) => ({label: item, value: item}))} defaultValue={operatorApproval} onChange={(value) => setOperatorApproval(value)} />
+                        <Checkbox.Group disabled={(role == 'workshop-supervisor') || (role == 'workshop-team-leader' && row.teamApproval == true)} options={row.mechanicalInspections.map((item) => ({label: item, value: item}))} defaultValue={operatorApproval} onChange={(value) => setOperatorApproval(value)} />
                     </div>
                 </span>
-
+                {role === 'workshop-team-leader' && <div className='flex flex-col w-full my-4 py-4'>
+                    <div class="form-check mb-10">
+                        <input
+                            class="form-check-input mt-1 mr-2 h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 focus:outline-none focus:ring-0"
+                            type="checkbox"
+                            name="check"
+                            id="checkNoIndex"
+                            checked={mileagesNotApplicable}
+                            disabled={row.teamApproval == true}
+                            onChange={() => {
+                                setMileagesNotApplicable(!mileagesNotApplicable)
+                            }}
+                        />
+                        <label
+                            class="form-check-label inline-block text-zinc-800"
+                            for="checkNoIndex"
+                        >
+                            Next Mileages N/A
+                        </label>
+                    </div>
+                    {!mileagesNotApplicable && (<div className='w-1/5'>
+                        <TextInputLogin
+                            label="Index"
+                            type="number"
+                            value={nextMileages}
+                            placeholder="Next Mileages"
+                            disabled={row.teamApproval == true}
+                            isRequired
+                            setNextMileages={setNextMileages}
+                        />
+                    </div>)} 
+                </div>}
             </div>
         </>
     )

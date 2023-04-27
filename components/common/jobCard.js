@@ -8,6 +8,7 @@ const JobCard = ({
 intent,
   data,
   updateMe,
+  role
 }) => {
 
     function getClassFromIntent(intent) {
@@ -56,10 +57,24 @@ intent,
                 </small>
             </div>
 
-            {data.reason && <div class="flex items-center bg-orange-100 text-orange-500 text-sm font-bold px-5 py-2 mr-5 mt-3" role="alert">
+            {data.reason && <div class="flex items-center bg-red-100 text-red-500 text-sm font-bold px-5 py-2 mr-5 mt-3" role="alert">
               <ExclamationTriangleIcon width={14} />&nbsp;&nbsp;
               <p>
                 {data.reason}
+              </p>
+            </div>}
+
+            {(data.isViewed == 'approved' && data.status == 'requisition' && data.sourceItem == 'Inventory') && <div class="flex items-center bg-green-100 text-green-500 text-sm font-bold px-5 py-2 mr-5 mt-3" role="alert">
+              <ExclamationTriangleIcon width={14} />&nbsp;&nbsp;
+              <p>
+                {role == 'workshop-manager' ? `You have approved the request` : `You can proceed with repair`}
+              </p>
+            </div>}
+            
+            {(data.isViewed == 'not viewed' && data.status == 'requisition' && data.sourceItem == 'Inventory') && <div class="flex items-center bg-orange-100 text-orange-500 text-sm font-bold px-5 py-2 mr-5 mt-3" role="alert">
+              <ExclamationTriangleIcon width={14} />&nbsp;&nbsp;
+              <p>
+                {role == 'workshop-manager' ? `You have approved the request` : `You can proceed with repair`}
               </p>
             </div>}
 

@@ -3,7 +3,6 @@ import { Select, Space } from 'antd';
 import MTextView from '../common/mTextView';
 
 const Testing = (props) => {
-
   const {
     userList,
     operator,
@@ -21,6 +20,7 @@ const Testing = (props) => {
               type="checkbox"
               name="check"
               id="checkNoIndex"
+              checked={operatorNotApplicable}
               onChange={() => {
                   setOperatorNotApp(!operatorNotApplicable)
               }}
@@ -42,7 +42,7 @@ const Testing = (props) => {
               className={"rounded-2xl w-1/3"}
               onChange={(value) => setOperator(value)}
               placeholder="Driver/Operator"
-              defaultValue={operator.length > 0 ? operator : ''}
+              defaultValue={(operator && operator.length > 0) ? operator : ''}
               optionLabelProp='label'
             >
               {userList.map((item, i) => (

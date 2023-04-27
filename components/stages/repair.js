@@ -8,18 +8,13 @@ import mechanics from '../../public/data/mechanics.json';
 
 const Repair = (props) => {
     const {
-        entryDate,
         mechanicalInspections,
-        inspectionTools,
-        itemsRequest,
-        row,
         setAssignIssue,
         assignIssue,
-        startRepair,
-        endRepair,
-        setStartRepair,
-        setEndRepair
+        entryDate
     } = props;
+
+    console.log('Entry Date ', entryDate)
 
     const range = (start, end) => {
         const result = [];
@@ -30,7 +25,11 @@ const Repair = (props) => {
     };
 
     const disableDate = (current) => {
-        return current && current > dayjs().endOf('day');
+        return current && current < dayjs(moment(entryDate).format('YYYY-MM-DD')).endOf('day');
+    }
+    
+    const disableCustomeDate = (current, i) => {
+        return current < dayjs(moment(assignIssue[i]['startRepair']).subtract(1, 'days').format('YYYY-MM-DD')).endOf('day');
     }
 
     const disableCustomTime = (current, i) => ({
@@ -67,7 +66,7 @@ const Repair = (props) => {
                     item.startRepair = item.startRepair;
                     item.endRepair = item.endRepair;
                     found = true;
-                    return;
+                    return item;
                 }
 
                 return item
@@ -90,9 +89,8 @@ const Repair = (props) => {
                 if(item.issue == value) {
                     item.mech = item.mech;
                     item.startRepair = date;
-                    item.endRepair = ''
                     found = true;
-                    return;
+                    return item;
                 }
 
                 return item
@@ -108,31 +106,29 @@ const Repair = (props) => {
     }
 
     const handleEndRepair = (date, value) => {
-        let found = false;
-        
         if(assignIssue.length != 0) {
+            let found = false;
             assignIssue.map((item) => {
                 if(item.issue == value) {
                     item.mech = item.mech;
                     item.startRepair = item.startRepair;
                     item.endRepair = date
                     found = true;
-                    return;
+                    return item;
                 }
-
-                return item
+                return item;
             })
             if (found) {
                 setAssignIssue(assignIssue);
+                found = false;
             } else {
                 setAssignIssue([...assignIssue, {issue: value, startRepair: '', mech: [''], endRepair: date}])
+                found = false;
             }
         } else {
             setAssignIssue([{issue, mech: [''], startRepair: '', endRepair: date}])
         }
     }
-
-    useEffect(() => {}, [handleEndRepair, handleStartRepair, handleAssign])
 
     return (
         <>
@@ -160,21 +156,33 @@ const Repair = (props) => {
                         </div>
                     </div>
                     <div className='flex space-x-5 w-1/2 my-4 p-4 bg-slate-100'>
+                        {console.log('Assign Issue I2 ', assignIssue)}
                         <div className='flex items-center'>
                             <div className='flex flex-row'>
                                 <MTextView content={"Start Repair:"} />
                                 <div className="text-sm text-red-600">*</div>
                             </div>
                             <div className='w-2/3 mt-3 ml-4'>
-                                <DatePicker
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    disabledDate={disableDate}
-                                    disabledTime={disabledTime}
-                                    showTime
-                                    value={(((assignIssue.length > 0 && assignIssue[i]) && assignIssue[i]['startRepair'])) && moment(assignIssue[i]['startRepair'])}
-                                    placeholder='Select Start'
-                                    onChange={(values, dateStrings) => handleStartRepair(dateStrings, issue)}
-                                />
+                                {assignIssue[i] && assignIssue[i]['startRepair'] ? (
+                                    <DatePicker
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                        disabledDate={disableDate}
+                                        disabledTime={disabledTime}
+                                        showTime
+                                        value={(((assignIssue.length > 0 && assignIssue[i]) && assignIssue[i]['startRepair'])) && moment(assignIssue[i]['startRepair'])}
+                                        disabled
+                                        // onChange={(values, dateStrings) => handleStartRepair(dateStrings, issue)}
+                                    />
+                                ) : (
+                                    <DatePicker
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                        disabledDate={disableDate}
+                                        disabledTime={disabledTime}
+                                        showTime
+                                        placeholder='Select Start'
+                                        onChange={(values, dateStrings) => handleStartRepair(dateStrings, issue)}
+                                    />
+                                )}
                             </div>
                         </div>
                         {(assignIssue[i] && assignIssue[i]['startRepair']) && <div className='flex items-center'>
@@ -183,56 +191,31 @@ const Repair = (props) => {
                                 <div className="text-sm text-red-600">*</div>
                             </div>
                             <div className='w-2/3 mt-3 ml-4'>
-                                <DatePicker
-                                    format="YYYY-MM-DD HH:mm:ss"
-                                    // disabledDate={() => disableDate(assignIssue[i]['endRepair'])}
-                                    disabledTime={(value) => disableCustomTime(value, i)}
-                                    showTime
-                                    value={((assignIssue.length > 0 && assignIssue[i]) && assignIssue[i]['endRepair']) && moment(assignIssue[i]['endRepair'])}
-                                    placeholder='Select End'
-                                    onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}
-                                />
+                                {assignIssue[i]['endRepair'] ? (
+                                    <DatePicker
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                        disabledDate={(current) => disableCustomeDate(current, i)}
+                                        disabledTime={(value) => disableCustomTime(value, i)}
+                                        showTime
+                                        value={((assignIssue.length > 0 && assignIssue[i]) && assignIssue[i]['endRepair']) ? moment(assignIssue[i]['endRepair']) : ''}
+                                        disabled
+                                        // onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}
+                                    />
+                                ) : (
+                                    <DatePicker
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                        disabledDate={(current) => disableCustomeDate(current, i)}
+                                        disabledTime={(value) => disableCustomTime(value, i)}
+                                        showTime
+                                        placeholder='Select End'
+                                        onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}
+                                    />
+                                )}
                             </div>
                         </div>}
                     </div>
                 </div>
             ))}
-            {/* <div className='flex flex-col space-y-5 pt-5'>
-                <div className='flex items-center justify-between'>
-                    <div className='flex flex-row'>
-                        <MTextView content={"Start Repair Time:"} />
-                        <div className="text-sm text-red-600">*</div>
-                    </div>
-                    <div className='w-4/5'>
-                        <DatePicker
-                            format="YYYY-MM-DD HH:mm:ss"
-                            disabledDate={disableDate}
-                            disabledTime={disabledTime}
-                            showTime
-                            value={startRepair && moment(startRepair)}
-                            placeholder='Select Date / Time'
-                            onChange={(values, dateStrings) => setStartRepair(dateStrings)}
-                        />
-                    </div>
-                </div>
-                {startRepair && <div className='flex items-center justify-between'>
-                    <div className='flex flex-row'>
-                        <MTextView content={"End Repair Time:"} />
-                        <div className="text-sm text-red-600">*</div>
-                    </div>
-                    <div className='w-4/5'>
-                        <DatePicker
-                            format="YYYY-MM-DD HH:mm:ss"
-                            disabledDate={disableDate}
-                            disabledTime={disableCustomTime}
-                            showTime
-                            value={endRepair && moment(endRepair)}
-                            placeholder='Select Date / Time'
-                            onChange={(values, dateStrings) => setEndRepair(dateStrings)}
-                        />
-                    </div>
-                </div>}
-            </div> */}
         </>
     )
 }

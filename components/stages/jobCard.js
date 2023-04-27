@@ -7,11 +7,7 @@ import locations from '../../public/data/location.json';
 
 const JobCard = (props) => {
     const {
-        entryDate,
-        driver,
         carPlate,
-        mileages,
-        location,
         startIndexNotApplicable,
         setEntryDate,
         setDriver,
@@ -28,8 +24,6 @@ const JobCard = (props) => {
         eqList,
         projectList
     } = props;
-
-    console.log('Locations ', locations)
 
     return (
         <>

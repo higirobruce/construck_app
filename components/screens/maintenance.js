@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import MSubmitButton from '../common/mSubmitButton';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import TextInput from '../common/TextIput';
-import { ArrowDownTrayIcon, ArrowLeftIcon, CheckIcon, ClockIcon, FolderPlusIcon, ListBulletIcon, QueueListIcon, UsersIcon, WrenchScrewdriverIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsVerticalIcon, ArrowDownTrayIcon, ArrowLeftIcon, ArrowPathRoundedSquareIcon, CheckIcon, ClockIcon, FolderPlusIcon, ListBulletIcon, QueueListIcon, UsersIcon, WrenchScrewdriverIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import dayjs from 'dayjs';
 import { toast, ToastContainer } from 'react-toastify';
 import JobCard from '../common/jobCard';
@@ -13,7 +13,7 @@ import Repair from '../stages/repair';
 import Testing from '../stages/testing';
 import GatePass from '../stages/gatePass';
 import MainStatusCard from '../common/mainStatusCard';
-import { Modal, Button, Dropdown } from 'antd';
+import { Modal, Button, Dropdown, Popconfirm } from 'antd';
 import moment from 'moment';
 import MTextView from '../common/mTextView';
 import PrintableItems from '../stages/printableItems';
@@ -25,11 +25,18 @@ const Maintenance = () => {
     
     const canCreateData = true;
     const role = JSON.parse(localStorage.getItem('user')).userType;
+    const text = 'Are you sure to approve the request of parts?';
 
     const [filterBy, setFilterBy] = useState('all');
     const [nAvailable, setNAvailable] = useState(0);
     const [nApproved, setNApproved] = useState(0);
     const [nCanceled, setNCanceled] = useState(0);
+    const [nEntry, setNEntry] = useState(0);
+    const [nDiagnosis, setNDiagnosis] = useState(0);
+    const [nParts, setNParts] = useState(0);
+    const [nRepair, setNRepair] = useState(0);
+    const [nTesting, setNTesting] = useState(0);
+    const [nClosed, setNClosed] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [viewPort, setViewPort] = useState('list');
@@ -69,6 +76,8 @@ const Maintenance = () => {
     const [teamApproval, setTeamApproval] = useState(false);
     const [supervisorApproval, setSupervisorApproval] = useState(false);
     const [operatorNotApplicable, setOperatorNotApp] = useState(false);
+    const [mileagesNotApplicable, setMileagesNotApplicable] = useState(false);
+    const [nextMileages, setNextMileages] = useState('')
 
     const url = process.env.NEXT_PUBLIC_BKEND_URL
     const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
@@ -93,19 +102,20 @@ const Maintenance = () => {
     };
 
     const handleOk = () => {
-        setCheckReason(false);
-        setReason('');
         setIsReason(false);
+        setCheckReason(false);
+        setIsViewed('approved')
+        setReason('');
         handleUpdate();
         setIsModalOpen(false);
         setPage(4);
     };
 
     const handleApproveReject = () => {
-        handleUpdate();
+        setCheckReason(false);
         setPage(4);
         setIsModalOpen(false);
-        setCheckReason(false);
+        handleUpdate();
     }
 
     const handleCancel = () => {
@@ -228,6 +238,8 @@ const Maintenance = () => {
             ? 7
             : 0
         )
+        setMileagesNotApplicable(data.mileagesNotApplicable);
+        setNextMileages(data.nextMileages);
         
         if((role == 'workshop-manager' && (data && data.status) && data.status == 'requisition')) {
             showModal()
@@ -304,9 +316,21 @@ const Maintenance = () => {
             let availableCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || result.isViewed == 'not viewed');
             let approvedCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || result.isViewed == 'approved');
             let canceledCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || result.isViewed == 'denied');
+            let EntryCards = res.filter((result) => result.status == 'entry');
+            let diagnosisCards = res.filter((result) => result.status == 'diagnosis');
+            let requisitionCards = res.filter((result) => result.status == 'requisition');
+            let repairCards = res.filter((result) => result.status == 'repair');
+            let testingCards = res.filter((result) => result.status == 'testing');
+            let closedCards = res.filter((result) => result.status == 'pass');
             setNAvailable(availableCards.length);
             setNApproved(approvedCards.length);
             setNCanceled(canceledCards.length);
+            setNEntry(EntryCards.length);
+            setNDiagnosis(diagnosisCards.length);
+            setNParts(requisitionCards.length);
+            setNRepair(repairCards.length);
+            setNTesting(testingCards.length);
+            setNClosed(closedCards.length);
             setJobCards(res)
         }
         )
@@ -317,6 +341,7 @@ const Maintenance = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        setFilterBy('all')
     }, [])
 
     useEffect(() => {
@@ -343,33 +368,32 @@ const Maintenance = () => {
             })
     }, [])
     
-    useEffect(() => {
-        fetch(`${url}/equipments`, {
-            headers: {
-                Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-            },
-        })
-           .then((res) => res.json())
-           .then(res => {
-            let list = res.equipments;
-            console.log('List ', list)
-            let eqOptions = list.map((p) => {
-                return {
-                    key: p._id,
-                    value: p._id,
-                    text: p.plateNumber,
-                    status: p.eqStatus,
-                    eqDescription: p.eqDescription,
-                    eqStatus: p.eqStatus
-                }
-            })
-            setEqList(eqOptions);
-           })
-           .catch((err) => {
-                toast.error(err)
-                // setLoadingData(false)
-            })
-    }, [])
+    // useEffect(() => {
+    //     fetch(`${url}/equipments`, {
+    //         headers: {
+    //             Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //         },
+    //     })
+    //        .then((res) => res.json())
+    //        .then(res => {
+    //         let list = res.equipments;
+    //         let eqOptions = list.map((p) => {
+    //             return {
+    //                 key: p._id,
+    //                 value: p._id,
+    //                 text: p.plateNumber,
+    //                 status: p.eqStatus,
+    //                 eqDescription: p.eqDescription,
+    //                 eqStatus: p.eqStatus
+    //             }
+    //         })
+    //         setEqList(eqOptions);
+    //        })
+    //        .catch((err) => {
+    //             toast.error(err)
+    //             // setLoadingData(false)
+    //         })
+    // }, [])
 
     useEffect(() => {
         fetch(`${url}/users`, {
@@ -389,6 +413,37 @@ const Maintenance = () => {
                     username: p.username,
                     phone: p.phone,
                     userType: p.userType
+                })
+            )
+            setUsers(userOptions);
+           })
+           .catch((err) => {
+                toast.error(err)
+                // setLoadingData(false)
+            })
+    }, [])
+    
+    useEffect(() => {
+        fetch(`${newUrl}/employees`, {
+            headers: {
+                Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+        })
+           .then((res) => res.json())
+           .then(res => {
+            let list = res;
+            console.log('List Employees', list);
+            let userOptions = 
+                list.map((p) => ( {
+                    key: p._id,
+                    value: p._id,
+                    text: p.firstName + ' ' + p.lastName,
+                    email: p.email,
+                    username: p.username,
+                    title: p.title,
+                    assignedShift: p.assignedShift,
+                    phone: p.phone,
+                    userType: p.type
                 })
             )
             setUsers(userOptions);
@@ -426,7 +481,17 @@ const Maintenance = () => {
         .then((res) => res.json())
         .then((res) => {
             setRow(res)
-            setPage(1)
+            fetch(`${newUrl}/equipments/sendToWorkshop/${res.plate.key}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                },
+            }).then(res => res.json())
+            .then((res) => {
+                setPage(1)
+            })
+            .catch((err) => toast.error('Error Occured!'))
         })
         .catch((err) => toast.error('Error Occured!'))
     }
@@ -451,6 +516,8 @@ const Maintenance = () => {
             sourceItem,
             transferParts,
             operatorNotApplicable,
+            mileagesNotApplicable,
+            nextMileages,
             teamApproval: role === 'workshop-team-leader' ? true : teamApproval,
             supervisorApproval: role === 'workshop-supervisor' ? true : row.supervisorApproval,
             isViewed:
@@ -495,7 +562,7 @@ const Maintenance = () => {
                         postingDate: moment(Date.now()).format('DD-MMMM-YYYY LT'),
                       },
                       from: 'appinfo@construck.rw',
-                      to: 'kevingarry97@gmail.com',
+                      to: 'amushimiyimana@construck.rw',
                       subject: 'Work Notification',
                       messageType: 'notification',
                     }),
@@ -513,8 +580,18 @@ const Maintenance = () => {
                 setViewPort('list')
             } 
             else if(role == 'workshop-supervisor' && (result.supervisorApproval == true && result.jobCard_status == 'closed')) {
-                populateJobCards();
-                setPage(7)
+                fetch(`${newUrl}/makeAvailable/${result.plate.key}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization:
+                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                    },
+                }).then((res) => res.json())
+                .then((r) => {
+                    populateJobCards();
+                    setPage(7);
+                })
             }
             else if(role == 'recording-officer' && result.status == 'testing') {
                 populateJobCards();
@@ -528,14 +605,21 @@ const Maintenance = () => {
 
     const getData = () => {
         let filtered = jobCards;
-        if(search)
+        if(search) {
             filtered = jobCards.filter(jobCard => 
                 jobCard.plate.text.toLowerCase().includes(search.toLowerCase()) 
                 ||
                 jobCard.jobCard_Id.toLowerCase().includes(search.toLowerCase())
                 ||
                 jobCard.driver.text.toLowerCase().includes(search.toLowerCase())
+                ||
+                jobCard.plate.eqDescription.toLowerCase().includes(search.toLowerCase())
             )
+        } else if(filterBy !== 'all') {
+            filtered = jobCards.filter(jobCard => 
+                jobCard.status == filterBy || jobCard.isViewed == filterBy
+            )
+        }
         return {totalCount: filtered.length, data: filtered}
     }
 
@@ -610,17 +694,11 @@ const Maintenance = () => {
             reason={reason}
         />,
         <Repair
-            entryDate={entryDate}
             mechanicalInspections={mechanicalInspections}
-            inspectionTools={inspectionTools}
-            itemsRequest={itemsRequest}
-            startRepair={startRepair}
-            endRepair={endRepair}
-            setStartRepair={setStartRepair}
-            setEndRepair={setEndRepair}
             row={row}
             setAssignIssue={setAssignIssue}
             assignIssue={assignIssue}
+            entryDate={entryDate}
         />,
         <Testing 
             userList={usersList}
@@ -700,50 +778,141 @@ const Maintenance = () => {
                     </div>
                 )}
                 {viewPort === 'list' && (
-                    <div className="flex flex-row items-center space-x-5">
-                        <MainStatusCard
-                            data={{ title: 'Available', content: nAvailable }}
-                            intent={
-                                filterBy === 'available' || filterBy === 'all'
-                                    ? 'available'
-                                    : ''
-                            }
-                            icon={<FolderPlusIcon className="h-5 w-5" />}
-                            onClick={() =>
-                            filterBy === 'available'
-                                ? setFilterBy('all')
-                                : setFilterBy('available')
-                            }
-                        />
-                        <MainStatusCard
-                            data={{ title: 'Approved', content: nApproved }}
-                            intent={
-                            filterBy === 'approved' || filterBy === 'all'
-                                ? 'approved'
-                                : ''
-                            }
-                            icon={<CheckIcon className="h-5 w-5" />}
-                            onClick={() =>
-                            filterBy === 'approved'
-                                ? setFilterBy('all')
-                                : setFilterBy('approved')
-                            }
-                        />
-                        <MainStatusCard
-                            data={{ title: 'Canceled', content: nCanceled }}
-                            intent={
-                            filterBy === 'canceled' || filterBy === 'all'
-                                ? 'canceled'
-                                : ''
-                            }
-                            icon={<XCircleIcon className="h-5 w-5" />}
-                            onClick={() =>
-                            filterBy === 'Canceled'
-                                ? setFilterBy('all')
-                                : setFilterBy('Canceled')
-                            }
-                        />
-                    </div>
+                    <>
+                        {role == 'workshop-manager' ? (
+                            <div className="flex flex-row items-center space-x-5">
+                                <MainStatusCard
+                                    data={{ title: 'Available', content: nAvailable }}
+                                    intent={
+                                        filterBy === 'not viewed' || filterBy === 'all'
+                                            ? 'not viewed'
+                                            : ''
+                                    }
+                                    icon={<FolderPlusIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'not viewed'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('not viewed')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Approved', content: nApproved }}
+                                    intent={
+                                    filterBy === 'approved' || filterBy === 'all'
+                                        ? 'approved'
+                                        : ''
+                                    }
+                                    icon={<CheckIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'approved'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('approved')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Canceled', content: nCanceled }}
+                                    intent={
+                                    filterBy === 'canceled' || filterBy === 'all'
+                                        ? 'canceled'
+                                        : ''
+                                    }
+                                    icon={<XCircleIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'Canceled'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('Canceled')
+                                    }
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-row items-center space-x-5">
+                                <MainStatusCard
+                                    data={{ title: 'Entry', content: nEntry }}
+                                    intent={
+                                        filterBy === 'entry' || filterBy === 'all'
+                                            ? 'entry'
+                                            : ''
+                                    }
+                                    icon={<FolderPlusIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'entry'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('entry')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Diagnos', content: nDiagnosis }}
+                                    intent={
+                                    filterBy === 'diagnosis' || filterBy === 'all'
+                                        ? 'diagnosis'
+                                        : ''
+                                    }
+                                    icon={<CheckIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'diagnosis'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('diagnosis')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Requisition', content: nParts }}
+                                    intent={
+                                        filterBy === 'requisition' || filterBy === 'all'
+                                            ? 'requisition'
+                                            : ''
+                                    }
+                                    icon={<ArrowPathRoundedSquareIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                        filterBy === 'requisition'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('requisition')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Repair', content: nRepair }}
+                                    intent={
+                                        filterBy === 'repair' || filterBy === 'all'
+                                        ? 'repair'
+                                        : ''
+                                    }
+                                    icon={<AdjustmentsVerticalIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'repair'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('repair')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Testing', content: nTesting }}
+                                    intent={
+                                        filterBy === 'testing' || filterBy === 'all'
+                                        ? 'testing'
+                                        : ''
+                                    }
+                                    icon={<WrenchScrewdriverIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'testing'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('testing')
+                                    }
+                                />
+                                <MainStatusCard
+                                    data={{ title: 'Closed', content: nClosed }}
+                                    intent={
+                                        filterBy === 'pass' || filterBy === 'all'
+                                        ? 'closed'
+                                        : ''
+                                    }
+                                    icon={<XCircleIcon className="h-5 w-5" />}
+                                    onClick={() =>
+                                    filterBy === 'pass'
+                                        ? setFilterBy('all')
+                                        : setFilterBy('pass')
+                                    }
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
                 {viewPort === 'list' && (
                     <Dropdown menu={{ items }} placement="bottomRight">
@@ -775,68 +944,84 @@ const Maintenance = () => {
                 on
                 width={800}
                 footer={
-                    (!checkReason ? [
+                    ((row.isViewed != 'approved' && row.sourceItem == 'Inventory') && ((!checkReason) ? [
                         <Button className='pt-0 pb-2' key="back" onClick={handleReject}>
                             Reject Request
                         </Button>,
-                        <Button className='pt-0 pb-2' key="submit" type="primary" onClick={handleOk}>
-                            Approve
-                        </Button>
+                        isViewed == 'denied' 
+                        ? <Popconfirm
+                                placement="topLeft"
+                                title={text}
+                                onConfirm={handleOk}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button className='pt-0 pb-2' type="primary">
+                                    Approve
+                                </Button>
+                            </Popconfirm>
+                        :   <Button className='pt-0 pb-2' key="submit" type="primary" onClick={handleOk}>
+                                Approve
+                            </Button>
                     ] : [
                         <Button disabled={reason.length < 1} className='pt-0 pb-2' key="submit" type="primary" onClick={handleApproveReject}>
                             Apply Denial
                         </Button>
-                    ])
+                    ]))
                 }
             >
-                <div className='py-10'>
-                    <div className='flex justify-between'>
-                        <h5 className='text-sm text-gray-400'>Job Card: <b className='text-gray-600'>{row.jobCard_id}</b></h5>
-                        <div className='flex space-x-2 text-lg text-gray-400'>
-                            <ClockIcon width={15} /> 
-                            <small className='text-gray-600 font-bold'>{moment(row.entryDate).format('DD-MMMM-YYYY LT')}</small>
-                        </div>
-                    </div>
-                    <h5 className='mt-5 text-sm text-gray-400'>Eq. Plate: <b className='text-gray-600'>{row.plate && row.plate.text}</b></h5>
-                    <h5 className='mt-7 text-sm text-gray-400'>Mech. Issues: </h5>
-                    <div className='flex items-start space-x-3'>
-                        {row.inventoryData && row.inventoryData.map((item) => (
-                            <div className='bg-gray-100 px-5 mt-2 py-2'>
-                                {item.map((value, i) => {
-                                    if(foundItem != value.issue) {
-                                        foundItem = value.issue;
-                                        return (
-                                            <>
-                                                <h6 className='p-0 m-0'>{value.issue}</h6>
-                                                <small>{value.item}: <b>{value.qty}</b></small>
-                                                <br />
-                                            </>
-                                        )
-                                    } else {
-                                        return (
-                                            <>
-                                                <small>{value.item}: <b>{value.qty}</b></small>
-                                                <br />
-                                            </>
-                                        )
-                                    }
-
-                                })}
-                                
-
+                {row.sourceItem == 'Inventory' ? 
+                    <div className='py-10'>
+                        <div className='flex justify-between'>
+                            <h5 className='text-sm text-gray-400'>Job Card: <b className='text-gray-600'>{row.jobCard_id}</b></h5>
+                            <div className='flex space-x-2 text-lg text-gray-400'>
+                                <ClockIcon width={15} /> 
+                                <small className='text-gray-600 font-bold'>{moment(row.entryDate).format('DD-MMMM-YYYY LT')}</small>
                             </div>
-                        ))}
-                    </div>
-                    {(isReason) && (
-                        <div className='flex w-full flex-col space-y-1 mt-5'>
-                            <div className='flex flex-row items-center'>
-                                <MTextView content={'Denial Reason'} />
-                                <div className='text-sm text-red-600'>*</div>
-                            </div>
-                            <input type={'text'} name="reason" value={reason} onChange={({target}) => setReason(target.value)} className="w-full flex-grow rounded-sm border-gray-100 py-2.5 px-3 text-sm font-medium shadow-none ring-1 ring-gray-200 transition duration-200 ease-in-out hover:ring-1 hover:ring-gray-400 focus:outline-none focus:ring-blue-300" placeholder={'Specify your reason'} />
                         </div>
-                    )}
-                </div>
+                        <h5 className='mt-5 text-sm text-gray-400'>Eq. Plate: <b className='text-gray-600'>{row.plate && row.plate.text}</b></h5>
+                        <h5 className='mt-7 text-sm text-gray-400'>Mech. Issues: </h5>
+                        <div className='flex items-start space-x-3'>
+                            {row.inventoryData && row.inventoryData.map((item) => (
+                                <div className='bg-gray-100 px-5 mt-2 py-2'>
+                                    {item.map((value, i) => {
+                                        if(foundItem != value.issue) {
+                                            foundItem = value.issue;
+                                            return (
+                                                <>
+                                                    <h6 className='p-0 m-0'>{value.issue}</h6>
+                                                    <small>{value.item}: <b>{value.qty}</b></small>
+                                                    <br />
+                                                </>
+                                            )
+                                        } else {
+                                            return (
+                                                <>
+                                                    <small>{value.item}: <b>{value.qty}</b></small>
+                                                    <br />
+                                                </>
+                                            )
+                                        }
+
+                                    })}
+                                    
+
+                                </div>
+                            ))}
+                        </div>
+                        {(isReason || reason) && (
+                            <div className='flex w-full flex-col space-y-1 mt-5'>
+                                <div className='flex flex-row items-center'>
+                                    <MTextView content={'Denial Reason'} />
+                                    <div className='text-sm text-red-600'>*</div>
+                                </div>
+                                <input type={'text'} name="reason" value={reason} onChange={({target}) => setReason(target.value)} className="w-full flex-grow rounded-sm border-gray-100 py-2.5 px-3 text-sm font-medium shadow-none ring-1 ring-gray-200 transition duration-200 ease-in-out hover:ring-1 hover:ring-gray-400 focus:outline-none focus:ring-blue-300" placeholder={'Specify your reason'} />
+                            </div>
+                        )}
+                    </div> 
+                : 
+                    <h5 className='text-lg font-semibold text-center mt-5'>Not Part of Inventory</h5>
+                }
             </Modal>
             {/* Displaying Job Cards List */}
             {viewPort === 'list' && (
@@ -871,8 +1056,11 @@ const Maintenance = () => {
                                     reason: c.reason,
                                     jobCard_status: c.jobCard_status,
                                     updated_At: c.updated_At,
-                                    operatorNotApplicable: c.operatorNotApplicable
+                                    operatorNotApplicable: c.operatorNotApplicable,
+                                    mileagesNotApplicable: c.mileagesNotApplicable,
+                                    nextMileages: c.nextMileages
                                 }}
+                                role={role}
                                 updateMe={setJobCardsToUpdate}
                                 canCreateData={canCreateData}
                             />
@@ -916,6 +1104,10 @@ const Maintenance = () => {
                         teamApproval={teamApproval}
                         operatorApproval={operatorApproval}
                         setOperatorApproval={setOperatorApproval}
+                        setNextMileages={setNextMileages}
+                        nextMileages={nextMileages}
+                        mileagesNotApplicable={mileagesNotApplicable}
+                        setMileagesNotApplicable={setMileagesNotApplicable}
                     />
                     <div className='flex mt-10 space-x-5'>
                         {role != 'workshop-team-leader' && <MSubmitButton intent='danger' submit={() => {
@@ -923,17 +1115,20 @@ const Maintenance = () => {
                                 setViewPort('list')
                             }} 
                             intentColor={'danger'}
-                            label={`Denie Approval`} 
+                            label={`Denie Approval`}
                         />}
-                        <MSubmitButton 
+                        
+                        {((role == 'workshop-team-leader' && row.teamApproval == false) || (role == 'workshop-supervisor' && (row.teamApproval == true && row.supervisorApproval == false))) && <MSubmitButton 
                             submit={() => {
-                                handleUpdate(); 
+                                role == 'workshop-supervisor' && setPage(7); 
+                                role == 'workshop-supervisor' && setEndRepair(Date.now()); 
+                                handleUpdate();
                                 setViewPort('list')
                             }}
                             intent={'success'}
                             intentColor={'success'}
                             label={`${role == 'workshop-supervisor' ? 'Authorise Gate Pass' : role == 'workshop-team-leader' ? 'Validate Repairs' : 'Save & Continue'}`} 
-                        />
+                        />}
                     </div>
                 </div>
             )}
