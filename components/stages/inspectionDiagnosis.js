@@ -17,7 +17,9 @@ const InspectionDiagnosis = (props) => {
         inspectionTools,
         mechanicalInspections,
         setInspectionTools,
-        setMechanicalInspections
+        setMechanicalInspections,
+        role,
+        previousMode
     } = props;
 
     const { Option } = Select;
@@ -38,7 +40,7 @@ const InspectionDiagnosis = (props) => {
                     <div className="text-sm text-red-600">*</div>
                 </div>
                 <div className='w-4/5'>
-                    <Checkbox.Group options={tools} defaultValue={inspectionTools} onChange={onChange} />
+                    <Checkbox.Group options={tools} defaultValue={inspectionTools} disabled={previousMode && role != 'workshop-support'} onChange={onChange} />
                 </div>
             </div>
             <div className='flex items-center justify-between'>
@@ -53,6 +55,7 @@ const InspectionDiagnosis = (props) => {
                         placeholder="Select the tools you want"
                         defaultValue={mechanicalInspections}
                         onChange={handleChange}
+                        disabled={previousMode && role != 'workshop-support'}
                         optionLabelProp="label"
                     >   
                         {mechanicIssues.map((item, i) => (

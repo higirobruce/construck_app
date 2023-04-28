@@ -14,7 +14,7 @@ const PrintableItems = ({row, setPage}) => {
     }, [componentRef.current]);
 
     const handleAfterPrint = React.useCallback(() => {
-        setPage(4)
+        row.sourceItem == 'Inventory' ? setPage(4) : setPage(5);
     }, []);
     
     return (
@@ -51,39 +51,62 @@ const PrintableItems = ({row, setPage}) => {
                     </div>
                     <h6 className='font-semi'>DATE: {moment(row['updated_At']).format('DD-MMMM-YYYY LT')}</h6>
                 </div>
-                <table style={{fontFamily: 'arial, sans-serif', borderCollapse: 'collapse', width: '100%', margin: '35px 0px'}}>
-                    <tr>
-                        <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
-                        <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>ITEM DESCRIPTION</th>
-                        <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>QTY</th>
-                        <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>UOM</th>
-                        <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>Outstanding <br /> Bal (Store)</th>
-                        <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
-                    </tr>
-                    {row.inventoryData && row.inventoryData.map((item, i) => (
-                        <>
-                            {item.map((value) => {
-                                let foundItem = itemsPart.find((v) => v['ITEM & PART'] == value['item']);
-                                return (
-                                    <tr>
-                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
-                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                            {value.item}
-                                        </td>
-                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                            {value.qty}
-                                        </td>
-                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                            {foundItem['UOM']}
-                                        </td>
-                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
-                                        <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
-                                    </tr>
+                {row.sourceItem == 'Inventory' ? (
+                    <table style={{fontFamily: 'arial, sans-serif', borderCollapse: 'collapse', width: '100%', margin: '35px 0px'}}>
+                        <tr>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>ITEM DESCRIPTION</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>QTY</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>UOM</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>Outstanding <br /> Bal (Store)</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
+                        </tr>
+                        {row.inventoryData && row.inventoryData.map((item, i) => (
+                            <>
+                                {item.map((value) => {
+                                    let foundItem = itemsPart.find((v) => v['ITEM & PART'] == value['item']);
+                                    return (
+                                        <tr>
+                                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                                {value.item}
+                                            </td>
+                                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                                {value.qty}
+                                            </td>
+                                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                                {foundItem['UOM']}
+                                            </td>
+                                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                            <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                        </tr>
+                                    )}
                                 )}
-                            )}
-                        </>
-                    ))}
-                </table>
+                            </>
+                        ))}
+                    </table>
+                ) : (
+                    <table style={{fontFamily: 'arial, sans-serif', borderCollapse: 'collapse', width: '100%', margin: '35px 0px'}}>
+                        <tr>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>ITEMS</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>FROM</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
+                        </tr>
+                        {row.transferData.map((value, i) => (
+                            <tr>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                    {value.parts}
+                                </td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                    {value.from}
+                                </td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                            </tr>
+                        ))}
+                    </table>
+                )}
                 <div className='flex justify-between items-center mt-5'>
                     <div className='flex items-center space-x-4'>
                         <h6 className='font-bold'><i>Authorized Signature :</i> </h6>
@@ -98,7 +121,7 @@ const PrintableItems = ({row, setPage}) => {
                             />
                         </div>
                     </div>
-                    <div className='flex items-center space-x-1'>
+                    <div className='flex items-center space-x-1 pl-10'>
                         <div>
                             <h6 className='font-bold'><i>Approved by :</i> </h6>
                             <h6 className='font-bold'><i>Inventory Manager</i> </h6>

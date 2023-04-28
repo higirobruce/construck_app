@@ -25,7 +25,9 @@ const Maintenance = () => {
     
     const canCreateData = true;
     const role = JSON.parse(localStorage.getItem('user')).userType;
+    const newRole = 'workshop-supports'
     const text = 'Are you sure to approve the request of parts?';
+    const textConfirm = 'Are you sure you want to save this action and proceed?';
 
     const [filterBy, setFilterBy] = useState('all');
     const [nAvailable, setNAvailable] = useState(0);
@@ -38,6 +40,7 @@ const Maintenance = () => {
     const [nTesting, setNTesting] = useState(0);
     const [nClosed, setNClosed] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [previousMode, setPreviousMode] = useState(false);
 
     const [viewPort, setViewPort] = useState('list');
     const [search, setSearch] = useState('');
@@ -107,6 +110,7 @@ const Maintenance = () => {
         setIsViewed('approved')
         setReason('');
         handleUpdate();
+        newRole != 'workshop-support' && handleLogsUpdate()
         setIsModalOpen(false);
         setPage(4);
     };
@@ -116,6 +120,7 @@ const Maintenance = () => {
         setPage(4);
         setIsModalOpen(false);
         handleUpdate();
+        newRole != 'workshop-support' && handleLogsUpdate()
     }
 
     const handleCancel = () => {
@@ -218,11 +223,15 @@ const Maintenance = () => {
         setUpdatedAt(data.updated_At)
         setOperatorNotApp(data.operatorNotApplicable)
         setPage(
-            (data && data.status) == 'entry'
+            newRole == 'workshop-support' && data.status != 'pass'
+            ? 1
+            : (data && data.status) == 'entry'
             ? 1 
             : (data && data.status) == 'diagnosis'
-            ? 1
+            ? 2
             : ((data && data.status) == 'requisition' && data.isViewed == 'approved')
+            ? 3
+            : ((data && data.status) == 'requisition' && data.sourceItem == 'Transfer')
             ? 3
             : (data && data.status) == 'requisition'
             ? 2
@@ -481,7 +490,45 @@ const Maintenance = () => {
         .then((res) => res.json())
         .then((res) => {
             setRow(res)
-            fetch(`${newUrl}/equipments/sendToWorkshop/${res.plate.key}`, {
+            fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                },
+            }).then(res => res.json())
+            .then((res) => {
+                setPage(1)
+            })
+            .catch((err) => toast.error('Error Occured!'))
+        })
+        .catch((err) => toast.error('Error Occured!'))
+    }
+
+    const handleLogsSubmit = () => {
+        const payload = {
+            entryDate,
+            carPlate,
+            mileages,
+            driver,
+            location,
+            status: 'entry'
+        }
+
+        fetch(`${newUrl}/api/maintenance/logs`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+            body: JSON.stringify({
+              payload
+            }),
+          })
+        .then((res) => res.json())
+        .then((res) => {
+            setRow(res)
+            fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -546,8 +593,9 @@ const Maintenance = () => {
         .then(res => res.json())
         .then(result => {
             populateJobCards();
+            let endWork = result.assignIssue && result.assignIssue.filter(item => item.endRepair == "" || item.hasOwnProperty('endRepair') == false)
+
             if((page == 2 && result.status == 'requisition' && result.sourceItem == 'Inventory') && role == 'recording-officer') {
-                
                 fetch(`${url}/email/send`, {
                     method: 'POST',
                     headers: {
@@ -572,15 +620,18 @@ const Maintenance = () => {
                     .catch((err) => console.log(err))
 
                 setViewPort('list')
-            } else if ((page == 2 && result.status == 'requisition' && result.sourceItem == 'Transfer') && role == 'recording-officer') {
+            } else if (result.sourceItem == 'No Parts Required' && role == 'recording-officer') {
                 setPage(5);
+            } else if (result.status == 'requisition' && result.sourceItem == 'Transfer' && role == 'recording-officer') {
+                setRow(result);
+                setPage(3);
             } 
-            else if(result.status == 'repair' && result.assignIssue.find(item => item.endRepair == "")) {
+            else if(result.status == 'repair' && endWork.length > 0) {
                 populateJobCards();
                 setViewPort('list')
             } 
             else if(role == 'workshop-supervisor' && (result.supervisorApproval == true && result.jobCard_status == 'closed')) {
-                fetch(`${newUrl}/makeAvailable/${result.plate.key}`, {
+                fetch(`${url}/makeAvailable/${result.plate.key}`, {
                     method: 'PUT',
                     headers: {
                       'Content-Type': 'application/json',
@@ -589,8 +640,117 @@ const Maintenance = () => {
                     },
                 }).then((res) => res.json())
                 .then((r) => {
-                    populateJobCards();
                     setPage(7);
+                    populateJobCards();
+                })
+            }
+            else if(role == 'recording-officer' && result.status == 'testing') {
+                populateJobCards();
+                setViewPort('list')
+            }
+            else
+                setPage(page + 1)
+        })
+        .catch(err => toast.error(err));
+    }
+    
+    const handleLogsUpdate = () => {
+        const payload = {
+            entryDate,
+            carPlate,
+            mileages,
+            driver,
+            location,
+            inspectionTools,
+            startRepair,
+            endRepair,
+            mechanicalInspections,
+            assignIssue,
+            transferData,
+            inventoryData,
+            inventoryItems,
+            operatorApproval,
+            operator,
+            sourceItem,
+            transferParts,
+            operatorNotApplicable,
+            mileagesNotApplicable,
+            nextMileages,
+            teamApproval: role === 'workshop-team-leader' ? true : teamApproval,
+            supervisorApproval: role === 'workshop-supervisor' ? true : row.supervisorApproval,
+            isViewed:
+                (role === 'workshop-manager' && row.status == 'requisition') ?
+                    (isReason) ? 'denied' : 'approved' : isViewed,
+            status: role != 'workshop-manager' ? page == 1 
+            ? 'diagnosis'
+            : page == 2 || page == 4
+            ? 'requisition'
+            : page == 5
+            ? 'repair'
+            : page == 6
+            ? 'testing'
+            : page == 7 && 'pass' : 'requisition',
+            reason: (role == 'workshop-manager' && !checkReason) ? '' : reason
+        }
+
+        fetch(`${newUrl}/api/maintenance/logs/${row.jobCard_id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+            body: JSON.stringify({payload})
+        })
+        .then(res => res.json())
+        .then(result => {
+            populateJobCards();
+            if((page == 2 && result.status == 'requisition' && result.sourceItem == 'Inventory') && role == 'recording-officer') {
+                fetch(`${url}/email/send`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization:
+                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                    },
+                    body: JSON.stringify({
+                      workPayload: {
+                        jobCard_Id: result.jobCard_Id,
+                        plate: result.plate,
+                        postingDate: moment(Date.now()).format('DD-MMMM-YYYY LT'),
+                      },
+                      from: 'appinfo@construck.rw',
+                      to: 'amushimiyimana@construck.rw',
+                      subject: 'Work Notification',
+                      messageType: 'notification',
+                    }),
+                })
+                    .then((res) => res.json())
+                    .then((res) => {})
+                    .catch((err) => console.log(err))
+
+                setViewPort('list')
+            } else if (result.sourceItem == 'No Parts Required' && role == 'recording-officer') {
+                setPage(5);
+            } else if (result.status == 'requisition' && result.sourceItem == 'Transfer' && role == 'recording-officer') {
+                setRow(result);
+                setPage(3);
+            } 
+            else if(result.status == 'repair' && result.assignIssue.find(item => item.endRepair == "")) {
+                populateJobCards();
+                setViewPort('list')
+            } 
+            else if(role == 'workshop-supervisor' && (result.supervisorApproval == true && result.jobCard_status == 'closed')) {
+                fetch(`${url}/makeAvailable/${result.plate.key}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization:
+                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                    },
+                }).then((res) => res.json())
+                .then((r) => {
+                    setPage(7);
+                    populateJobCards();
                 })
             }
             else if(role == 'recording-officer' && result.status == 'testing') {
@@ -611,7 +771,7 @@ const Maintenance = () => {
                 ||
                 jobCard.jobCard_Id.toLowerCase().includes(search.toLowerCase())
                 ||
-                jobCard.driver.text.toLowerCase().includes(search.toLowerCase())
+                (jobCard.driver) && jobCard.driver.text.toLowerCase().includes(search.toLowerCase())
                 ||
                 jobCard.plate.eqDescription.toLowerCase().includes(search.toLowerCase())
             )
@@ -650,6 +810,8 @@ const Maintenance = () => {
             setInspectionTools={setInspectionTools}
             mechanicalInspections={mechanicalInspections}
             setMechanicalInspections={setMechanicalInspections}
+            role={newRole}
+            previousMode={previousMode}
         />,
         <PartsRequisitions 
             sourceItem={sourceItem}
@@ -669,10 +831,13 @@ const Maintenance = () => {
             setInventoryItems={setInventoryItems}
             setInventoryData={setInventoryData}
             reason={reason}
+            role={newRole}
+            previousMode={previousMode}
         />,
         <PrintableItems 
             row={row} 
             setPage={setPage}
+            role={newRole}
         />,
         <PartsRequisitions 
             sourceItem={sourceItem}
@@ -692,6 +857,8 @@ const Maintenance = () => {
             setInventoryItems={setInventoryItems}
             setInventoryData={setInventoryData}
             reason={reason}
+            role={newRole}
+            previousMode={previousMode}
         />,
         <Repair
             mechanicalInspections={mechanicalInspections}
@@ -699,6 +866,8 @@ const Maintenance = () => {
             setAssignIssue={setAssignIssue}
             assignIssue={assignIssue}
             entryDate={entryDate}
+            role={newRole}
+            previousMode={previousMode}
         />,
         <Testing 
             userList={usersList}
@@ -706,6 +875,8 @@ const Maintenance = () => {
             setOperator={setOperator}
             operatorNotApplicable={operatorNotApplicable}
             setOperatorNotApp={setOperatorNotApp}
+            role={newRole}
+            previousMode={previousMode}
         />,
         <GatePass 
             row={row}
@@ -927,9 +1098,10 @@ const Maintenance = () => {
                 {(viewPort === 'new' || viewPort === 'change' || viewPort === 'operatorView') && (
                     <MSubmitButton
                         submit={() => {
+                            setPreviousMode(false);
                             setPage(0);
                             populateJobCards();
-                            setViewPort('list')
+                            setViewPort('list');
                         }}
                         intent="primary"
                         icon={<ArrowLeftIcon className="h-5 w-5 text-zinc-800" />}
@@ -949,7 +1121,7 @@ const Maintenance = () => {
                             Reject Request
                         </Button>,
                         isViewed == 'denied' 
-                        ? <Popconfirm
+                        ?   <Popconfirm
                                 placement="topLeft"
                                 title={text}
                                 onConfirm={handleOk}
@@ -1076,10 +1248,31 @@ const Maintenance = () => {
                 <div className='mt-5 w-1/2'>
                     {role == 'recording-officer' ? componentList[page] : <h5 className='text-lg font-medium mt-5 text-center'>Logged in user is not authorized for job card creation</h5>}
                     <div className='flex mt-10 space-x-5'>
-                        {page != 0 && 
-                            <MSubmitButton submit={() => setPage(page - 1)} label={`Go to Previous`} intent={'primary'} />
+                        {(page != 0 && page != 1) && 
+                            <MSubmitButton submit={() => {setPage(page - 1); setPreviousMode(true)}} label={`Go to Previous`} intent={'primary'} />
                         }
-                        {role == 'recording-officer' && <MSubmitButton submit={page == 0 ? handleSubmit : handleUpdate} label={`${page == 2 ? `Submit Request` : page == 0 ? `Create Job Card` : `Save & Continue`}`} />}
+                        {role == 'recording-officer' && (
+                            <Popconfirm
+                                placement="topLeft"
+                                title={textConfirm}
+                                onConfirm={() => {
+                                    previousMode && setViewPort('list');
+                                    if(page == 0) {
+                                        handleSubmit();
+                                        newRole != 'workshop-support' && handleLogsSubmit()
+                                    } else {
+                                        handleUpdate();
+                                        newRole != 'workshop-support' && handleLogsUpdate()
+                                    }
+                                }}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <button className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'>
+                                    <div className='font-bold'>{`${page == 2 ? `Submit Request` : page == 0 ? `Create Job Card` : `Save & Continue`}`}</div>
+                                </button>
+                            </Popconfirm>
+                        )}
                     </div>
                 </div>
             )}
@@ -1087,11 +1280,25 @@ const Maintenance = () => {
             {viewPort === 'change' && (
                 <div className={`mt-5 ${row && row.isViewed == 'approved' ? 'w-3/4' : 'w-1/2'}`}>
                     {componentList[page]}
-                    {(row && (page != 3 && page != 7)) && <div className='flex mt-10 space-x-5'>
-                        {(page != 0) &&
-                            <MSubmitButton intent='primary' submit={() => setPage(page - 1)} label={`Go to Previous`} />
+                    {(newRole !== 'workshop-support' && row && (page != 3 && page != 7)) && <div className='flex mt-10 space-x-5'>
+                        {((page != 0 && page != 1) || (page != 1 && newRole !== 'workshop-support')) &&
+                            <MSubmitButton intent='primary' submit={() => {setPage(page - 1); setPreviousMode(true)}} label={`Go to Previous`} />
                         }
-                        <MSubmitButton submit={handleUpdate} label={`${page == 2 ? `Submit Request` : `Save & Continue`}`} />
+                        <Popconfirm
+                            placement="topLeft"
+                            title={textConfirm}
+                            onConfirm={() => {
+                                previousMode && setViewPort('list')
+                                handleUpdate();
+                                newRole != 'workshop-support' && handleLogsUpdate();
+                            }}
+                            okText="Yes"
+                            cancelText="No"
+                        >
+                            <button className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'>
+                                <div>{`${page == 2 ? `Submit Request` : `Save & Continue`}`}</div>
+                            </button>
+                        </Popconfirm>
                     </div>}
                 </div>
             )}
@@ -1120,9 +1327,9 @@ const Maintenance = () => {
                         
                         {((role == 'workshop-team-leader' && row.teamApproval == false) || (role == 'workshop-supervisor' && (row.teamApproval == true && row.supervisorApproval == false))) && <MSubmitButton 
                             submit={() => {
-                                role == 'workshop-supervisor' && setPage(7); 
-                                role == 'workshop-supervisor' && setEndRepair(Date.now()); 
+                                (role == 'workshop-supervisor') && setPage(7);
                                 handleUpdate();
+                                newRole != 'workshop-support' && handleLogsUpdate();
                                 setViewPort('list')
                             }}
                             intent={'success'}

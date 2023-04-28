@@ -20,7 +20,9 @@ const PartsRequisition = (props) => {
         setInventoryItems,
         setInventoryData,
         setPage,
-        reason
+        reason,
+        role,
+        previousMode
     } = props;
 
     const handleInventory = (value, i) => {
@@ -100,14 +102,7 @@ const PartsRequisition = (props) => {
     }
 
     const handleSource = (value) => {
-
         setSourceItem(value)
-        
-        if(value == 'No Parts Required') {
-            setTimeout(() => {
-                setPage(5);
-            }, 300)
-        }
     }
     
     return (
@@ -154,6 +149,7 @@ const PartsRequisition = (props) => {
                             placeholder="Select the tools you want"
                             defaultValue={sourceItem}
                             onChange={handleSource}
+                            disabled={previousMode && role != 'workshop-support'}
                             optionLabelProp="label"
                         >   
                             {['No Parts Required', 'Inventory', 'Transfer'].map((item, i) => (
@@ -178,6 +174,7 @@ const PartsRequisition = (props) => {
                         style={{ width: '100%' }}
                         placeholder="Select parts to transfer"
                         defaultValue={transferParts.length > 0 ? transferParts : [] }
+                        disabled={previousMode && role != 'workshop-support'}
                         onChange={handleTransfers} 
                         optionLabelProp="label"
                     >   
@@ -205,7 +202,8 @@ const PartsRequisition = (props) => {
                                     style={{ width: '60%' }}
                                     placeholder="Parts transfer from"
                                     defaultValue={transferData.length > 0 ? transferData[i]['from'] : []}
-                                    onChange={(value) => handleChange(value, item, i)} 
+                                    onChange={(value) => handleChange(value, item, i)}
+                                    disabled={previousMode && role != 'workshop-support'}
                                     optionLabelProp="label"
                                 >
                                     {eqList.filter(item => item.eqStatus == "workshop").map((item, i) => (
@@ -289,6 +287,7 @@ const PartsRequisition = (props) => {
                                         className="mb-20"
                                         placeholder="Select Items for this part"
                                         defaultValue={(inventoryItems.length < 1 || inventoryItems[0]['value'] == '') ? [] : ((inventoryItems[i] && inventoryItems[i].value) && inventoryItems[i].value)}
+                                        disabled={previousMode && role != 'workshop-support'}
                                         onChange={(value) => handleInventory(value, i)}
                                     >
                                         {itemsPart.map((item, i) => (
@@ -313,6 +312,7 @@ const PartsRequisition = (props) => {
                                                     value={inventoryData[i][key] && inventoryData[i][key].qty}
                                                     name="qty"
                                                     type={'number'}
+                                                    disabled={previousMode && role != 'workshop-support'}
                                                 />
                                             </div>
                                         </div>
@@ -328,4 +328,4 @@ const PartsRequisition = (props) => {
     )
 }
 
-export default PartsRequisition
+export default PartsRequisition;
