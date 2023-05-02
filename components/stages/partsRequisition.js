@@ -59,6 +59,8 @@ const PartsRequisition = (props) => {
     }
 
     const handleQuantity = ({target}, key, inventory, i, item) => {
+        if(target.value < 1)
+            return;
 
         let newData = [...inventoryData];
 
@@ -72,7 +74,7 @@ const PartsRequisition = (props) => {
     }
 
     const handleReceivedQty = ({target}, key, inventory, i, item) => {
-        if(target.value > inventoryData[i][key]['qty'])
+        if(target.value > inventoryData[i][key]['qty'] || target.value < 1)
             return;
         
         let newData = [...inventoryData];
@@ -89,9 +91,6 @@ const PartsRequisition = (props) => {
             setTransferData([...transferData, {parts: '', from: ''}])
         }
         setTransferParts(value);
-
-        console.log('Transfer Parts ', value.length);
-        console.log('Transfer Data ', transferData.length);
 
         if(transferData.length > value.length) {
             const validParts = transferData.filter((item) => item.parts == value.map((val) => val));

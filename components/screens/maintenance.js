@@ -54,6 +54,7 @@ const Maintenance = () => {
     const [isReason, setIsReason] = useState(false);
     const [checkReason, setCheckReason] = useState(false);
     const [updatedAt, setUpdatedAt] = useState('');
+    const [loading, setLoading] = useState(false);
 
     // Form States
     const [entryDate, setEntryDate] = useState('');
@@ -527,6 +528,7 @@ const Maintenance = () => {
     }, [])
 
     const handleSubmit = () => {
+        setLoading(true)
         const payload = {
             entryDate,
             carPlate,
@@ -561,11 +563,13 @@ const Maintenance = () => {
                 setPage(1)
             })
             .catch((err) => toast.error('Error Occured!'))
+            setLoading(false)
         })
         .catch((err) => toast.error('Error Occured!'))
     }
 
     const handleLogsSubmit = () => {
+        setLoading(true);
         const payload = {
             entryDate,
             carPlate,
@@ -598,11 +602,13 @@ const Maintenance = () => {
                 setPage(1)
             })
             .catch((err) => toast.error('Error Occured!'))
+            setLoading(false);
         })
         .catch((err) => toast.error('Error Occured!'))
     }
 
     const handleUpdate = () => {
+        setLoading(true);
         const payload = {
             entryDate,
             carPlate,
@@ -658,7 +664,7 @@ const Maintenance = () => {
         .then(result => {
             populateJobCards();
             let endWork = result.assignIssue && result.assignIssue.filter(item => item.endRepair == "" || item.hasOwnProperty('endRepair') == false)
-
+            setLoading(false);
             if((page == 2 && result.status == 'requisition' && (result.sourceItem == 'Inventory' || result.sourceItem == 'Transfer')) && (role == 'recording-officer' || role == 'workshop-support')) {
                 fetch(`${url}/email/send`, {
                     method: 'POST',
@@ -722,7 +728,7 @@ const Maintenance = () => {
     }
     
     const handleLogsUpdate = () => {
-        console.log('Existing Row ', existingRow)
+        setLoading(true);
         const payload = {
             entryDate,
             carPlate,
@@ -773,6 +779,7 @@ const Maintenance = () => {
         })
         .then(res => res.json())
         .then(result => {
+            setLoading(false);
             populateJobCards();
         })
         .catch(err => toast.error(err));
@@ -1292,7 +1299,9 @@ const Maintenance = () => {
                                 okText="Yes"
                                 cancelText="No"
                             >
-                                <button className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'>
+                                <button 
+                                    disabled={loading}
+                                    className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'>
                                     <div className='font-bold'>{`${page == 2 ? `Submit Request` : page == 0 ? `Create Job Card` : `Save & Continue`}`}</div>
                                 </button>
                             </Popconfirm>
@@ -1321,7 +1330,10 @@ const Maintenance = () => {
                             okText="Yes"
                             cancelText="No"
                         >
-                            <button className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'>
+                            <button 
+                                disabled={loading}
+                                className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'
+                            >
                                 <div>{`${page == 2 ? `Submit Request` : `Save & Continue`}`}</div>
                             </button>
                         </Popconfirm>

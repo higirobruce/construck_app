@@ -29,8 +29,8 @@ const GatePass = ({row}) => {
       <div ref={componentRef} className="m-4 w-3/4">
 
         <Watermark
-          height={30}
-          width={33}
+          height={80}
+          width={60}
           rotate={20}
           gapY={75.5}
           image={imageBase64}
@@ -38,12 +38,12 @@ const GatePass = ({row}) => {
           <div className='flex flex-col bg-white shadow-sm py-4 px-6'>
             <h5 className='text-lg font-semibold text-center'>Gate Pass Card: </h5>
             <div className='flex justify-between items-center my-5'>
-              <span>Plate: <small className='text-lg font-medium'>{row.plate.text}</small></span>
-              <span>Entry Date: <small className='text-lg font-medium'>{moment(row.entryDate).format('Do.MM YY HH:MM a')}</small></span>
+              <span>Plate: <small className='text-lg font-medium'>{row.plate.text} - {row.plate.eqDescription}</small></span>
+              <span>Entry Date: <small className='text-lg font-medium'>{moment(row.entryDate).format('DD-MMMM-YYYY LT')}</small></span>
             </div>
             <div className='flex justify-between items-center my-5'>
             <span>Operator / Driver: <small className='text-lg font-medium'>{row.operator}</small></span>
-              <span>Release Date: <small className='text-lg font-medium'>{moment(Date.now()).format('Do.MM YY HH:MM a')}</small></span>
+              <span>Release Date: <small className='text-lg font-medium'>{moment(Date.now()).format('DD-MMMM-YYYY LT')}</small></span>
             </div>
           </div>
         </Watermark>
