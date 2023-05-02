@@ -74,7 +74,10 @@ const PartsRequisition = (props) => {
     }
 
     const handleReceivedQty = ({target}, key, inventory, i, item) => {
-        if(target.value > inventoryData[i][key]['qty'] && target.value < 1)
+        if(target.value < 1)
+            return;
+
+        if(target.value > inventoryData[i][key]['qty'])
             return;
         
         let newData = [...inventoryData];
