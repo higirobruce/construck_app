@@ -67,6 +67,7 @@ export default function Users() {
         { key: '6', value: 'dispatch-view', text: 'Display Dispatch' },
         { key: '10', value: 'workshop-manager', text: 'Workshop manager' },
         { key: '11', value: 'workshop-supervisor', text: 'Workshop supervisor' },
+        { key: '15', value: 'workshop-support', text: 'Workshop support' },
         { key: '12', value: 'recording-officer', text: 'Recording officer' },
         { key: '13', value: 'workshop-team-leader', text: 'Workshop team leader' },
         { key: '8', value: 'customer-admin', text: 'Customer Admin' },
