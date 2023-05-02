@@ -101,10 +101,10 @@ const OperatorCard = (props) => {
                     </div>
                     {!mileagesNotApplicable && (<div className='w-1/5'>
                         <TextInputLogin
-                            label="Index"
+                            label="Next Service Mileages"
                             type="number"
                             value={nextMileages}
-                            placeholder="Next Mileages"
+                            placeholder="Mileages"
                             disabled={row.teamApproval == true}
                             isRequired
                             setNextMileages={setNextMileages}

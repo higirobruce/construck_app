@@ -88,7 +88,15 @@ const PartsRequisition = (props) => {
         for(let i = 0; i <= transferParts.length; i++) {
             setTransferData([...transferData, {parts: '', from: ''}])
         }
-        setTransferParts(value)
+        setTransferParts(value);
+
+        console.log('Transfer Parts ', value.length);
+        console.log('Transfer Data ', transferData.length);
+
+        if(transferData.length > value.length) {
+            const validParts = transferData.filter((item) => item.parts == value.map((val) => val));
+            setTransferData(validParts);
+        }
     }
 
     const handleChange = (value, part, i) => {

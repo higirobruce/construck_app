@@ -55,7 +55,7 @@ const JobCard = (props) => {
                                 placeholder='Driver name' 
                                 search 
                                 selection 
-                                options={usersList.filter(item => item.userType == 'dispatch')}
+                                options={usersList.filter(item => item.userType == 'driver')}
                                 className="w-1/3"
                                 onChange={(e, data) => setDriver(
                                         usersList.filter((u) => u.key == data.value)[0]

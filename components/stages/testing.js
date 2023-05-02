@@ -45,7 +45,7 @@ const Testing = (props) => {
               defaultValue={(operator && operator.length > 0) ? operator : ''}
               optionLabelProp='label'
             >
-              {userList.map((item, i) => (
+              {userList.filter((item) => item.userType == 'driver').map((item, i) => (
                 <Select.Option key={i} value={item.text} label={item.text}>
                   <Space>
                     {item.text}

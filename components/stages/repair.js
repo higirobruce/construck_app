@@ -23,7 +23,7 @@ const Repair = (props) => {
     };
 
     const disableDate = (current) => {
-        return current && current < dayjs(moment(entryDate).subtract(1, 'days').format('YYYY-MM-DD')).endOf('day');
+        return current && current <= dayjs(moment(entryDate).format('YYYY-MM-DD')).endOf('day');
     }
     
     const disableCustomeDate = (current, i) => {

@@ -25,7 +25,6 @@ const Maintenance = () => {
     
     const canCreateData = true;
     const role = JSON.parse(localStorage.getItem('user')).userType;
-    const newRole = 'workshop-supports'
     const text = 'Are you sure to approve the request of parts?';
     const textConfirm = 'Are you sure you want to save this action and proceed?';
 
@@ -48,7 +47,9 @@ const Maintenance = () => {
     const [eqList, setEqList] = useState([]);
     const [usersList, setUsers] = useState([]);
     const [jobCards, setJobCards] = useState([]);
+    const [jobLogCards, setJobLogCards] = useState([]);
     const [row, setRow] = useState('');
+    const [existingRow, setExistingRow] = useState('')
     const [page, setPage] = useState(0);
     const [isReason, setIsReason] = useState(false);
     const [checkReason, setCheckReason] = useState(false);
@@ -105,14 +106,14 @@ const Maintenance = () => {
     };
 
     const handleOk = () => {
+        setIsViewed(isViewed == 'new request' ? 'approved new request' : 'approved')
         setIsReason(false);
         setCheckReason(false);
-        setIsViewed('approved')
         setReason('');
-        handleUpdate();
-        newRole != 'workshop-support' && handleLogsUpdate()
         setIsModalOpen(false);
         setPage(4);
+        handleUpdate();
+        // role != 'workshop-support' && handleLogsUpdate()
     };
 
     const handleApproveReject = () => {
@@ -120,7 +121,7 @@ const Maintenance = () => {
         setPage(4);
         setIsModalOpen(false);
         handleUpdate();
-        newRole != 'workshop-support' && handleLogsUpdate()
+        // role != 'workshop-support' && handleLogsUpdate()
     }
 
     const handleCancel = () => {
@@ -199,6 +200,7 @@ const Maintenance = () => {
 
     const setJobCardsToUpdate = (data) => {
         setRow(data)
+        setExistingRow(prevState => prevState != '' ? data : prevState )
         setEntryDate(data.entryDate)
         setCarPlate(data.plate)
         setDriver(data.driver)
@@ -222,16 +224,19 @@ const Maintenance = () => {
         setSupervisorApproval(data.supervisorApproval)
         setUpdatedAt(data.updated_At)
         setOperatorNotApp(data.operatorNotApplicable)
+        console.log('Data Viewed ', data);
         setPage(
-            newRole == 'workshop-support' && data.status != 'pass'
+            role == 'workshop-support' && (data.status != 'pass' && data.status != 'requisition')
             ? 1
             : (data && data.status) == 'entry'
             ? 1 
             : (data && data.status) == 'diagnosis'
             ? 2
-            : ((data && data.status) == 'requisition' && data.isViewed == 'approved')
+            : (role == 'workshop-support' && (data && data.status) == 'requisition' && data.isViewed == 'approved new request')
             ? 3
-            : ((data && data.status) == 'requisition' && data.sourceItem == 'Transfer')
+            : (role != 'workshop-support' && (data && data.status) == 'requisition' && data.isViewed == 'approved')
+            ? 3
+            : (role != 'workshop-support' && (data && data.status) == 'requisition' && data.sourceItem == 'Transfer' && data.isViewed == 'approved')
             ? 3
             : (data && data.status) == 'requisition'
             ? 2
@@ -268,50 +273,131 @@ const Maintenance = () => {
         .then((res) => res.json())
         .then((res) => {
             let data = [];
-            if(query == 'general') {
-                for(let i = 0; i < res.length; i++) {
-                    if(res[i].sourceItem == 'Inventory') {
-                        for(let j = 0; j < res[i].inventoryData.length; j++) {
-                            for(let v = 0; v < res[i].inventoryData[j].length; v++) {
-                                data['Mechanical issues'] = res[i].inventoryData[j][v]['issue'];
-                                data['Qty requested'] = res[i].inventoryData[j][v]['qty'];
-                                data['Qty recieved'] = res[i].inventoryData[j][v]['recQty'];
 
-                                data = [...data, data]
+            if(query == 'general') {
+                data = res.flatMap((obj) => {
+                    if(obj.sourceItem == 'Inventory') {
+                        return obj.inventoryData.map((subObj) => {
+                            return subObj.map((anotherSub) => {
+                                return {
+                                    'jobCard-Id': obj.jobCard_Id,
+                                    'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                                    'driver / Operator': obj.operator,
+                                    'location': obj.location,
+                                    'mileages': obj.mileage,
+                                    'mechanical Issue': anotherSub.issue,
+                                    'plate number': obj.plate.text,
+                                    'source of parts': obj.sourceItem,
+                                    'parts requested': anotherSub.item,
+                                    'quantity requested': anotherSub.qty,
+                                    'quantity received': anotherSub.recQty,
+                                    'status': obj.status,
+                                    'end repair': obj.endRepair && moment(obj.endRepair).format('DD-MMMM-YYYY LT'),
+                                    'mechanics': obj.assignIssue.map((item) => item.mech).join(', ')
+                                }
+                            })
+                        })
+                    } else if(obj.sourceItem == 'Transfer') {
+                        return obj.transferData.map((subObj) => {
+                            return {
+                                'jobCard-Id': obj.jobCard_Id,
+                                'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                                'driver / Operator': obj.operator,
+                                'location': obj.location,
+                                'mileages': obj.mileage,
+                                'mechanical Issue': obj.mechanicalInspections.join(', '),
+                                'plate number': obj.plate.text,
+                                'source of parts': obj.sourceItem,
+                                'parts transfered': subObj.parts,
+                                'parts taken from': subObj.from,
+                                'status': obj.status,
+                                'end repair': obj.endRepair && moment(obj.endRepair).format('DD-MMMM-YYYY LT'),
+                                'mechanics': obj.assignIssue.map((item) => item.mech).join(', ')
                             }
+                        })
+                    } else {
+                        return {
+                            'jobCard-Id': obj.jobCard_Id,
+                            'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                            'driver / Operator': obj.operator,
+                            'location': obj.location,
+                            'mileages': obj.mileage,
+                            'mechanical Issue': obj.mechanicalInspections.join(', '),
+                            'plate number': obj.plate.text,
+                            'source of parts': obj.sourceItem,
+                            'status': obj.status,
+                            'end repair': obj.endRepair && moment(obj.endRepair).format('DD-MMMM-YYYY LT'),
+                            'mechanics': obj.assignIssue.map((item) => item.mech).join(', ')
                         }
                     }
-                }
-
-                // data = res.map(r => {
-                //     if(r.sourceItem == 'Inventory') {
-                //         r.inventoryData.map((inv, i) => {
-                //             inv[i].map((in) => (
-
-                //             ))
+                })
+            } else if(query == 'mechanic') {
+                data = res.flatMap((obj) => {
+                    if(obj.assignIssue.length > 0) {
+                        return obj.assignIssue.map((subObj) => {
+                            return {
+                                'jobCard-Id': obj.jobCard_Id,
+                                'mechanical Issue': subObj.issue,
+                                'plate number': obj.plate.text,
+                                'mechanics': subObj.mech.join(', '),
+                                'start date & time': moment(subObj.startRepair).format('DD-MMMM-YYYY LT'),
+                                'end date & time': moment(subObj.endRepair).format('DD-MMMM-YYYY LT'),
+                            }
+                        })
+                    }
+                })
+            } else {
+                data = [];
+                // data = res.flatMap((obj) => {
+                //     if(obj.sourceItem == 'Inventory') {
+                //         return obj.inventoryData.map((subObj) => {
+                //             return {
+                //                 'jobCard-Id': obj.jobCard_Id,
+                //                 'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                //                 'driver / Operator': obj.operator,
+                //                 'location': obj.location,
+                //                 'mileages': obj.mileage,
+                //                 'mechanical Issue': anotherSub.issue,
+                //                 'plate number': obj.plate.text,
+                //                 'source of parts': obj.sourceItem,
+                //                 'parts requested': anotherSub.item,
+                //                 'quantity requested': anotherSub.qty,
+                //                 'quantity received': anotherSub.recQty,
+                //                 'status': obj.status,
+                //                 'end repair': obj.endRepair && moment(obj.endRepair).format('DD-MMMM-YYYY LT'),
+                //                 'mechanics': obj.assignIssue.map((item) => item.mech).join(', ')
+                //             }
                 //         })
                 //     }
-                //     r['inventories'] = r.inventoryData;
-                //     r['location'] = r.location.text;
-                //     r['equipment'] = r.plate.text;
-                //     r['stage'] = r.status;
-    
-                //     delete r.plate;
-                //     delete r.status;
-                //     delete r.inventoryItems;
-                //     delete r.inventoryData;
-    
-                //     return r;
                 // })
             }
             
-            exportToCSV(data,
+            const flattenMap = data.flatMap((item) => {
+                if(Array.isArray(item)) {
+                    return item.map((subObj) => ({...subObj}))
+                }
+                return [item]
+            }).filter((item) => item !== undefined);
+            
+            exportToCSV(flattenMap,
             `Detailed Workshop ${moment().format('DD-MMM-YYYY HH-mm-ss')}`
             )
         })
         .catch((err) => {
             console.log('Error ', err)
         })
+    }
+
+    const populateJobLogsCard = () => {
+        fetch(`${newUrl}/api/maintenance/logs`, {
+            headers: {
+                Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            }
+        })
+        .then((res) => res.json())
+        .then(res => (
+            setJobLogCards(res)
+        ))
     }
 
     const populateJobCards = () => {
@@ -322,8 +408,8 @@ const Maintenance = () => {
         })
         .then(res => res.json())
         .then(res => {
-            let availableCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || result.isViewed == 'not viewed');
-            let approvedCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || result.isViewed == 'approved');
+            let availableCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || (result.isViewed == 'not viewed' || result.isViewed == 'new request'));
+            let approvedCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || (result.isViewed == 'approved' || result.isViewed == 'approved new request'));
             let canceledCards = res.filter((result) => result.status == 'requisition' && (!result.isViewed) || result.isViewed == 'denied');
             let EntryCards = res.filter((result) => result.status == 'entry');
             let diagnosisCards = res.filter((result) => result.status == 'diagnosis');
@@ -403,9 +489,9 @@ const Maintenance = () => {
                 // setLoadingData(false)
             })
     }, [])
-
+    
     useEffect(() => {
-        fetch(`${url}/users`, {
+        fetch(`${url}/employees`, {
             headers: {
                 Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
             },
@@ -413,15 +499,18 @@ const Maintenance = () => {
            .then((res) => res.json())
            .then(res => {
             let list = res;
+            console.log('List Employees', list);
             let userOptions = 
-                list.map((p) => ({
+                list.map((p) => ( {
                     key: p._id,
                     value: p._id,
                     text: p.firstName + ' ' + p.lastName,
                     email: p.email,
                     username: p.username,
+                    title: p.title,
+                    assignedShift: p.assignedShift,
                     phone: p.phone,
-                    userType: p.userType
+                    userType: p.type
                 })
             )
             setUsers(userOptions);
@@ -431,40 +520,10 @@ const Maintenance = () => {
                 // setLoadingData(false)
             })
     }, [])
-    
-    // useEffect(() => {
-    //     fetch(`${newUrl}/employees`, {
-    //         headers: {
-    //             Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-    //         },
-    //     })
-    //        .then((res) => res.json())
-    //        .then(res => {
-    //         let list = res;
-    //         console.log('List Employees', list);
-    //         let userOptions = 
-    //             list.map((p) => ( {
-    //                 key: p._id,
-    //                 value: p._id,
-    //                 text: p.firstName + ' ' + p.lastName,
-    //                 email: p.email,
-    //                 username: p.username,
-    //                 title: p.title,
-    //                 assignedShift: p.assignedShift,
-    //                 phone: p.phone,
-    //                 userType: p.type
-    //             })
-    //         )
-    //         setUsers(userOptions);
-    //        })
-    //        .catch((err) => {
-    //             toast.error(err)
-    //             // setLoadingData(false)
-    //         })
-    // }, [])
 
     useEffect(() => {
         populateJobCards();
+        populateJobLogsCard();
     }, [])
 
     const handleSubmit = () => {
@@ -490,6 +549,7 @@ const Maintenance = () => {
         .then((res) => res.json())
         .then((res) => {
             setRow(res)
+            setExistingRow(res)
             fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
                 method: 'PUT',
                 headers: {
@@ -527,7 +587,6 @@ const Maintenance = () => {
           })
         .then((res) => res.json())
         .then((res) => {
-            setRow(res)
             fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
                 method: 'PUT',
                 headers: {
@@ -568,7 +627,10 @@ const Maintenance = () => {
             teamApproval: role === 'workshop-team-leader' ? true : teamApproval,
             supervisorApproval: role === 'workshop-supervisor' ? true : row.supervisorApproval,
             isViewed:
+                (role == 'workshop-support') ? 'new request' :
                 (role === 'workshop-manager' && row.status == 'requisition') ?
+                    (isReason && isViewed == 'new request') ? 'denied' :
+                    (!isReason && isViewed == 'new request') ? 'approved new request' :
                     (isReason) ? 'denied' : 'approved' : isViewed,
             status: role != 'workshop-manager' ? page == 1 
             ? 'diagnosis'
@@ -579,7 +641,9 @@ const Maintenance = () => {
             : page == 6
             ? 'testing'
             : page == 7 && 'pass' : 'requisition',
-            reason: (role == 'workshop-manager' && !checkReason) ? '' : reason
+            reason: (role == 'workshop-manager' && !checkReason) ? '' : reason,
+            requestParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed == 'denied' || row.isViewed == 'not viewed') ? Date.now() : '',
+            receivedParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed != 'denied' || row.isViewed != 'not viewed') ? Date.now() : ''
         }
 
         fetch(`${newUrl}/api/maintenance/${row._id}`, {
@@ -595,7 +659,7 @@ const Maintenance = () => {
             populateJobCards();
             let endWork = result.assignIssue && result.assignIssue.filter(item => item.endRepair == "" || item.hasOwnProperty('endRepair') == false)
 
-            if((page == 2 && result.status == 'requisition' && result.sourceItem == 'Inventory') && role == 'recording-officer') {
+            if((page == 2 && result.status == 'requisition' && (result.sourceItem == 'Inventory' || result.sourceItem == 'Transfer')) && (role == 'recording-officer' || role == 'workshop-support')) {
                 fetch(`${url}/email/send`, {
                     method: 'POST',
                     headers: {
@@ -620,9 +684,12 @@ const Maintenance = () => {
                     .catch((err) => console.log(err))
 
                 setViewPort('list')
-            } else if (result.sourceItem == 'No Parts Required' && role == 'recording-officer') {
+            } else if (result.status == 'testing' && role == 'recording-officer') {
+                populateJobCards();
+                setViewPort('list')
+            } else if (result.status !== 'repair' && result.sourceItem == 'No Parts Required' && role == 'recording-officer') {
                 setPage(5);
-            } else if (result.status == 'requisition' && result.sourceItem == 'Transfer' && role == 'recording-officer') {
+            } else if (role != 'workshop-support' && result.status == 'requisition' && result.sourceItem == 'Transfer' && role == 'recording-officer') {
                 setRow(result);
                 setPage(3);
             } 
@@ -655,6 +722,7 @@ const Maintenance = () => {
     }
     
     const handleLogsUpdate = () => {
+        console.log('Existing Row ', existingRow)
         const payload = {
             entryDate,
             carPlate,
@@ -666,8 +734,8 @@ const Maintenance = () => {
             endRepair,
             mechanicalInspections,
             assignIssue,
-            transferData,
-            inventoryData,
+            transferData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? transferData : existingRow.transferData,
+            inventoryData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? inventoryData : existingRow.inventoryData,
             inventoryItems,
             operatorApproval,
             operator,
@@ -690,10 +758,12 @@ const Maintenance = () => {
             : page == 6
             ? 'testing'
             : page == 7 && 'pass' : 'requisition',
-            reason: (role == 'workshop-manager' && !checkReason) ? '' : reason
+            reason: (role == 'workshop-manager' && !checkReason) ? '' : reason,
+            requestParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed == 'denied' || row.isViewed == 'not viewed') ? Date.now() : '',
+            receivedParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed != 'denied' || row.isViewed != 'not viewed') ? Date.now() : ''
         }
-
-        fetch(`${newUrl}/api/maintenance/logs/${row.jobCard_id}`, {
+        
+        fetch(`${newUrl}/api/maintenance/logs/${row.jobCard_Id || row.jobCard_id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -704,61 +774,6 @@ const Maintenance = () => {
         .then(res => res.json())
         .then(result => {
             populateJobCards();
-            if((page == 2 && result.status == 'requisition' && result.sourceItem == 'Inventory') && role == 'recording-officer') {
-                fetch(`${url}/email/send`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization:
-                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-                    },
-                    body: JSON.stringify({
-                      workPayload: {
-                        jobCard_Id: result.jobCard_Id,
-                        plate: result.plate,
-                        postingDate: moment(Date.now()).format('DD-MMMM-YYYY LT'),
-                      },
-                      from: 'appinfo@construck.rw',
-                      to: 'amushimiyimana@construck.rw',
-                      subject: 'Work Notification',
-                      messageType: 'notification',
-                    }),
-                })
-                    .then((res) => res.json())
-                    .then((res) => {})
-                    .catch((err) => console.log(err))
-
-                setViewPort('list')
-            } else if (result.sourceItem == 'No Parts Required' && role == 'recording-officer') {
-                setPage(5);
-            } else if (result.status == 'requisition' && result.sourceItem == 'Transfer' && role == 'recording-officer') {
-                setRow(result);
-                setPage(3);
-            } 
-            else if(result.status == 'repair' && result.assignIssue.find(item => item.endRepair == "")) {
-                populateJobCards();
-                setViewPort('list')
-            } 
-            else if(role == 'workshop-supervisor' && (result.supervisorApproval == true && result.jobCard_status == 'closed')) {
-                fetch(`${url}/makeAvailable/${result.plate.key}`, {
-                    method: 'PUT',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization:
-                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-                    },
-                }).then((res) => res.json())
-                .then((r) => {
-                    setPage(7);
-                    populateJobCards();
-                })
-            }
-            else if(role == 'recording-officer' && result.status == 'testing') {
-                populateJobCards();
-                setViewPort('list')
-            }
-            else
-                setPage(page + 1)
         })
         .catch(err => toast.error(err));
     }
@@ -810,7 +825,7 @@ const Maintenance = () => {
             setInspectionTools={setInspectionTools}
             mechanicalInspections={mechanicalInspections}
             setMechanicalInspections={setMechanicalInspections}
-            role={newRole}
+            role={role}
             previousMode={previousMode}
         />,
         <PartsRequisitions 
@@ -831,13 +846,14 @@ const Maintenance = () => {
             setInventoryItems={setInventoryItems}
             setInventoryData={setInventoryData}
             reason={reason}
-            role={newRole}
+            role={role}
             previousMode={previousMode}
         />,
         <PrintableItems 
             row={row} 
+            jobLogCards={jobLogCards}
             setPage={setPage}
-            role={newRole}
+            role={role}
         />,
         <PartsRequisitions 
             sourceItem={sourceItem}
@@ -857,7 +873,7 @@ const Maintenance = () => {
             setInventoryItems={setInventoryItems}
             setInventoryData={setInventoryData}
             reason={reason}
-            role={newRole}
+            role={role}
             previousMode={previousMode}
         />,
         <Repair
@@ -866,7 +882,7 @@ const Maintenance = () => {
             setAssignIssue={setAssignIssue}
             assignIssue={assignIssue}
             entryDate={entryDate}
-            role={newRole}
+            role={role}
             previousMode={previousMode}
         />,
         <Testing 
@@ -875,7 +891,7 @@ const Maintenance = () => {
             setOperator={setOperator}
             operatorNotApplicable={operatorNotApplicable}
             setOperatorNotApp={setOperatorNotApp}
-            role={newRole}
+            role={role}
             previousMode={previousMode}
         />,
         <GatePass 
@@ -955,13 +971,13 @@ const Maintenance = () => {
                                 <MainStatusCard
                                     data={{ title: 'Available', content: nAvailable }}
                                     intent={
-                                        filterBy === 'not viewed' || filterBy === 'all'
+                                        filterBy === 'not viewed' || filterBy === 'all' || filterBy === 'new request'
                                             ? 'not viewed'
                                             : ''
                                     }
                                     icon={<FolderPlusIcon className="h-5 w-5" />}
                                     onClick={() =>
-                                    filterBy === 'not viewed'
+                                    filterBy === 'not viewed' || filterBy === 'new request'
                                         ? setFilterBy('all')
                                         : setFilterBy('not viewed')
                                     }
@@ -1109,14 +1125,14 @@ const Maintenance = () => {
                     />
                 )}
             </div>
+            {console.log('Row Check ', row)}
             <Modal
                 open={isModalOpen}
-                onOk={handleOk}
                 onCancel={handleCancel}
                 on
                 width={800}
                 footer={
-                    ((row.isViewed != 'approved' && row.sourceItem == 'Inventory') && ((!checkReason) ? [
+                    (((row.isViewed != 'approved' && row.isViewed != 'approved new request') && (row.sourceItem == 'Inventory' || row.sourceItem == 'Transfer')) && ((!checkReason) ? [
                         <Button className='pt-0 pb-2' key="back" onClick={handleReject}>
                             Reject Request
                         </Button>,
@@ -1142,7 +1158,7 @@ const Maintenance = () => {
                     ]))
                 }
             >
-                {row.sourceItem == 'Inventory' ? 
+                {row.sourceItem != 'No Parts Required' ? 
                     <div className='py-10'>
                         <div className='flex justify-between'>
                             <h5 className='text-sm text-gray-400'>Job Card: <b className='text-gray-600'>{row.jobCard_id}</b></h5>
@@ -1154,7 +1170,7 @@ const Maintenance = () => {
                         <h5 className='mt-5 text-sm text-gray-400'>Eq. Plate: <b className='text-gray-600'>{row.plate && row.plate.text}</b></h5>
                         <h5 className='mt-7 text-sm text-gray-400'>Mech. Issues: </h5>
                         <div className='flex items-start space-x-3'>
-                            {row.inventoryData && row.inventoryData.map((item) => (
+                            {row.sourceItem == 'Inventory' ? row.inventoryData && row.inventoryData.map((item) => (
                                 <div className='bg-gray-100 px-5 mt-2 py-2'>
                                     {item.map((value, i) => {
                                         if(foundItem != value.issue) {
@@ -1179,7 +1195,15 @@ const Maintenance = () => {
                                     
 
                                 </div>
-                            ))}
+                            )) : (
+                                <>
+                                    {row.transferData && row.transferData.map((item) => (
+                                        <div className='bg-gray-100 px-5 mt-2 py-2'>
+                                            <small>{item.from}: <b>{item.parts}</b></small>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
                         </div>
                         {(isReason || reason) && (
                             <div className='flex w-full flex-col space-y-1 mt-5'>
@@ -1259,10 +1283,10 @@ const Maintenance = () => {
                                     previousMode && setViewPort('list');
                                     if(page == 0) {
                                         handleSubmit();
-                                        newRole != 'workshop-support' && handleLogsSubmit()
+                                        role != 'workshop-support' && handleLogsSubmit()
                                     } else {
                                         handleUpdate();
-                                        newRole != 'workshop-support' && handleLogsUpdate()
+                                        role != 'workshop-support' && handleLogsUpdate()
                                     }
                                 }}
                                 okText="Yes"
@@ -1278,19 +1302,21 @@ const Maintenance = () => {
             )}
 
             {viewPort === 'change' && (
-                <div className={`mt-5 ${row && row.isViewed == 'approved' ? 'w-3/4' : 'w-1/2'}`}>
+                <div className={`mt-5 ${row && (row.isViewed == 'approved' || row.isViewed == 'approved new request') ? 'w-3/4' : 'w-1/2'}`}>
                     {componentList[page]}
-                    {(newRole !== 'workshop-support' && row && (page != 3 && page != 7)) && <div className='flex mt-10 space-x-5'>
-                        {((page != 0 && page != 1) || (page != 1 && newRole !== 'workshop-support')) &&
+                    {(row && (page != 3 && page != 7)) && <div className='flex mt-10 space-x-5'>
+                        {((page != 0 && page != 1) || (page != 1 && role !== 'workshop-support')) &&
                             <MSubmitButton intent='primary' submit={() => {setPage(page - 1); setPreviousMode(true)}} label={`Go to Previous`} />
                         }
                         <Popconfirm
                             placement="topLeft"
                             title={textConfirm}
                             onConfirm={() => {
-                                previousMode && setViewPort('list')
-                                handleUpdate();
-                                newRole != 'workshop-support' && handleLogsUpdate();
+                                if(row) {
+                                    previousMode && setViewPort('list')
+                                    handleUpdate();
+                                    role != 'workshop-support' && handleLogsUpdate();
+                                }
                             }}
                             okText="Yes"
                             cancelText="No"
@@ -1329,7 +1355,7 @@ const Maintenance = () => {
                             submit={() => {
                                 (role == 'workshop-supervisor') && setPage(7);
                                 handleUpdate();
-                                newRole != 'workshop-support' && handleLogsUpdate();
+                                role != 'workshop-support' && handleLogsUpdate();
                                 setViewPort('list')
                             }}
                             intent={'success'}
