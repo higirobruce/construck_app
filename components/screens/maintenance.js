@@ -258,7 +258,7 @@ const Maintenance = () => {
         
         if(role == 'workshop-manager' && (data && data.status == 'requisition')) {
             showModal()
-        } else if((role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
+        } else if(((role == 'recording-officer' && data.status == 'testing') || (role == 'recording-officer' && data.status == 'pass')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
             setViewPort('operatorView');
         } else {
             setViewPort((data && data.status) && 'change');
@@ -971,7 +971,7 @@ const Maintenance = () => {
                 )}
                 {viewPort === 'list' && (
                     <>
-                        {role == 'workshop-manager' ? (
+                        {/* {role == 'workshop-manager' ? (
                             <div className="flex flex-row items-center space-x-5">
                                 <MainStatusCard
                                     data={{ title: 'Available', content: nAvailable }}
@@ -1016,7 +1016,7 @@ const Maintenance = () => {
                                     }
                                 />
                             </div>
-                        ) : (
+                        ) : ( */}
                             <div className="flex flex-row items-center space-x-5">
                                 <MainStatusCard
                                     data={{ title: 'Entry', content: nEntry }}
@@ -1103,7 +1103,7 @@ const Maintenance = () => {
                                     }
                                 />
                             </div>
-                        )}
+                        {/* )} */}
                     </>
                 )}
                 {viewPort === 'list' && (

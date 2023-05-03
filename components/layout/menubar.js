@@ -256,18 +256,6 @@ export default function MenuBar() {
           <WrenchScrewdriverIcon className="h-5 w-5" />
           <div className="hidden w-1/2 font-semibold md:block">My Repairs</div>
         </div> */}
-        
-        <div
-          className={
-            screen === 'workshop'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-          }
-          onClick={() => setScreen('workshop')}
-        >
-          <BuildingStorefrontIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">My Workshop</div>
-        </div>
 
         {canReverseTransactions && (
           <div
