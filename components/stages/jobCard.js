@@ -55,7 +55,7 @@ const JobCard = (props) => {
                                 placeholder='Driver name' 
                                 search 
                                 selection 
-                                options={usersList.filter(item => item.userType == 'driver')}
+                                options={usersList.sort((a, b) => a.text.toLowerCase() < b.text.toLowerCase() ? -1 : a.text.toLowerCase() > b.text.toLowerCase() ? 1 : 0).filter(item => item.userType == 'driver')}
                                 className="w-1/3"
                                 onChange={(e, data) => setDriver(
                                         usersList.filter((u) => u.key == data.value)[0]
@@ -82,7 +82,7 @@ const JobCard = (props) => {
                                 placeholder='Car Plates' 
                                 search 
                                 selection 
-                                options={eqList.filter(item => item.eqStatus !== "workshop")}
+                                options={eqList.sort((a, b) => a.text.toLowerCase() < b.text.toLowerCase() ? -1 : a.text.toLowerCase() > b.text.toLowerCase() ? 1 : 0).filter(item => item.eqStatus !== "workshop")}
                                 className="w-1/3"
                                 onChange={(e, data) => setCarPlate(
                                     eqList.filter((e) => e.key == data.value)[0]

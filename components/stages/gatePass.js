@@ -26,13 +26,14 @@ const GatePass = ({row}) => {
           </button>
         )}
       />
-      <div ref={componentRef} className="m-4 w-3/4">
+      <div ref={componentRef} className="m-4 w-full">
 
         <Watermark
-          height={80}
-          width={60}
+          height={100}
+          width={100}
           rotate={20}
           gapY={75.5}
+          gapX={1000}
           image={imageBase64}
         >
           <div className='flex flex-col bg-white shadow-sm py-4 px-6'>

@@ -199,7 +199,7 @@ const Maintenance = () => {
         disabledSeconds: () => [55, 56],
     })
 
-    const setJobCardsToUpdate = (data) => {
+    const setJobCardsToUpdate = async (data) => {
         setRow(data)
         setExistingRow(prevState => prevState != '' ? data : prevState )
         setEntryDate(data.entryDate)
@@ -225,7 +225,6 @@ const Maintenance = () => {
         setSupervisorApproval(data.supervisorApproval)
         setUpdatedAt(data.updated_At)
         setOperatorNotApp(data.operatorNotApplicable)
-        console.log('Data Viewed ', data);
         setPage(
             role == 'workshop-support' && (data.status != 'pass' && data.status != 'requisition')
             ? 1
@@ -500,7 +499,6 @@ const Maintenance = () => {
            .then((res) => res.json())
            .then(res => {
             let list = res;
-            console.log('List Employees', list);
             let userOptions = 
                 list.map((p) => ( {
                     key: p._id,
@@ -690,6 +688,19 @@ const Maintenance = () => {
                     .catch((err) => console.log(err))
 
                 setViewPort('list')
+            } else if(role == 'workshop-supervisor' && result.jobCard_status == 'closed') {
+                fetch(`${url}/equipments/makeAvailable/${result.plate.key}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization:
+                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+                    },
+                }).then((res) => res.json())
+                .then((r) => {
+                    setPage(7);
+                    populateJobCards();
+                })
             } else if (result.status == 'testing' && role == 'recording-officer') {
                 populateJobCards();
                 setViewPort('list')
@@ -703,20 +714,6 @@ const Maintenance = () => {
                 populateJobCards();
                 setViewPort('list')
             } 
-            else if(role == 'workshop-supervisor' && (result.supervisorApproval == true && result.jobCard_status == 'closed')) {
-                fetch(`${url}/makeAvailable/${result.plate.key}`, {
-                    method: 'PUT',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization:
-                        'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-                    },
-                }).then((res) => res.json())
-                .then((r) => {
-                    setPage(7);
-                    populateJobCards();
-                })
-            }
             else if(role == 'recording-officer' && result.status == 'testing') {
                 populateJobCards();
                 setViewPort('list')
@@ -1286,7 +1283,9 @@ const Maintenance = () => {
                             <Popconfirm
                                 placement="topLeft"
                                 title={textConfirm}
+                                disabled={loading}
                                 onConfirm={() => {
+                                    if(loading) return;
                                     previousMode && setViewPort('list');
                                     if(page == 0) {
                                         handleSubmit();
@@ -1320,7 +1319,9 @@ const Maintenance = () => {
                         <Popconfirm
                             placement="topLeft"
                             title={textConfirm}
+                            disabled={loading}
                             onConfirm={() => {
+                                if(loading) return;
                                 if(row) {
                                     previousMode && setViewPort('list')
                                     handleUpdate();

@@ -27,7 +27,7 @@ const Repair = (props) => {
     }
     
     const disableCustomeDate = (current, i) => {
-        return current < dayjs(moment(assignIssue[i]['startRepair']).subtract(1, 'days').format('YYYY-MM-DD')).endOf('day');
+        return current < dayjs(moment(assignIssue[i]['startRepair']).subtract(1, 'days').format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
     }
 
     const disableCustomTime = (current, i) => ({

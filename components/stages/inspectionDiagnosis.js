@@ -58,12 +58,14 @@ const InspectionDiagnosis = (props) => {
                         disabled={previousMode && role != 'workshop-support'}
                         optionLabelProp="label"
                     >   
-                        {mechanicIssues.map((item, i) => (
-                            <Option key={i} value={item['SERVICE']} label={item['SERVICE']}>
-                                <Space>
-                                    {item['SERVICE']}
-                                </Space>
-                            </Option>
+                        {mechanicIssues
+                            .sort((a, b) => a['SERVICE'].toLowerCase() < b['SERVICE'].toLowerCase() ? -1 : a['SERVICE'].toLowerCase() > b['SERVICE'].toLowerCase() ? 1 : 0)
+                            .map((item, i) => (
+                                <Option key={i} value={item['SERVICE']} label={item['SERVICE']}>
+                                    <Space>
+                                        {item['SERVICE']}
+                                    </Space>
+                                </Option>
                         ))}
                     </Select>
                 </div>

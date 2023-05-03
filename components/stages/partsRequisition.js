@@ -188,12 +188,14 @@ const PartsRequisition = (props) => {
                         onChange={handleTransfers} 
                         optionLabelProp="label"
                     >   
-                        {itemsPart.map((item, i) => (
-                            <Option key={i} value={item['ITEM & PART']} label={item['ITEM & PART']}>
-                                <Space>
-                                    {item['ITEM & PART']}
-                                </Space>
-                            </Option>
+                        {itemsPart
+                            .sort((a, b) => a['ITEM & PART'].toLowerCase() < b['ITEM & PART'].toLowerCase() ? -1 : a['ITEM & PART'].toLowerCase() > b['ITEM & PART'].toLowerCase() ? 1 : 0)
+                            .map((item, i) => (
+                                <Option key={i} value={item['ITEM & PART']} label={item['ITEM & PART']}>
+                                    <Space>
+                                        {item['ITEM & PART']}
+                                    </Space>
+                                </Option>
                         ))}
                     </Select>
                 </div>
@@ -247,12 +249,14 @@ const PartsRequisition = (props) => {
                                         disabled
                                         defaultValue={inventoryItems.length > 0 ? ((inventoryItems[i] && inventoryItems[i].value) && inventoryItems[i].value) : []}
                                     >
-                                        {itemsPart.map((item, i) => (
-                                            <Option key={i} value={item['ITEM & PART']} label={item['ITEM & PART']}>
-                                                <Space>
-                                                    {item['ITEM & PART']}
-                                                </Space>
-                                            </Option>
+                                        {itemsPart
+                                            .sort((a, b) => a['ITEM & PART'].toLowerCase() < b['ITEM & PART'].toLowerCase() ? -1 : a['ITEM & PART'].toLowerCase() > b['ITEM & PART'].toLowerCase() ? 1 : 0)
+                                            .map((item, i) => (
+                                                <Option key={i} value={item['ITEM & PART']} label={item['ITEM & PART']}>
+                                                    <Space>
+                                                        {item['ITEM & PART']}
+                                                    </Space>
+                                                </Option>
                                         ))}
                                     </Select>
                                     {(inventoryItems.length > 0 && (inventoryItems[i] && inventoryItems[i].value) && inventoryItems[i].value.length > 0) && inventoryItems[i].value.map((inventory, key) => (
@@ -300,12 +304,14 @@ const PartsRequisition = (props) => {
                                         disabled={previousMode && role != 'workshop-support'}
                                         onChange={(value) => handleInventory(value, i)}
                                     >
-                                        {itemsPart.map((item, i) => (
-                                            <Option key={i} value={item['ITEM & PART']} label={item['ITEM & PART']}>
-                                                <Space>
-                                                    {item['ITEM & PART']}
-                                                </Space>
-                                            </Option>
+                                        {itemsPart
+                                            .sort((a, b) => a['ITEM & PART'].toLowerCase() < b['ITEM & PART'].toLowerCase() ? -1 : a['ITEM & PART'].toLowerCase() > b['ITEM & PART'].toLowerCase() ? 1 : 0)
+                                            .map((item, i) => (
+                                                <Option key={i} value={item['ITEM & PART']} label={item['ITEM & PART']}>
+                                                    <Space>
+                                                        {item['ITEM & PART']}
+                                                    </Space>
+                                                </Option>
                                         ))}
                                     </Select>
                                     {(inventoryItems.length > 0 && (inventoryItems[i] && inventoryItems[i].value) && inventoryItems[i].value.length > 0) && inventoryItems[i].value.map((inventory, key) => (
