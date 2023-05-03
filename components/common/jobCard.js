@@ -33,7 +33,7 @@ intent,
         className={`${getClassFromIntent(intent)} ${(data.startTime && data.jobCard_status == 'opened') ? `bg-orange-200` : (data.jobCard_status == 'closed') ? `bg-green-200` : ``}`}
     >
         <div className='flex items-center justify-between'>
-            <h5 className='font-bold'>{data.plate.text}</h5>
+            <h5 className='font-bold'>{data.plate.text + ' - ' + data.plate.eqDescription}</h5>
             {!data.finishTime && <span
                 class="rounded-full bg-blue-100 py-1.5 px-3 text-xs font-medium text-blue-600"
             >
