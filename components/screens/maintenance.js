@@ -258,7 +258,7 @@ const Maintenance = () => {
         
         if(role == 'workshop-manager' && (data && data.status == 'requisition')) {
             showModal()
-        } else if(role == 'operatorOfficer' || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
+        } else if((role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
             setViewPort('operatorView');
         } else {
             setViewPort((data && data.status) && 'change');
