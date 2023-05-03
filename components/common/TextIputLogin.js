@@ -13,6 +13,7 @@ export default function TextInputLogin({
   isRequired = false,
   error,
   errorMessage,
+  disabled
 }) {
   return (
     <div className="flex w-full flex-col space-y-1">
@@ -27,6 +28,7 @@ export default function TextInputLogin({
         value={value}
         type={isPassword ? `password` : type}
         placeholder={placeholder}
+        disabled={disabled}
       />
       {error && (
         <div className="flex text-xs font-normal text-red-500">

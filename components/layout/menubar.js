@@ -1,4 +1,5 @@
 import {
+  WrenchIcon,
   ArrowLeftOnRectangleIcon,
   ArrowPathIcon,
   BellIcon,
@@ -13,6 +14,8 @@ import {
   UsersIcon,
   QueueListIcon,
   BanknotesIcon,
+  WrenchScrewdriverIcon,
+  BuildingStorefrontIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
@@ -51,12 +54,18 @@ export default function MenuBar() {
 
   let isProjectManager = role === 'customer-project-manager'
 
+  let isWorkshopUser =
+    role === 'workshop-manager' ||
+    role === 'workshop-supervisor' ||
+    role === 'recording-officer' ||
+    role === 'workshop-team-leader'
+
   function logout() {
     localStorage.removeItem('user')
     setUser({})
   }
   return (
-    <div className="flex min-h-screen w-30 flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
+    <div className="w-30 flex min-h-screen flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
@@ -134,7 +143,7 @@ export default function MenuBar() {
             >
               <TruckIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">
-                Equipments
+                Equipment
               </div>
             </div>
 
@@ -152,7 +161,7 @@ export default function MenuBar() {
               </div>
             </div>
 
-            <div
+            {/* <div
               className={
                 screen === 'profile'
                   ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
@@ -162,7 +171,7 @@ export default function MenuBar() {
             >
               <UserIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">Profile</div>
-            </div>
+            </div> */}
           </>
         )}
 
@@ -210,7 +219,7 @@ export default function MenuBar() {
           </div>
         )}
 
-        {canSeeSettings && (
+        {/* {canSeeSettings && (
           <div
             className={
               screen === 'settings'
@@ -222,7 +231,31 @@ export default function MenuBar() {
             <CogIcon className="h-5 w-5" />
             <div className="hidden w-1/2 font-semibold md:block">Settings</div>
           </div>
-        )}
+        )} */}
+
+        <div
+          className={
+            screen === 'maintenance'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('maintenance')}
+        >
+          <WrenchIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">Maintenance</div>
+        </div>
+
+        {/* <div
+          className={
+            screen === 'repair'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+          }
+          onClick={() => setScreen('repair')}
+        >
+          <WrenchScrewdriverIcon className="h-5 w-5" />
+          <div className="hidden w-1/2 font-semibold md:block">My Repairs</div>
+        </div> */}
 
         {canReverseTransactions && (
           <div
@@ -237,6 +270,7 @@ export default function MenuBar() {
             <div className="hidden w-1/2 font-semibold md:block">Reversals</div>
           </div>
         )}
+        
       </div>
 
       <div className="flex w-full flex-col items-center px-5">

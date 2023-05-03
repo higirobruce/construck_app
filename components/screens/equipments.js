@@ -117,6 +117,11 @@ export default function Equipments() {
       text: 'PNEUMATIC ASPHALT COMPACTOR',
       value: 'PNEUMATIC ASPHALT COMPACTOR',
     },
+    {
+      key: 26,
+      text: 'DOUBLE DRUM ASPHALT COMPACTOR',
+      value: 'DOUBLE DRUM ASPHALT COMPACTOR',
+    },
     { key: 18, text: 'SOIL COMPACTOR', value: 'SOIL COMPACTOR' },
     { key: 19, text: 'STUMPER', value: 'STUMPER' },
     { key: 20, text: 'TIPPER TRUCK', value: 'TIPPER TRUCK' },

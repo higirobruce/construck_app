@@ -58,19 +58,25 @@ export default function Users() {
         { key: '2', value: 'customer-site-manager', text: 'Site Manager' },
       ]
     : [
-        { key: '7', value: 'workshop-admin', text: 'Admin Workshop' },
+        // { key: '7', value: 'workshop-admin', text: 'Admin workshop' },
         { key: '4', value: 'revenue-admin', text: 'Admin Revenue' },
         { key: '2', value: 'admin', text: 'Administrator' },
         { key: '1', value: 'display', text: 'Display' },
         { key: '3', value: 'revenue', text: 'Revenue officer' },
         { key: '5', value: 'dispatch', text: 'Dispatch officer' },
         { key: '6', value: 'dispatch-view', text: 'Display Dispatch' },
+        { key: '10', value: 'workshop-manager', text: 'Workshop manager' },
+        { key: '11', value: 'workshop-supervisor', text: 'Workshop supervisor' },
+        { key: '15', value: 'workshop-support', text: 'Workshop support' },
+        { key: '12', value: 'recording-officer', text: 'Recording officer' },
+        { key: '13', value: 'workshop-team-leader', text: 'Workshop team leader' },
         { key: '8', value: 'customer-admin', text: 'Customer Admin' },
         {
           key: '9',
           value: 'customer-project-manager',
           text: 'Project Manager',
         },
+        { key: '14', value: 'logistic-officer', text: 'Logistic Officer' },
       ]
 
   useEffect(() => {
@@ -474,12 +480,13 @@ export default function Users() {
                   <MTextView content="User Role" />
                   {<div className="text-sm text-red-600">*</div>}
                 </div>
-                <div className="">
+                <div className="w-full">
                   <Dropdown
                     options={rolesOptions}
                     placeholder="Role"
                     fluid
                     search
+                    
                     selection
                     onChange={(e, data) => {
                       setRole(data.value)
