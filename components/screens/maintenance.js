@@ -226,6 +226,7 @@ const Maintenance = () => {
         setUpdatedAt(data.updated_At)
         setOperatorNotApp(data.operatorNotApplicable)
         setPage(
+            role != 'workshop-manager' &&
             role == 'workshop-support' && (data.status != 'pass' && data.status != 'requisition')
             ? 1
             : (data && data.status) == 'entry'
@@ -255,7 +256,7 @@ const Maintenance = () => {
         setMileagesNotApplicable(data.mileagesNotApplicable);
         setNextMileages(data.nextMileages);
         
-        if((role == 'workshop-manager' && (data && data.status) && data.status == 'requisition')) {
+        if(role == 'workshop-manager' && (data && data.status == 'requisition')) {
             showModal()
         } else if(role == 'operatorOfficer' || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
             setViewPort('operatorView');
@@ -1355,7 +1356,7 @@ const Maintenance = () => {
                         mileagesNotApplicable={mileagesNotApplicable}
                         setMileagesNotApplicable={setMileagesNotApplicable}
                     />
-                    <div className='flex mt-10 space-x-5'>
+                    {row.status == 'testing' && <div className='flex mt-10 space-x-5'>
                         {role != 'workshop-team-leader' && <MSubmitButton intent='danger' submit={() => {
                                 setTeamApproval(false);
                                 setViewPort('list')
@@ -1375,7 +1376,7 @@ const Maintenance = () => {
                             intentColor={'success'}
                             label={`${role == 'workshop-supervisor' ? 'Authorise Gate Pass' : role == 'workshop-team-leader' ? 'Validate Repairs' : 'Save & Continue'}`} 
                         />}
-                    </div>
+                    </div>}
                 </div>
             )}
         </div>
