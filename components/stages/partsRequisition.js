@@ -216,12 +216,17 @@ const PartsRequisition = (props) => {
                                     <div className='text-sm text-red-600'>*</div>
                                 </div>
                                 <Select
+                                    showSearch
                                     style={{ width: '60%' }}
                                     placeholder="Parts transfer from"
                                     defaultValue={transferData.length > 0 ? transferData[i]['from'] : []}
                                     onChange={(value) => handleChange(value, item, i)}
                                     disabled={previousMode && role != 'workshop-support'}
                                     optionLabelProp="label"
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
                                 >
                                     {eqList.filter(item => item.eqStatus == "workshop").map((item, i) => (
                                         <Option key={i} value={item.text} label={item.text}>

@@ -33,7 +33,7 @@ const GatePass = ({row}) => {
           width={100}
           rotate={20}
           gapY={75.5}
-          gapX={900}
+          gapX={800}
           image={imageBase64}
         >
           <div className='flex flex-col bg-white shadow-sm py-4 px-6'>
