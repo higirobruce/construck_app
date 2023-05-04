@@ -21,6 +21,22 @@ const Repair = (props) => {
         }
         return result;
     };
+    
+    const rangeDate = (start) => {
+        console.log('Start ', start);
+        const result = [];
+        for (let i = 0; i < 24; i++) {
+            if(i < start) {
+                result.push(i);
+            } else if(i > new Date().getHours()) {
+                result.push(i)
+            } else {
+                return
+            }
+        }
+        
+        return result;
+    };
 
     const disableDate = (current) => {
         return current && current < dayjs(moment(entryDate).subtract(1, 'day').format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
@@ -37,8 +53,8 @@ const Repair = (props) => {
                 ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
                 && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
                 && (new Date()).getDate() == (new Date(assignIssue[i].startRepair)).getDate())
-                ? range(0, new Date(assignIssue[i].startRepair).getHours())
-                : range((new Date()).getHours() + 1, 24)
+                ? rangeDate(new Date(assignIssue[i].startRepair).getHours())
+                : rangeDate(1, 24)
             )
         },
         disabledMinutes: () => (
