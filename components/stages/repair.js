@@ -23,21 +23,24 @@ const Repair = (props) => {
     };
 
     const disableDate = (current) => {
-        return current && current <= dayjs(moment(entryDate).format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
+        return current && current < dayjs(moment(entryDate).subtract(1, 'day').format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
     }
     
     const disableCustomeDate = (current, i) => {
-        return current < dayjs(moment(assignIssue[i]['startRepair']).subtract(1, 'days').format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
+        return current < dayjs(moment(assignIssue[i]['startRepair']).subtract(1, 'day').format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
     }
 
-    const disableCustomTime = (current, i) => ({
-        disabledHours: () => (
-            ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
-            && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
-            && (new Date()).getDate() == (new Date(assignIssue[i].startRepair)).getDate())
-            ? range(0, (new Date()).getHours())
-            : range((new Date()).getHours() + 1, 24)
-        ),
+    const disableCustomTime = (i) => ({
+        disabledHours: () => {
+            console.log('Assign Issue ', assignIssue[i]);
+            return (
+                ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
+                && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
+                && (new Date()).getDate() == (new Date(assignIssue[i].startRepair)).getDate())
+                ? range(1, 24)
+                : range((new Date()).getHours() + 1, 24)
+            )
+        },
         disabledMinutes: () => (
             ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
             && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
@@ -203,7 +206,7 @@ const Repair = (props) => {
                                     <DatePicker
                                         format="YYYY-MM-DD HH:mm:ss"
                                         disabledDate={(current) => disableCustomeDate(current, i)}
-                                        disabledTime={(value) => disableCustomTime(value, i)}
+                                        disabledTime={() => disableCustomTime(i)}
                                         showTime
                                         placeholder='Select End'
                                         onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}

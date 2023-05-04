@@ -68,14 +68,14 @@ const JobCard = (props) => {
                         <div className='flex flex-row'>
                             <MTextView content={"Plate Number:"} />
                             <div className="text-sm text-red-600">*</div>
-                            {carPlate && (
-                                <div className="ml-2 rounded shadow-md">
-                                <MTextView
-                                    content={carPlate.eqDescription}
-                                    selected
-                                />
-                                </div>
-                            )}
+                                {carPlate && (
+                                    <div className="ml-2 rounded shadow-md">
+                                    <MTextView
+                                        content={carPlate.eqDescription}
+                                        selected
+                                    />
+                                    </div>
+                                )}
                         </div>
                         <div className='w-4/5 mt-2'>
                             <Dropdown 
