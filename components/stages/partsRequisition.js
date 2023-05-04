@@ -31,6 +31,14 @@ const PartsRequisition = (props) => {
         newData[i]['value'] = value;
         newData[i]['index'] = i;
 
+        setInventoryItems(newData);
+
+        for(let i = 0; i <= mechanicalInspections.length; i++) {
+            if(inventoryItems.length < mechanicalInspections.length) {
+                setInventoryItems([...inventoryItems, {value: '', index: i}])
+            }
+        }
+
         if(inventoryData[i]) {
             let foundInventory = inventoryData;
             let newInventory = [...inventoryData[i]];
@@ -43,17 +51,9 @@ const PartsRequisition = (props) => {
             // Add new array
             foundInventory.splice(i, 0, updatedInventory);
 
-            setInventoryData(foundInventory);
+            setInventoryData([...foundInventory, [{issue: '', item: '', qty: '', recQty: ''}]]);
         } else {
             setInventoryData([...inventoryData, [{issue: '', item: '', qty: '', recQty: ''}]])
-        }
-
-        setInventoryItems(newData);
-
-        for(let i = 0; i <= mechanicalInspections.length; i++) {
-            if(inventoryItems.length < mechanicalInspections.length) {
-                setInventoryItems([...inventoryItems, {value: '', index: i}])
-            }
         }
 
     }
@@ -64,13 +64,18 @@ const PartsRequisition = (props) => {
 
         let newData = [...inventoryData];
 
+        console.log('New Data 01', newData[i]);
+
         if(newData[i] && newData[i][key]) {
+            console.log('No Key')
             newData[i][key]['issue'] = item;
             newData[i][key]['item'] = inventory;
             newData[i][key][target.name] = target.value;
-    
-            setInventoryData(newData)
         }
+        
+        console.log('New Data 02', newData);
+
+        setInventoryData(newData)
     }
 
     const handleReceivedQty = ({target}, key, inventory, i, item) => {

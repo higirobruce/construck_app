@@ -74,7 +74,7 @@ const Maintenance = () => {
     const [transferParts, setTransferParts] = useState([]);
     const [transferData, setTransferData] = useState([]);
     const [inventoryItems, setInventoryItems] = useState([{value: '', index: 0}]);
-    const [inventoryData, setInventoryData] = useState([]);
+    const [inventoryData, setInventoryData] = useState([[{issue: '', item: '', qty: '', recQty: ''}]]);
     const [reason, setReason] = useState('');
     const [isViewed, setIsViewed] = useState('not viewed');
     const [operatorApproval, setOperatorApproval] = useState([]);
@@ -151,7 +151,7 @@ const Maintenance = () => {
         setTransferParts([]);
         setTransferData([]);
         setInventoryItems([{value: '', index: 0}]);
-        setInventoryData([]);
+        setInventoryData([[{issue: '', item: '', qty: '', recQty: ''}]]);
         setIsReason(false);
         setReason('');
         setIsViewed('not viewed');
