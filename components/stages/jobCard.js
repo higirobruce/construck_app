@@ -55,7 +55,7 @@ const JobCard = (props) => {
                                 placeholder='Driver name' 
                                 search 
                                 selection 
-                                options={usersList.sort((a, b) => a.text.toLowerCase() < b.text.toLowerCase() ? -1 : a.text.toLowerCase() > b.text.toLowerCase() ? 1 : 0).filter(item => item.userType == 'driver')}
+                                options={usersList.sort((a, b) => a.text.toLowerCase() < b.text.toLowerCase() ? -1 : a.text.toLowerCase() > b.text.toLowerCase() ? 1 : 0)}
                                 className="w-1/3"
                                 onChange={(e, data) => setDriver(
                                         usersList.filter((u) => u.key == data.value)[0]

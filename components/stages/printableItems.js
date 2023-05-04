@@ -103,7 +103,7 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                                                 {value.qty}
                                             </td>
                                             <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                                {foundItem['UOM']}
+                                                {foundItem && foundItem['UOM']}
                                             </td>
                                             <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
                                             <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
