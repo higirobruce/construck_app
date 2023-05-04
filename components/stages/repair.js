@@ -37,7 +37,7 @@ const Repair = (props) => {
                 ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
                 && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
                 && (new Date()).getDate() == (new Date(assignIssue[i].startRepair)).getDate())
-                ? range(1, 24)
+                ? range(0, new Date(assignIssue[i].startRepair).getHours())
                 : range((new Date()).getHours() + 1, 24)
             )
         },
