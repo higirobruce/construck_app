@@ -58,7 +58,7 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                 )}
                 onAfterPrint={handleAfterPrint}
             />
-            <div ref={componentRef} className='m-4 w-full'>
+            <div ref={componentRef} className='p-4 w-full'>
                 <div className='flex justify-between items-center w-full'>
                     <div />
                     <h3 className='text-xl font-extrabold my-10'>{row.sourceItem == 'Inventory' ? 'MATERIAL REQUISITION FORM' : 'MATERIAL TRANSFER FORM'}</h3>
@@ -103,7 +103,7 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                                                 {value.qty}
                                             </td>
                                             <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
-                                                {foundItem['UOM']}
+                                                {foundItem && foundItem['UOM']}
                                             </td>
                                             <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
                                             <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>

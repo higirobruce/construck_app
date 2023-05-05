@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import MSubmitButton from '../common/mSubmitButton';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import TextInput from '../common/TextIput';
-import { AdjustmentsVerticalIcon, ArrowDownTrayIcon, ArrowLeftIcon, ArrowPathRoundedSquareIcon, CheckIcon, ClockIcon, FolderPlusIcon, ListBulletIcon, QueueListIcon, UsersIcon, WrenchScrewdriverIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsVerticalIcon, ArrowDownTrayIcon, ArrowLeftIcon, ArrowPathIcon, ArrowPathRoundedSquareIcon, CheckIcon, ClockIcon, FolderPlusIcon, ListBulletIcon, QueueListIcon, UsersIcon, WrenchScrewdriverIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import dayjs from 'dayjs';
 import { toast, ToastContainer } from 'react-toastify';
 import JobCard from '../common/jobCard';
@@ -74,7 +74,7 @@ const Maintenance = () => {
     const [transferParts, setTransferParts] = useState([]);
     const [transferData, setTransferData] = useState([]);
     const [inventoryItems, setInventoryItems] = useState([{value: '', index: 0}]);
-    const [inventoryData, setInventoryData] = useState([]);
+    const [inventoryData, setInventoryData] = useState([[{issue: '', item: '', qty: '', recQty: ''}]]);
     const [reason, setReason] = useState('');
     const [isViewed, setIsViewed] = useState('not viewed');
     const [operatorApproval, setOperatorApproval] = useState([]);
@@ -151,7 +151,7 @@ const Maintenance = () => {
         setTransferParts([]);
         setTransferData([]);
         setInventoryItems([{value: '', index: 0}]);
-        setInventoryData([]);
+        setInventoryData([[{issue: '', item: '', qty: '', recQty: ''}]]);
         setIsReason(false);
         setReason('');
         setIsViewed('not viewed');
@@ -199,7 +199,8 @@ const Maintenance = () => {
         disabledSeconds: () => [55, 56],
     })
 
-    const setJobCardsToUpdate = async (data) => {
+    const setJobCardsToUpdate = (data) => {
+        refreshData();
         setRow(data)
         setExistingRow(prevState => prevState != '' ? data : prevState )
         setEntryDate(data.entryDate)
@@ -258,7 +259,7 @@ const Maintenance = () => {
         
         if(role == 'workshop-manager' && (data && data.status == 'requisition')) {
             showModal()
-        } else if(((role == 'recording-officer' && data.status == 'testing') || (role == 'recording-officer' && data.status == 'pass')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
+        } else if(((role == 'recording-officer' && data.status == 'testing')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
             setViewPort('operatorView');
         } else {
             setViewPort((data && data.status) && 'change');
@@ -387,6 +388,13 @@ const Maintenance = () => {
         .catch((err) => {
             console.log('Error ', err)
         })
+    }
+
+    const refreshData = () => {
+        setLoading(true);
+        populateJobCards();
+        populateJobLogsCard();
+        setLoading(false);
     }
 
     const populateJobLogsCard = () => {
@@ -590,6 +598,7 @@ const Maintenance = () => {
           })
         .then((res) => res.json())
         .then((res) => {
+            setLoading(true);
             fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
                 method: 'PUT',
                 headers: {
@@ -599,6 +608,7 @@ const Maintenance = () => {
             }).then(res => res.json())
             .then((res) => {
                 setPage(1)
+                setLoading(false)
             })
             .catch((err) => toast.error('Error Occured!'))
             setLoading(false);
@@ -957,6 +967,7 @@ const Maintenance = () => {
                     <MSubmitButton
                         submit={() => {
                             emptyState();
+                            refreshData();
                             setViewPort('new')
                         }}
                         intent="primary"
@@ -1107,12 +1118,20 @@ const Maintenance = () => {
                     </>
                 )}
                 {viewPort === 'list' && (
-                    <Dropdown menu={{ items }} placement="bottomRight">
-                        <QueueListIcon
-                            className="h-10 w-10 cursor-pointer"
-                            // onClick={() => download()}
+                    <div className="flex items-center space-x-5">
+                        <Dropdown menu={{ items }} placement="bottomRight">
+                            <QueueListIcon
+                                className="h-10 w-10 cursor-pointer"
+                                // onClick={() => download()}
+                            />
+                        </Dropdown>
+                        <MSubmitButton
+                            submit={refreshData}
+                            intent="neutral"
+                            icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
+                            label="Refresh"
                         />
-                    </Dropdown>
+                    </div>
                     
                 )}
                 
@@ -1280,7 +1299,7 @@ const Maintenance = () => {
                         {(page != 0 && page != 1) && 
                             <MSubmitButton submit={() => {setPage(page - 1); setPreviousMode(true)}} label={`Go to Previous`} intent={'primary'} />
                         }
-                        {role == 'recording-officer' && (
+                        {(role == 'recording-officer' && !loading) && (
                             <Popconfirm
                                 placement="topLeft"
                                 title={textConfirm}
@@ -1317,7 +1336,7 @@ const Maintenance = () => {
                         {((page != 0 && page != 1) || (page != 1 && role !== 'workshop-support')) &&
                             <MSubmitButton intent='primary' submit={() => {setPage(page - 1); setPreviousMode(true)}} label={`Go to Previous`} />
                         }
-                        <Popconfirm
+                        {!loading && <Popconfirm
                             placement="topLeft"
                             title={textConfirm}
                             disabled={loading}
@@ -1338,7 +1357,7 @@ const Maintenance = () => {
                             >
                                 <div>{`${page == 2 ? `Submit Request` : `Save & Continue`}`}</div>
                             </button>
-                        </Popconfirm>
+                        </Popconfirm>}
                     </div>}
                 </div>
             )}
@@ -1357,15 +1376,20 @@ const Maintenance = () => {
                         setMileagesNotApplicable={setMileagesNotApplicable}
                     />
                     {row.status == 'testing' && <div className='flex mt-10 space-x-5'>
-                        {role != 'workshop-team-leader' && <MSubmitButton intent='danger' submit={() => {
-                                setTeamApproval(false);
-                                setViewPort('list')
+                        {((role == 'workshop-team-leader' && row.teamApproval == false) || role == 'workshop-supervisor') && <MSubmitButton intent='danger' submit={() => {
+                                if(role == 'workshop-team-leader') {
+                                    setTeamApproval(false);
+                                    setViewPort('list')
+                                } else {
+                                    setSupervisorApproval(false);
+                                    setViewPort('list');
+                                }
                             }} 
                             intentColor={'danger'}
                             label={`Denie Approval`}
                         />}
                         
-                        {((role == 'workshop-team-leader' && row.teamApproval == false) || (role == 'workshop-supervisor' && (row.teamApproval == true && row.supervisorApproval == false))) && <MSubmitButton 
+                        {((role == 'workshop-team-leader' && row.teamApproval == false) || ((role == 'workshop-supervisor') && (row.teamApproval == true && row.supervisorApproval == false))) && <MSubmitButton 
                             submit={() => {
                                 (role == 'workshop-supervisor') && setPage(7);
                                 handleUpdate();

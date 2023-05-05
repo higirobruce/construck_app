@@ -31,6 +31,14 @@ const PartsRequisition = (props) => {
         newData[i]['value'] = value;
         newData[i]['index'] = i;
 
+        setInventoryItems(newData);
+
+        for(let i = 0; i <= mechanicalInspections.length; i++) {
+            if(inventoryItems.length < mechanicalInspections.length) {
+                setInventoryItems([...inventoryItems, {value: '', index: i}])
+            }
+        }
+
         if(inventoryData[i]) {
             let foundInventory = inventoryData;
             let newInventory = [...inventoryData[i]];
@@ -43,17 +51,9 @@ const PartsRequisition = (props) => {
             // Add new array
             foundInventory.splice(i, 0, updatedInventory);
 
-            setInventoryData(foundInventory);
+            setInventoryData([...foundInventory, [{issue: '', item: '', qty: '', recQty: ''}]]);
         } else {
             setInventoryData([...inventoryData, [{issue: '', item: '', qty: '', recQty: ''}]])
-        }
-
-        setInventoryItems(newData);
-
-        for(let i = 0; i <= mechanicalInspections.length; i++) {
-            if(inventoryItems.length < mechanicalInspections.length) {
-                setInventoryItems([...inventoryItems, {value: '', index: i}])
-            }
         }
 
     }
@@ -64,13 +64,18 @@ const PartsRequisition = (props) => {
 
         let newData = [...inventoryData];
 
-        if(newData[i]) {
+        console.log('New Data 01', newData[i]);
+
+        if(newData[i] && newData[i][key]) {
+            console.log('No Key')
             newData[i][key]['issue'] = item;
             newData[i][key]['item'] = inventory;
             newData[i][key][target.name] = target.value;
-    
-            setInventoryData(newData)
         }
+        
+        console.log('New Data 02', newData);
+
+        setInventoryData(newData)
     }
 
     const handleReceivedQty = ({target}, key, inventory, i, item) => {
@@ -211,12 +216,17 @@ const PartsRequisition = (props) => {
                                     <div className='text-sm text-red-600'>*</div>
                                 </div>
                                 <Select
+                                    showSearch
                                     style={{ width: '60%' }}
                                     placeholder="Parts transfer from"
                                     defaultValue={transferData.length > 0 ? transferData[i]['from'] : []}
                                     onChange={(value) => handleChange(value, item, i)}
                                     disabled={previousMode && role != 'workshop-support'}
                                     optionLabelProp="label"
+                                    optionFilterProp="children"
+                                    filterOption={(input, option) =>
+                                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                    }
                                 >
                                     {eqList.filter(item => item.eqStatus == "workshop").map((item, i) => (
                                         <Option key={i} value={item.text} label={item.text}>
@@ -325,7 +335,7 @@ const PartsRequisition = (props) => {
                                                 <input
                                                     className='rounded-sm border-gray-100 py-2.5 px-3 text-sm font-medium shadow-none ring-1 ring-gray-200 transition duration-200 ease-in-out hover:ring-1 hover:ring-gray-400 focus:outline-none focus:ring-blue-300'
                                                     onChange={(e) => handleQuantity(e, key, inventory, i, item)}
-                                                    value={inventoryData[i][key] && inventoryData[i][key].qty}
+                                                    value={inventoryData && inventoryData[i] && inventoryData[i][key] && inventoryData[i][key].qty}
                                                     name="qty"
                                                     type={'number'}
                                                     disabled={previousMode && role != 'workshop-support'}

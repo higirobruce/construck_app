@@ -55,7 +55,7 @@ const JobCard = (props) => {
                                 placeholder='Driver name' 
                                 search 
                                 selection 
-                                options={usersList.sort((a, b) => a.text.toLowerCase() < b.text.toLowerCase() ? -1 : a.text.toLowerCase() > b.text.toLowerCase() ? 1 : 0).filter(item => item.userType == 'driver')}
+                                options={usersList.sort((a, b) => a.text.toLowerCase() < b.text.toLowerCase() ? -1 : a.text.toLowerCase() > b.text.toLowerCase() ? 1 : 0)}
                                 className="w-1/3"
                                 onChange={(e, data) => setDriver(
                                         usersList.filter((u) => u.key == data.value)[0]
@@ -68,14 +68,14 @@ const JobCard = (props) => {
                         <div className='flex flex-row'>
                             <MTextView content={"Plate Number:"} />
                             <div className="text-sm text-red-600">*</div>
-                            {carPlate && (
-                                <div className="ml-2 rounded shadow-md">
-                                <MTextView
-                                    content={carPlate.eqDescription}
-                                    selected
-                                />
-                                </div>
-                            )}
+                                {carPlate && (
+                                    <div className="ml-2 rounded shadow-md">
+                                    <MTextView
+                                        content={carPlate.eqDescription}
+                                        selected
+                                    />
+                                    </div>
+                                )}
                         </div>
                         <div className='w-4/5 mt-2'>
                             <Dropdown 
