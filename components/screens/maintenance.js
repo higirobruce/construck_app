@@ -74,7 +74,7 @@ const Maintenance = () => {
     const [transferParts, setTransferParts] = useState([]);
     const [transferData, setTransferData] = useState([]);
     const [inventoryItems, setInventoryItems] = useState([{value: '', index: 0}]);
-    const [inventoryData, setInventoryData] = useState([]);
+    const [inventoryData, setInventoryData] = useState([[{issue: '', item: '', qty: '', recQty: ''}]]);
     const [reason, setReason] = useState('');
     const [isViewed, setIsViewed] = useState('not viewed');
     const [operatorApproval, setOperatorApproval] = useState([]);
@@ -151,7 +151,7 @@ const Maintenance = () => {
         setTransferParts([]);
         setTransferData([]);
         setInventoryItems([{value: '', index: 0}]);
-        setInventoryData([]);
+        setInventoryData([[{issue: '', item: '', qty: '', recQty: ''}]]);
         setIsReason(false);
         setReason('');
         setIsViewed('not viewed');
@@ -259,7 +259,7 @@ const Maintenance = () => {
         
         if(role == 'workshop-manager' && (data && data.status == 'requisition')) {
             showModal()
-        } else if(((role == 'recording-officer' && data.status == 'testing') || (role == 'recording-officer' && data.status == 'pass')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
+        } else if(((role == 'recording-officer' && data.status == 'testing')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
             setViewPort('operatorView');
         } else {
             setViewPort((data && data.status) && 'change');
@@ -1376,7 +1376,7 @@ const Maintenance = () => {
                         setMileagesNotApplicable={setMileagesNotApplicable}
                     />
                     {row.status == 'testing' && <div className='flex mt-10 space-x-5'>
-                        {(role == 'workshop-team-leader' || role == 'workshop-supervisor') && <MSubmitButton intent='danger' submit={() => {
+                        {((role == 'workshop-team-leader' && row.teamApproval == false) || role == 'workshop-supervisor') && <MSubmitButton intent='danger' submit={() => {
                                 if(role == 'workshop-team-leader') {
                                     setTeamApproval(false);
                                     setViewPort('list')

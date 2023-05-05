@@ -39,13 +39,18 @@ const Testing = (props) => {
           </div>
           <div className='ml-3 w-full'>
             <Select
+              showSearch
               className={"rounded-2xl w-1/3"}
               onChange={(value) => setOperator(value)}
               placeholder="Driver/Operator"
               defaultValue={(operator && operator.length > 0) ? operator : ''}
               optionLabelProp='label'
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
             >
-              {userList.filter((item) => item.userType == 'driver').map((item, i) => (
+              {userList.map((item, i) => (
                 <Select.Option key={i} value={item.text} label={item.text}>
                   <Space>
                     {item.text}
