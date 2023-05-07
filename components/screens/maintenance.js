@@ -83,9 +83,11 @@ const Maintenance = () => {
     const [operatorNotApplicable, setOperatorNotApp] = useState(false);
     const [mileagesNotApplicable, setMileagesNotApplicable] = useState(false);
     const [nextMileages, setNextMileages] = useState('')
+    const [receivedParts, setReceivedParts] = useState('');
+    const [requestParts, setRequestParts] = useState('')
 
     const url = process.env.NEXT_PUBLIC_BKEND_URL
-    const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
+    const newUrl = process.env.NEXT_PUBLIC_BKEND_NEW_URL
     const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
     const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
     let foundItem = '';
@@ -137,6 +139,7 @@ const Maintenance = () => {
     }
 
     const emptyState = () => {
+        setPage(0);
         setEntryDate('');
         setMileages('');
         setDriver('');
@@ -161,6 +164,8 @@ const Maintenance = () => {
         setStartRepair('');
         setEndRepair('');
         setOperatorNotApp(false);
+        setReceivedParts('');
+        setRequestParts('');
     }
 
     const range = (start, end) => {
@@ -226,6 +231,8 @@ const Maintenance = () => {
         setSupervisorApproval(data.supervisorApproval)
         setUpdatedAt(data.updated_At)
         setOperatorNotApp(data.operatorNotApplicable)
+        setRequestParts(data.requestParts)
+        setReceivedParts(data.receivedParts)
         setPage(
             role != 'workshop-manager' &&
             role == 'workshop-support' && (data.status != 'pass' && data.status != 'requisition')
@@ -349,29 +356,16 @@ const Maintenance = () => {
                     }
                 })
             } else {
-                data = [];
-                // data = res.flatMap((obj) => {
-                //     if(obj.sourceItem == 'Inventory') {
-                //         return obj.inventoryData.map((subObj) => {
-                //             return {
-                //                 'jobCard-Id': obj.jobCard_Id,
-                //                 'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
-                //                 'driver / Operator': obj.operator,
-                //                 'location': obj.location,
-                //                 'mileages': obj.mileage,
-                //                 'mechanical Issue': anotherSub.issue,
-                //                 'plate number': obj.plate.text,
-                //                 'source of parts': obj.sourceItem,
-                //                 'parts requested': anotherSub.item,
-                //                 'quantity requested': anotherSub.qty,
-                //                 'quantity received': anotherSub.recQty,
-                //                 'status': obj.status,
-                //                 'end repair': obj.endRepair && moment(obj.endRepair).format('DD-MMMM-YYYY LT'),
-                //                 'mechanics': obj.assignIssue.map((item) => item.mech).join(', ')
-                //             }
-                //         })
-                //     }
-                // })
+                data = res.flatMap((obj) => {
+                    console.log('Object', obj)
+                    return {
+                        'jobCard-Id': obj.jobCard_Id,
+                        'plate number': obj.plate.text,
+                        'mechanical Issue': obj.mechanicalInspections.join(', '),
+                        'parts requested': moment(new Date(+obj.requestParts)).format('DD-MMMM-YYYY LT'),
+                        'parts received': moment(new Date(+obj.receivedParts)).format('DD-MMMM-YYYY LT'),
+                    }
+                })
             }
             
             const flattenMap = data.flatMap((item) => {
@@ -535,7 +529,6 @@ const Maintenance = () => {
     }, [])
 
     const handleSubmit = () => {
-        setLoading(true)
         const payload = {
             entryDate,
             carPlate,
@@ -570,13 +563,11 @@ const Maintenance = () => {
                 setPage(1)
             })
             .catch((err) => toast.error('Error Occured!'))
-            setLoading(false)
         })
         .catch((err) => toast.error('Error Occured!'))
     }
 
     const handleLogsSubmit = () => {
-        setLoading(true);
         const payload = {
             entryDate,
             carPlate,
@@ -611,7 +602,6 @@ const Maintenance = () => {
                 setLoading(false)
             })
             .catch((err) => toast.error('Error Occured!'))
-            setLoading(false);
         })
         .catch((err) => toast.error('Error Occured!'))
     }
@@ -657,9 +647,11 @@ const Maintenance = () => {
             ? 'testing'
             : page == 7 && 'pass' : 'requisition',
             reason: (role == 'workshop-manager' && !checkReason) ? '' : reason,
-            requestParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed == 'denied' || row.isViewed == 'not viewed') ? Date.now() : '',
-            receivedParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed != 'denied' || row.isViewed != 'not viewed') ? Date.now() : ''
+            requestParts: (role == 'recording-officer' && row.status == 'requisition' && row.isViewed == 'not viewed') ? Date.now() : requestParts,
+            receivedParts: role == 'recording-officer' && (row.status == 'requisition') && (row.isViewed == 'denied' || row.isViewed == 'approved') ? Date.now() : receivedParts
         }
+
+        console.log('Row 123', row);
 
         fetch(`${newUrl}/api/maintenance/${row._id}`, {
             method: 'PUT',
@@ -675,6 +667,9 @@ const Maintenance = () => {
             let endWork = result.assignIssue && result.assignIssue.filter(item => item.endRepair == "" || item.hasOwnProperty('endRepair') == false)
             setLoading(false);
             if((page == 2 && result.status == 'requisition' && (result.sourceItem == 'Inventory' || result.sourceItem == 'Transfer')) && (role == 'recording-officer' || role == 'workshop-support')) {
+                console.log('Result ', result)
+                if(result.isViewed == 'not viewed' || result.isViewed == 'new request') setRequestParts(result.requestParts);
+                setReceivedParts(result.receivedParts);
                 fetch(`${url}/email/send`, {
                     method: 'POST',
                     headers: {
@@ -1278,7 +1273,9 @@ const Maintenance = () => {
                                     updated_At: c.updated_At,
                                     operatorNotApplicable: c.operatorNotApplicable,
                                     mileagesNotApplicable: c.mileagesNotApplicable,
-                                    nextMileages: c.nextMileages
+                                    nextMileages: c.nextMileages,
+                                    requestParts: c.requestParts,
+                                    receivedParts: c.receivedParts
                                 }}
                                 role={role}
                                 updateMe={setJobCardsToUpdate}

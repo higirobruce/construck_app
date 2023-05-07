@@ -34,7 +34,7 @@ const Repair = (props) => {
                 return
             }
         }
-        
+
         return result;
     };
 
@@ -48,21 +48,20 @@ const Repair = (props) => {
 
     const disableCustomTime = (i) => ({
         disabledHours: () => {
-            console.log('Assign Issue ', assignIssue[i]);
             return (
-                ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
-                && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
-                && (new Date()).getDate() == (new Date(assignIssue[i].startRepair)).getDate())
-                ? rangeDate(new Date(assignIssue[i].startRepair).getHours())
+                ((new Date()).getFullYear() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getFullYear()
+                && (new Date()).getMonth() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMonth()
+                && (new Date()).getDate() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getDate())
+                ? rangeDate(new Date(assignIssue[i] && assignIssue[i].startRepair).getHours())
                 : rangeDate(1, 24)
             )
         },
         disabledMinutes: () => (
-            ((new Date()).getFullYear() == (new Date(assignIssue[i].startRepair)).getFullYear()
-            && (new Date()).getMonth() == (new Date(assignIssue[i].startRepair)).getMonth()
-            && ((new Date()).getDate() == (new Date(assignIssue[i].startRepair)).getDate()) 
-            && ((new Date()).getHours() == (new Date(assignIssue[i].startRepair)).getHours())))
-            ? range(1, (new Date(assignIssue[i].startRepair)).getMinutes() + 1) 
+            ((new Date()).getFullYear() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getFullYear()
+            && (new Date()).getMonth() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMonth()
+            && ((new Date()).getDate() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getDate()) 
+            && ((new Date()).getHours() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getHours())))
+            ? range(1, (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMinutes() + 1) 
             : range((new Date()).getMinutes() + 2, 60),
         disabledSeconds: () => [55, 56],    
     })
@@ -153,12 +152,14 @@ const Repair = (props) => {
                 <div className='flex space-x-5 items-center'>
                     <div className='flex flex-col w-1/2 my-4 p-4 bg-slate-100'>
                         <div className='flex items-center justify-between'>
+                            {console.log('Assign Issue I2 ', assignIssue)}
                             <span className='text-gray-400'>Issue: <small className='text-gray-700 text-base'>{issue}</small></span>
                             <Select
                                 mode="multiple"
                                 className={"rounded-2xl w-1/3"}
                                 onChange={(value) => handleAssign(issue, value)}
                                 placeholder="Assign Mechanics"
+                                disabled={assignIssue[i] && assignIssue[i].endRepair}
                                 defaultValue={assignIssue.length > 0 ? (assignIssue.filter((assign) => assign.issue == issue).length > 0 && assignIssue.filter((assign) => assign.issue == issue)[0].mech) : []}
                                 optionLabelProp='label'
                             >
@@ -173,7 +174,6 @@ const Repair = (props) => {
                         </div>
                     </div>
                     <div className='flex space-x-5 w-1/2 my-4 p-4 bg-slate-100'>
-                        {console.log('Assign Issue I2 ', assignIssue)}
                         <div className='flex items-center'>
                             <div className='flex flex-row'>
                                 <MTextView content={"Start Repair:"} />
