@@ -44,7 +44,7 @@ const GatePass = ({row}) => {
             </div>
             <div className='flex justify-between items-center my-5'>
             <span>Operator / Driver: <small className='text-lg font-medium'>{row.operator}</small></span>
-              <span>Release Date: <small className='text-lg font-medium'>{moment().format('DD-MMMM-YYYY LT')}</small></span>
+              <span>Release Date: <small className='text-lg font-medium'>{moment(row.finishTime).format('DD-MMMM-YYYY LT')}</small></span>
             </div>
           </div>
         </Watermark>

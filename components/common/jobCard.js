@@ -79,7 +79,7 @@ intent,
 
             <dl class="mt-5 flex justify-between pr-6 w-full">
                 <div class="flex flex-col-reverse">
-                    <dt class="text-sm font-medium text-gray-600">{moment(data.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT')}</dt>
+                    <dt class="text-sm font-medium text-gray-600">{moment(data.entryDate && data.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT')}</dt>
                     <dd class="text-xs text-gray-500">Entry Date:</dd>
                 </div>
 
