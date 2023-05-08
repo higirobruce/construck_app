@@ -87,7 +87,7 @@ const Maintenance = () => {
     const [requestParts, setRequestParts] = useState('')
 
     const url = process.env.NEXT_PUBLIC_BKEND_URL
-    const newUrl = process.env.NEXT_PUBLIC_BKEND_NEW_URL
+    const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
     const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
     const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
     let foundItem = '';
