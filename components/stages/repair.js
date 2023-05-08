@@ -11,7 +11,8 @@ const Repair = (props) => {
         mechanicalInspections,
         setAssignIssue,
         assignIssue,
-        entryDate
+        entryDate,
+        row
     } = props;
 
     const range = (start, end) => {
@@ -52,7 +53,7 @@ const Repair = (props) => {
                 && (new Date()).getMonth() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMonth()
                 && (new Date()).getDate() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getDate())
                 ? rangeDate(new Date(assignIssue[i] && assignIssue[i].startRepair).getHours())
-                : rangeDate(1, 24)
+                : range(new Date().getHours() + 1, 24)
             )
         },
         disabledMinutes: () => (
@@ -66,8 +67,33 @@ const Repair = (props) => {
     })
 
     const disabledTime = (current) => ({
-        disabledHours: () => range((new Date()).getHours() + 1, 24),
-        disabledMinutes: () => range((new Date()).getMinutes() + 2, 60),
+        disabledHours: () => {
+            return (
+                (new Date(current).getFullYear() == new Date(row && row.entryDate).getFullYear()
+                && new Date(current).getMonth() == new Date(row && row.entryDate).getMonth()
+                && new Date(current).getDate() == new Date(row && row.entryDate).getDate())
+                ? range(new Date(row && row.entryDate).getHours() + 1, 24)
+                : (new Date(current).getFullYear() == new Date().getFullYear()
+                && new Date(current).getMonth() == new Date().getMonth()
+                && new Date(current).getDate() == new Date().getDate())
+                ? range(new Date(current).getHours() + 1, 24)
+                : range(0, 0)
+            )
+        },
+        disabledMinutes: () => {
+            return (
+                (new Date(current).getFullYear() == new Date(row && row.entryDate).getFullYear()
+                && new Date(current).getMonth() == new Date(row && row.entryDate).getMonth()
+                && new Date(current).getDate() == new Date(row && row.entryDate).getDate())
+                && new Date(current).getHours() == new Date(row && row.entryDate).getHours())
+                ? range(new Date(row && row.entryDate).getMinutes() + 2, 60)
+                : (new Date(current).getFullYear() == new Date().getFullYear()
+                && new Date(current).getMonth() == new Date().getMonth()
+                && new Date(current).getDate() == new Date().getDate())
+                && new Date(current).getHours() == new Date().getHours()
+                ? range(new Date(current).getMinutes() + 2, 60)
+                : range(0, 0)
+        },
         disabledSeconds: () => [55, 56],
     })
 
