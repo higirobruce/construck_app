@@ -149,10 +149,9 @@ const Repair = (props) => {
     return (
         <>
             {mechanicalInspections && mechanicalInspections.map((issue, i) => (
-                <div className='flex space-x-5 items-center'>
-                    <div className='flex flex-col w-1/2 my-4 p-4 bg-slate-100'>
+                <div className='flex flex-col space-x-5 w-full'>
+                    <div className='flex flex-col w-5/6 my-4 p-4 bg-slate-100'>
                         <div className='flex items-center justify-between'>
-                            {console.log('Assign Issue I2 ', assignIssue)}
                             <span className='text-gray-400'>Issue: <small className='text-gray-700 text-base'>{issue}</small></span>
                             <Select
                                 mode="multiple"

@@ -159,6 +159,7 @@ const Maintenance = () => {
         setReason('');
         setIsViewed('not viewed');
         setOperatorApproval([]);
+        setOperator('')
         setTeamApproval(false);
         setSupervisorApproval(false)
         setStartRepair('');
@@ -286,8 +287,8 @@ const Maintenance = () => {
             if(query == 'general') {
                 data = res.flatMap((obj) => {
                     if(obj.sourceItem == 'Inventory') {
-                        return obj.inventoryData.map((subObj) => {
-                            return subObj.map((anotherSub) => {
+                        return obj.inventoryData.filter(array => array.some(obj => obj.issue !== "")).map((subObj) => {
+                            return subObj.filter(value => value.issue !== '').map((anotherSub) => {
                                 return {
                                     'jobCard-Id': obj.jobCard_Id,
                                     'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
@@ -357,7 +358,6 @@ const Maintenance = () => {
                 })
             } else {
                 data = res.flatMap((obj) => {
-                    console.log('Object', obj)
                     return {
                         'jobCard-Id': obj.jobCard_Id,
                         'plate number': obj.plate.text,
@@ -608,6 +608,7 @@ const Maintenance = () => {
 
     const handleUpdate = () => {
         setLoading(true);
+
         const payload = {
             entryDate,
             carPlate,
@@ -744,7 +745,7 @@ const Maintenance = () => {
             mechanicalInspections,
             assignIssue,
             transferData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? transferData : existingRow.transferData,
-            inventoryData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? inventoryData : existingRow.inventoryData,
+            inventoryData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? inventoryData: existingRow.inventoryData,
             inventoryItems,
             operatorApproval,
             operator,
@@ -1189,9 +1190,9 @@ const Maintenance = () => {
                         <h5 className='mt-5 text-sm text-gray-400'>Eq. Plate: <b className='text-gray-600'>{row.plate && row.plate.text}</b></h5>
                         <h5 className='mt-7 text-sm text-gray-400'>Mech. Issues: </h5>
                         <div className='flex items-start space-x-3'>
-                            {row.sourceItem == 'Inventory' ? row.inventoryData && row.inventoryData.map((item) => (
+                            {row.sourceItem == 'Inventory' ? row.inventoryData && row.inventoryData.filter(array => array.some(obj => obj.issue !== "")).map((item) => (
                                 <div className='bg-gray-100 px-5 mt-2 py-2'>
-                                    {item.map((value, i) => {
+                                    {item.filter(value => value.issue !== '').map((value, i) => {
                                         if(foundItem != value.issue) {
                                             foundItem = value.issue;
                                             return (

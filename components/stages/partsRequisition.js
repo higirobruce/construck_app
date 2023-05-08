@@ -148,8 +148,6 @@ const PartsRequisition = (props) => {
     const handleSource = (value) => {
         setSourceItem(value)
     }
-    
-    console.log('Eq Description ', eqType)
 
     return (
         <div className='flex flex-col space-y-10'>
