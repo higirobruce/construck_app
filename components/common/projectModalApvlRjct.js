@@ -526,8 +526,8 @@ export default function ModalApprovalRejections({
                           <div className="flex flex-col">
                             <MTextView content={detail.status} />
                             <div className="font-mono text-xs">
-                              {detail.rejectedReason
-                                ? 'Reason: ' + detail.rejectedReason
+                              {detail.reasonForRejection
+                                ? 'Reason: ' + detail.reasonForRejection
                                 : ''}
                             </div>
                           </div>
