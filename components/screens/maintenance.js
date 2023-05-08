@@ -291,7 +291,7 @@ const Maintenance = () => {
                             return subObj.filter(value => value.issue !== '').map((anotherSub) => {
                                 return {
                                     'jobCard-Id': obj.jobCard_Id,
-                                    'entry Date': moment(obj.entryDate && obj.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT'),
+                                    'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
                                     'driver / Operator': obj.operator,
                                     'location': obj.location,
                                     'mileages': obj.mileage,
@@ -311,7 +311,7 @@ const Maintenance = () => {
                         return obj.transferData.map((subObj) => {
                             return {
                                 'jobCard-Id': obj.jobCard_Id,
-                                'entry Date': moment(obj.entryDate && obj.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT'),
+                                'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
                                 'driver / Operator': obj.operator,
                                 'location': obj.location,
                                 'mileages': obj.mileage,
@@ -328,7 +328,7 @@ const Maintenance = () => {
                     } else {
                         return {
                             'jobCard-Id': obj.jobCard_Id,
-                            'entry Date': moment(obj.entryDate && obj.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT'),
+                            'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
                             'driver / Operator': obj.operator,
                             'location': obj.location,
                             'mileages': obj.mileage,

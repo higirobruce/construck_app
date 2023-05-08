@@ -4,6 +4,7 @@ import MTextView from '../common/mTextView';
 import { Dropdown } from 'semantic-ui-react';
 import TextInputLogin from '../common/TextIputLogin';
 import locations from '../../public/data/location.json';
+import moment from 'moment';
 
 const JobCard = (props) => {
     const {
@@ -41,7 +42,7 @@ const JobCard = (props) => {
                                 disabledTime={disabledTime}
                                 showTime
                                 placeholder='Select Date / Time'
-                                onChange={(values, dateStrings) => setEntryDate(dateStrings)}
+                                onChange={(values, dateStrings) => setEntryDate(moment(dateStrings))}
                             />
                         </div>
                     </div>
