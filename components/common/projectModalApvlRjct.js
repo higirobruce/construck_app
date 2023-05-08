@@ -134,7 +134,7 @@ export default function ModalApprovalRejections({
     let _siteWorkDetails = [...workDetails]
 
     if (isSiteWork) {
-      let _dailyWork = _work.dailyWork[dailyWorkIndex]
+      let _dailyWork = _work.dailyWorkNew[dailyWorkIndex]
       _dailyWork.toConfirm = true
 
       _siteWorkDetails[workIndex] = _work
@@ -174,7 +174,7 @@ export default function ModalApprovalRejections({
     // console.log(ogWorkDetails)
 
     if (isSiteWork) {
-      let _dailyWork = _work.dailyWork[dailyWorkIndex]
+      let _dailyWork = _work.dailyWorkNew[dailyWorkIndex]
       _dailyWork.toConfirm = false
       _dailyWork.confirming = false
 
@@ -202,7 +202,7 @@ export default function ModalApprovalRejections({
       let id = _work._id
 
       if (isSiteWork) {
-        let _dailyWork = _work.dailyWork[dailyWorkIndex]
+        let _dailyWork = _work.dailyWorkNew[dailyWorkIndex]
         _dailyWork.confirming = true
         _siteWorkDetails[workIndex] = _work
         setWorkDetails(_siteWorkDetails)
@@ -220,7 +220,7 @@ export default function ModalApprovalRejections({
           .then((res) => {
             let _work2 = workDetails[workIndex]
             let _siteWorkDetails2 = [...workDetails]
-            let _dailyWork2 = _work2.dailyWork[dailyWorkIndex]
+            let _dailyWork2 = _work2.dailyWorkNew[dailyWorkIndex]
             _dailyWork2.confirming = false
             _dailyWork2.toConfirm = false
             _dailyWork2.status = 'validated'
@@ -319,10 +319,10 @@ export default function ModalApprovalRejections({
             {workDetails && workDetails.length > 0 && (
               <div className="flex flex-col rounded-lg ring-1 ring-gray-100">
                 {workDetails.map((detail, workIndex) => {
-                  if (detail.siteWork)
+                  if (detail?.siteWork)
                     return (
-                      detail.siteWork &&
-                      detail.dailyWork.map((d, index) => {
+                      detail?.siteWork &&
+                      detail?.dailyWorkNew.map((d, index) => {
                         return (
                           d.status &&
                           // d.status !== 'validated' &&
@@ -526,8 +526,8 @@ export default function ModalApprovalRejections({
                           <div className="flex flex-col">
                             <MTextView content={detail.status} />
                             <div className="font-mono text-xs">
-                              {detail.rejectedReason
-                                ? 'Reason: ' + detail.rejectedReason
+                              {detail.reasonForRejection
+                                ? 'Reason: ' + detail.reasonForRejection
                                 : ''}
                             </div>
                           </div>
