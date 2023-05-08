@@ -21,13 +21,10 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
     const getNewRequest = () => {
         let existingCard = jobLogCards.filter((item) => item.jobCard_Id == row.jobCard_id)[0];
         let diff = [];
-        console.log('Existing Card ', existingCard);
-        console.log('Row ', row);
         if(existingCard.sourceItem == 'Transfer') {
             diff = existingCard.transferData.filter((obj1) => !row.transferData.some((obj2) => obj1.from == obj2.from && obj1.parts == obj2.parts))
         } else {
             for (let i = 0; i < existingCard.inventoryData.length; i++) {
-                console.log('Existing Card I ', existingCard.inventoryData[i])
                 for (let j = 0; j < existingCard.inventoryData[i].length; j++) {
                     const obj1 = existingCard.inventoryData[i][j];
                     const obj2 = row.inventoryData[i].find((obj) => obj.issue == obj1.issue);
@@ -37,13 +34,10 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                 }
             }
             diff = existingCard.inventoryData.filter((obj1) => !row.inventoryData.some((obj2) => obj1.from == obj2.from && obj1.parts == obj2.parts))
-            console.log('Diff ', diff)
         }
 
         return {data: diff}
     }
-
-    console.log(getNewRequest().data, 'Get New Requests ');
     
     return (
         <div className='flex flex-col items-center space-y-5'>

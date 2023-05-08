@@ -47,8 +47,7 @@ const OperatorCard = (props) => {
                 <span>
                     {row.inventoryItems.map((item) => (
                         
-                        <> 
-                            {console.log('Item ', item)}
+                        <>
                             {item.value.length > 0 && item.value.map((value) => (
                                 <small className='bg-red-50 text-red-600 text-sm font-medium mx-2 pb-2 pt-1 px-4'>{value}</small>
                             ))}

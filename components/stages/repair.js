@@ -23,7 +23,6 @@ const Repair = (props) => {
     };
     
     const rangeDate = (start) => {
-        console.log('Start ', start);
         const result = [];
         for (let i = 0; i < 24; i++) {
             if(i < start) {
