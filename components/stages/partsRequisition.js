@@ -66,25 +66,21 @@ const PartsRequisition = (props) => {
 
         let newData = [...inventoryData];
 
-        console.log('New Data 01', newData[i]);
-
         if(newData[i] && newData[i][key]) {
-            console.log('No Key')
             newData[i][key]['issue'] = item;
             newData[i][key]['item'] = inventory;
             newData[i][key][target.name] = target.value;
         }
-        
-        console.log('New Data 02', newData);
 
         setInventoryData(newData)
     }
 
     const handleReceivedQty = ({target}, key, inventory, i, item) => {
-        if(target.value < 1)
-            return;
 
         if(target.value > inventoryData[i][key]['qty'])
+            return;
+
+        if(target.value < 0)
             return;
         
         let newData = [...inventoryData];

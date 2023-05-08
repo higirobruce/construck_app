@@ -291,7 +291,7 @@ const Maintenance = () => {
                             return subObj.filter(value => value.issue !== '').map((anotherSub) => {
                                 return {
                                     'jobCard-Id': obj.jobCard_Id,
-                                    'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                                    'entry Date': moment(obj.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT'),
                                     'driver / Operator': obj.operator,
                                     'location': obj.location,
                                     'mileages': obj.mileage,
@@ -311,7 +311,7 @@ const Maintenance = () => {
                         return obj.transferData.map((subObj) => {
                             return {
                                 'jobCard-Id': obj.jobCard_Id,
-                                'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                                'entry Date': moment(obj.entryDatetoLocaleString()).format('DD-MMMM-YYYY LT'),
                                 'driver / Operator': obj.operator,
                                 'location': obj.location,
                                 'mileages': obj.mileage,
@@ -328,7 +328,7 @@ const Maintenance = () => {
                     } else {
                         return {
                             'jobCard-Id': obj.jobCard_Id,
-                            'entry Date': moment(obj.entryDate).format('DD-MMMM-YYYY LT'),
+                            'entry Date': moment(obj.entryDate.toLocaleString()).format('DD-MMMM-YYYY LT'),
                             'driver / Operator': obj.operator,
                             'location': obj.location,
                             'mileages': obj.mileage,
@@ -648,11 +648,9 @@ const Maintenance = () => {
             ? 'testing'
             : page == 7 && 'pass' : 'requisition',
             reason: (role == 'workshop-manager' && !checkReason) ? '' : reason,
-            requestParts: (role == 'recording-officer' && row.status == 'requisition' && row.isViewed == 'not viewed') ? Date.now() : requestParts,
-            receivedParts: role == 'recording-officer' && (row.status == 'requisition') && (row.isViewed == 'denied' || row.isViewed == 'approved') ? Date.now() : receivedParts
+            requestParts: (role == 'recording-officer' && row.status == 'requisition' && row.isViewed == 'not viewed') ? moment() : requestParts,
+            receivedParts: role == 'recording-officer' && (row.status == 'requisition') && (row.isViewed == 'denied' || row.isViewed == 'approved') ? moment() : receivedParts
         }
-
-        console.log('Row 123', row);
 
         fetch(`${newUrl}/api/maintenance/${row._id}`, {
             method: 'PUT',
@@ -668,7 +666,6 @@ const Maintenance = () => {
             let endWork = result.assignIssue && result.assignIssue.filter(item => item.endRepair == "" || item.hasOwnProperty('endRepair') == false)
             setLoading(false);
             if((page == 2 && result.status == 'requisition' && (result.sourceItem == 'Inventory' || result.sourceItem == 'Transfer')) && (role == 'recording-officer' || role == 'workshop-support')) {
-                console.log('Result ', result)
                 if(result.isViewed == 'not viewed' || result.isViewed == 'new request') setRequestParts(result.requestParts);
                 setReceivedParts(result.receivedParts);
                 fetch(`${url}/email/send`, {
@@ -682,7 +679,7 @@ const Maintenance = () => {
                       workPayload: {
                         jobCard_Id: result.jobCard_Id,
                         plate: result.plate,
-                        postingDate: moment(Date.now()).format('DD-MMMM-YYYY LT'),
+                        postingDate: moment().format('DD-MMMM-YYYY LT'),
                       },
                       from: 'appinfo@construck.rw',
                       to: 'amushimiyimana@construck.rw',
@@ -769,8 +766,8 @@ const Maintenance = () => {
             ? 'testing'
             : page == 7 && 'pass' : 'requisition',
             reason: (role == 'workshop-manager' && !checkReason) ? '' : reason,
-            requestParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed == 'denied' || row.isViewed == 'not viewed') ? Date.now() : '',
-            receivedParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed != 'denied' || row.isViewed != 'not viewed') ? Date.now() : ''
+            requestParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed == 'denied' || row.isViewed == 'not viewed') ? moment() : '',
+            receivedParts: role == 'recording-officer' && row.status == 'requisition' && (row.isViewed != 'denied' || row.isViewed != 'not viewed') ? moment() : ''
         }
         
         fetch(`${newUrl}/api/maintenance/logs/${row.jobCard_Id || row.jobCard_id}`, {
@@ -1145,7 +1142,6 @@ const Maintenance = () => {
                     />
                 )}
             </div>
-            {console.log('Row Check ', row)}
             <Modal
                 open={isModalOpen}
                 onCancel={handleCancel}
