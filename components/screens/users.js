@@ -76,6 +76,7 @@ export default function Users() {
           value: 'customer-project-manager',
           text: 'Project Manager',
         },
+        { key: '16', value: 'customer-site-manager', text: 'Site Manager' },
         { key: '14', value: 'logistic-officer', text: 'Logistic Officer' },
       ]
 
@@ -495,7 +496,7 @@ export default function Users() {
                 </div>
               </div>
 
-              {(role == 'customer-project-manager' || role === 'admin') && (
+              {(role == 'customer-project-manager' || role === 'admin' || role == 'customer-site-manager') && (
                 <div className="flex flex-col items-start space-y-1">
                   <div className="flex flex-row items-center">
                     <MTextView content="Assign to Project" />
