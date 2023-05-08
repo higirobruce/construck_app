@@ -25,6 +25,8 @@ const PartsRequisition = (props) => {
         previousMode
     } = props;
 
+    const [eqType, setEqType] = useState([]);
+
     const handleInventory = (value, i) => {
         let newData = [...inventoryItems];
 
@@ -107,7 +109,24 @@ const PartsRequisition = (props) => {
     }
 
     const handleChange = (value, part, i) => {
+
+        const foundItem = eqList.filter(({text}) => value == text)
+        const updatedEqList = [...eqType];
         
+        if(updatedEqList && updatedEqList[i]) {
+            if(updatedEqList[i]['text'] != value) {
+                updatedEqList[i]['eqDescription'] = foundItem[0]['eqDescription'];
+                updatedEqList[i]['eqStatus'] = foundItem[0]['eqStatus'];
+                updatedEqList[i]['key'] = foundItem[0]['key'];
+                updatedEqList[i]['status'] = foundItem[0]['status'];
+                updatedEqList[i]['text'] = foundItem[0]['text'];
+                updatedEqList[i]['value'] = foundItem[0]['value'];
+                setEqType(updatedEqList)
+            }
+        } else {
+            setEqType([...eqType, foundItem])
+        }
+
         let newData = [...transferData];
 
         newData[i]['from'] = value;
@@ -116,10 +135,20 @@ const PartsRequisition = (props) => {
         setTransferData(newData);
     }
 
+    useEffect(() => {
+        let foundItem;
+        
+        transferData.map((transfer, i) => {
+            foundItem = eqList.filter(({text}) => transfer['from'] == text);
+            setEqType(prevState => ([...prevState, foundItem[0]]));
+        })
+        
+    }, [])
+
     const handleSource = (value) => {
         setSourceItem(value)
     }
-    
+
     return (
         <div className='flex flex-col space-y-10'>
             {reason && <div class="flex items-center bg-orange-100 text-orange-500 text-sm font-bold px-5 py-2 mr-5 mt-3" role="alert">
@@ -214,6 +243,14 @@ const PartsRequisition = (props) => {
                                 <div className='flex flex-row items-center'>
                                     <MTextView content={'From'} />
                                     <div className='text-sm text-red-600'>*</div>
+                                    {eqType[i] && (
+                                        <div className="ml-2 rounded shadow-md">
+                                            <MTextView
+                                                content={eqType[i].eqDescription || eqType[i][0].eqDescription}
+                                                selected
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 <Select
                                     showSearch

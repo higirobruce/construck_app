@@ -89,9 +89,9 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                             <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>Outstanding <br /> Bal (Store)</th>
                             <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
                         </tr>
-                        {row.inventoryData && row.inventoryData.map((item, i) => (
+                        {row.inventoryData && row.inventoryData.filter(array => array.some(obj => obj.issue !== "")).map((item, i) => (
                             <>
-                                {item.map((value) => {
+                                {item.filter(value => value.issue !== '').map((value) => {
                                     let foundItem = itemsPart.find((v) => v['ITEM & PART'] == value['item']);
                                     return (
                                         <tr>
