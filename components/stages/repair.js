@@ -46,23 +46,34 @@ const Repair = (props) => {
         return current < dayjs(moment(assignIssue[i]['startRepair']).subtract(1, 'day').format('YYYY-MM-DD')).endOf('day') || current > dayjs().endOf('day');
     }
 
-    const disableCustomTime = (i) => ({
+    const disableCustomTime = (current, i) => ({
         disabledHours: () => {
             return (
-                ((new Date()).getFullYear() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getFullYear()
-                && (new Date()).getMonth() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMonth()
-                && (new Date()).getDate() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getDate())
-                ? rangeDate(new Date(assignIssue[i] && assignIssue[i].startRepair).getHours())
-                : range(new Date().getHours() + 1, 24)
+                (new Date(current).getFullYear() == new Date(assignIssue[i] && assignIssue[i].startRepair).getFullYear()
+                && new Date(current).getMonth() == new Date(assignIssue[i] && assignIssue[i].startRepair).getMonth()
+                && new Date(current).getDate() == new Date(assignIssue[i] && assignIssue[i].startRepair).getDate())
+                ? range(0, new Date(assignIssue[i] && assignIssue[i].startRepair).getHours())
+                : (new Date(current).getFullYear() == new Date().getFullYear()
+                && new Date(current).getMonth() == new Date().getMonth()
+                && new Date(current).getDate() == new Date().getDate())
+                ? range(new Date(current).getHours() + 1, 24)
+                : range(0, 0)
             )
         },
-        disabledMinutes: () => (
-            ((new Date()).getFullYear() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getFullYear()
-            && (new Date()).getMonth() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMonth()
-            && ((new Date()).getDate() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getDate()) 
-            && ((new Date()).getHours() == (new Date(assignIssue[i] && assignIssue[i].startRepair)).getHours())))
-            ? range(1, (new Date(assignIssue[i] && assignIssue[i].startRepair)).getMinutes() + 1) 
-            : range((new Date()).getMinutes() + 2, 60),
+        disabledMinutes: () => {
+            return (
+                (new Date(current).getFullYear() == new Date(assignIssue[i] && assignIssue[i].startRepair).getFullYear()
+                && new Date(current).getMonth() == new Date(assignIssue[i] && assignIssue[i].startRepair).getMonth()
+                && new Date(current).getDate() == new Date(assignIssue[i] && assignIssue[i].startRepair).getDate()
+                && new Date(current).getHours() == new Date(assignIssue[i] && assignIssue[i].startRepair).getHours())
+                ? range(0, new Date(assignIssue[i] && assignIssue[i].startRepair).getMinutes() + 1) 
+                : (new Date(current).getFullYear() == new Date().getFullYear()
+                && new Date(current).getMonth() == new Date().getMonth()
+                && new Date(current).getDate() == new Date().getDate()
+                && new Date(current).getHours() == new Date().getHours())
+                ? range((new Date()).getMinutes() + 2, 60)
+                : range(0, 0)
+        )},
         disabledSeconds: () => [55, 56],    
     })
 
@@ -72,7 +83,7 @@ const Repair = (props) => {
                 (new Date(current).getFullYear() == new Date(row && row.entryDate).getFullYear()
                 && new Date(current).getMonth() == new Date(row && row.entryDate).getMonth()
                 && new Date(current).getDate() == new Date(row && row.entryDate).getDate())
-                ? range(new Date(row && row.entryDate).getHours() + 1, 24)
+                ? range(0, new Date(row && row.entryDate).getHours())
                 : (new Date(current).getFullYear() == new Date().getFullYear()
                 && new Date(current).getMonth() == new Date().getMonth()
                 && new Date(current).getDate() == new Date().getDate())
@@ -86,7 +97,7 @@ const Repair = (props) => {
                 && new Date(current).getMonth() == new Date(row && row.entryDate).getMonth()
                 && new Date(current).getDate() == new Date(row && row.entryDate).getDate())
                 && new Date(current).getHours() == new Date(row && row.entryDate).getHours())
-                ? range(new Date(row && row.entryDate).getMinutes() + 2, 60)
+                ? range(0, new Date(row && row.entryDate).getMinutes())
                 : (new Date(current).getFullYear() == new Date().getFullYear()
                 && new Date(current).getMonth() == new Date().getMonth()
                 && new Date(current).getDate() == new Date().getDate())
@@ -246,7 +257,7 @@ const Repair = (props) => {
                                     <DatePicker
                                         format="YYYY-MM-DD HH:mm:ss"
                                         disabledDate={(current) => disableCustomeDate(current, i)}
-                                        disabledTime={() => disableCustomTime(i)}
+                                        disabledTime={(value) => disableCustomTime(value, i)}
                                         showTime
                                         placeholder='Select End'
                                         onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}
