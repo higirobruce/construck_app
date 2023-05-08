@@ -32,6 +32,7 @@ const OperatorCard = (props) => {
             <div className='flex flex-col space-y-5'>
                 <span className='text-gray-400 pt-6'>Job Card ID: <small className='text-black text-sm font-medium'>{row.jobCard_id}</small></span>
                 <span className='text-gray-400 py-4'>Plate Number: <small className='text-black text-sm font-medium'>{row.plate.text}</small> <sup className='bg-blue-500 rounded-full px-2 pb-0.5'><small className='text-white'>{row.plate.eqDescription}</small></sup></span>
+                <span className='text-gray-400 pb-4'>Operator: <small className='text-black text-sm font-medium'>{row.operator ? row.operator : 'N/A'}</small></span>
                 <div className='flex items-center space-x-2'>
                     <span className='text-gray-500'>Tools:</span>
                 </div>
