@@ -817,6 +817,7 @@ export default function Workdata() {
         setNJobs(1)
         setNMachinesToMove(1)
         setSelEquipments([])
+        setSelJobTypes([]);
         setFromProjects([])
         settoProjects([])
         setTargetTrips(0)
@@ -824,6 +825,9 @@ export default function Workdata() {
         setLoadingData(false)
         setSubmitting(false)
         setComment(null)
+        setPostingDate(moment())
+        setAstDrivers([])
+
       })
       .catch((err) => {
         toast.error(err)
@@ -1514,6 +1518,7 @@ export default function Workdata() {
           })
         }
       } else {
+        refresh()
         setSubmitting(false)
       }
     }
