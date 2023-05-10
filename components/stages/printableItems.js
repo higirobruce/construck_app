@@ -21,19 +21,23 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
     const getNewRequest = () => {
         let existingCard = jobLogCards.filter((item) => item.jobCard_Id == row.jobCard_id)[0];
         let diff = [];
+        
         if(existingCard.sourceItem == 'Transfer') {
-            diff = existingCard.transferData.filter((obj1) => !row.transferData.some((obj2) => obj1.from == obj2.from && obj1.parts == obj2.parts))
+            diff = row.transferData.filter((obj1) => !existingCard.transferData.some((obj2) => obj1.from == obj2.from))
         } else {
-            for (let i = 0; i < existingCard.inventoryData.length; i++) {
-                for (let j = 0; j < existingCard.inventoryData[i].length; j++) {
-                    const obj1 = existingCard.inventoryData[i][j];
-                    const obj2 = row.inventoryData[i].find((obj) => obj.issue == obj1.issue);
-                    if (JSON.stringify(obj1) !== JSON.stringify(obj2)) {
-                        diff.push({obj1, obj2});
+            for (let i = 0; i < row.inventoryData.length; i++) {
+                for (let j = 0; j < row.inventoryData[i].length; j++) {
+                    const string1 = JSON.stringify(row.inventoryData[i][j]);
+                    const string2 = JSON.stringify(existingCard.inventoryData && existingCard.inventoryData[i] && existingCard.inventoryData[i][j]);
+                    if (string1 !== string2) {
+                        // if the object doesn't exist in array2, add it to the diffArray
+                        if (!diff[i]) {
+                          diff[i] = [];
+                        }
+                        diff[i].push(JSON.parse(string1));
                     }
                 }
             }
-            diff = existingCard.inventoryData.filter((obj1) => !row.inventoryData.some((obj2) => obj1.from == obj2.from && obj1.parts == obj2.parts))
         }
 
         return {data: diff}
@@ -107,7 +111,7 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                             </>
                         ))}
                     </table>
-                ) : (
+                ) : (row.sourceItem == 'Transfer' && role != 'workshop-support') ? (
                     <table style={{fontFamily: 'arial, sans-serif', borderCollapse: 'collapse', width: '100%', margin: '35px 0px'}}>
                         <tr>
                             <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
@@ -128,7 +132,60 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                             </tr>
                         ))}
                     </table>
-                )}
+                ) : (row.sourceItem == 'Transfer' && role == 'workshop-support') ? (
+                    <table style={{fontFamily: 'arial, sans-serif', borderCollapse: 'collapse', width: '100%', margin: '35px 0px'}}>
+                        <tr>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>ITEMS</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>FROM</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
+                        </tr>
+                        {getNewRequest().data.map((value, i) => (
+                            <tr>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                    {value.parts}
+                                </td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                    {value.from}
+                                </td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                            </tr>
+                        ))}
+                    </table>
+                ) : <table style={{fontFamily: 'arial, sans-serif', borderCollapse: 'collapse', width: '100%', margin: '35px 0px'}}>
+                <tr>
+                    <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
+                    <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>ITEM DESCRIPTION</th>
+                    <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>QTY</th>
+                    <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>UOM</th>
+                    <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>Outstanding <br /> Bal (Store)</th>
+                    <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
+                </tr>
+                {getNewRequest().data && getNewRequest().data.filter(array => array.some(obj => obj.issue !== "")).map((item, i) => (
+                    <>
+                        {item.filter(value => value.issue !== '').map((value) => {
+                            let foundItem = itemsPart.find((v) => v['ITEM & PART'] == value['item']);
+                            return (
+                                <tr>
+                                    <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                    <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                        {value.item}
+                                    </td>
+                                    <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                        {value.qty}
+                                    </td>
+                                    <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                        {foundItem && foundItem['UOM']}
+                                    </td>
+                                    <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                    <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                </tr>
+                            )}
+                        )}
+                    </>
+                ))}
+            </table>}
                 <div className='flex justify-between items-center mt-5'>
                     <div className='flex items-center space-x-4'>
                         <h6 className='font-bold'><i>Authorized Signature :</i> </h6>

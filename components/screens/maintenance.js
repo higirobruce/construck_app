@@ -87,7 +87,7 @@ const Maintenance = () => {
     const [requestParts, setRequestParts] = useState('')
 
     const url = process.env.NEXT_PUBLIC_BKEND_URL
-    const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
+    const newUrl = process.env.NEXT_PUBLIC_BKEND_NEW_URL
     const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
     const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
     let foundItem = '';
@@ -181,23 +181,24 @@ const Maintenance = () => {
         return current && current > dayjs().endOf('day');
     }
 
-    // const disableCustomTime = (current) => ({
-    //     disabledHours: () => (
-    //         ((new Date()).getFullYear() == (new Date(startRepair)).getFullYear()
-    //         && (new Date()).getMonth() == (new Date(startRepair)).getMonth()
-    //         && (new Date()).getDate() == (new Date(startRepair)).getDate())
-    //         ? range(0, (new Date()).getHours())
-    //         : range((new Date()).getHours() + 1, 24)
-    //     ),
-    //     disabledMinutes: () => (
-    //         ((new Date()).getFullYear() == (new Date(startRepair)).getFullYear()
-    //         && (new Date()).getMonth() == (new Date(startRepair)).getMonth()
-    //         && ((new Date()).getDate() == (new Date(startRepair)).getDate()) 
-    //         && ((new Date()).getHours() == (new Date(startRepair)).getHours())))
-    //         ? range(1, (new Date(startRepair)).getMinutes() + 1) 
-    //         : range((new Date()).getMinutes() + 2, 60),
-    //     disabledSeconds: () => [55, 56],    
-    // })
+    const disableCustomTime = (current) => ({
+        disabledHours: () => (
+            (new Date().getFullYear() == new Date(current).getFullYear()
+            && new Date().getMonth() == new Date(current).getMonth()
+            && new Date().getDate() == new Date(current).getDate())
+            ? range(new Date().getHours() + 1, 24)
+            : range(0, 0)
+        ),
+        disabledMinutes: () => (
+            (new Date().getFullYear() == new Date(current).getFullYear()
+            && new Date().getMonth() == new Date(current).getMonth()
+            && (new Date().getDate() == new Date(current).getDate()) 
+            && (new Date().getHours() == new Date(current).getHours()))
+            ? range((new Date(current)).getMinutes() + 2, 60)
+            : range(0, 0)
+        ),
+        disabledSeconds: () => [55, 56],    
+    })
 
     const disabledTime = (current) => ({
         disabledHours: () => range((new Date()).getHours() + 1, 24),
@@ -206,6 +207,7 @@ const Maintenance = () => {
     })
 
     const setJobCardsToUpdate = (data) => {
+        populateJobLogsCard();
         refreshData();
         setRow(data)
         setExistingRow(prevState => prevState != '' ? data : prevState )
@@ -741,8 +743,8 @@ const Maintenance = () => {
             endRepair,
             mechanicalInspections,
             assignIssue,
-            transferData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? transferData : existingRow.transferData,
-            inventoryData: (role == 'workshop-manager' && (isViewed !== 'new request' && isViewed !== 'approve new request')) ? inventoryData: existingRow.inventoryData,
+            transferData,
+            inventoryData,
             inventoryItems,
             operatorApproval,
             operator,
@@ -822,7 +824,7 @@ const Maintenance = () => {
             startIndexNotApplicable={startIndexNotApplicable}
             setStartIndxNotApp={setStartIndxNotApp}
             disableDate={disableDate}
-            disabledTime={disabledTime}
+            disabledTime={disableCustomTime}
             usersList={usersList}
             eqList={eqList}
             projectList={projectList}
@@ -1303,10 +1305,10 @@ const Maintenance = () => {
                                     previousMode && setViewPort('list');
                                     if(page == 0) {
                                         handleSubmit();
-                                        role != 'workshop-support' && handleLogsSubmit()
+                                        role == 'recording-officer' && handleLogsSubmit()
                                     } else {
                                         handleUpdate();
-                                        role != 'workshop-support' && handleLogsUpdate()
+                                        role == 'recording-officer' && handleLogsUpdate()
                                     }
                                 }}
                                 okText="Yes"
@@ -1339,7 +1341,7 @@ const Maintenance = () => {
                                 if(row) {
                                     previousMode && setViewPort('list')
                                     handleUpdate();
-                                    role != 'workshop-support' && handleLogsUpdate();
+                                    role == 'recording-officer'&& handleLogsUpdate();
                                 }
                             }}
                             okText="Yes"
@@ -1387,7 +1389,7 @@ const Maintenance = () => {
                             submit={() => {
                                 (role == 'workshop-supervisor') && setPage(7);
                                 handleUpdate();
-                                role != 'workshop-support' && handleLogsUpdate();
+                                role == 'recording-officer' && handleLogsUpdate();
                                 setViewPort('list')
                             }}
                             intent={'success'}
