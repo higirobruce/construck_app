@@ -130,6 +130,7 @@ export default function Equipments() {
     { key: 23, text: 'WATER TANK TRUCK', value: 'WATER TANK TRUCK' },
     { key: 24, text: 'WHEEL LOADER', value: 'WHEEL LOADER' },
     { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
+    { key: 26, text: 'PICK UP', value: 'PICK UP' },
   ]
 
   let assetTypeOptions = [
