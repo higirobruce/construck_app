@@ -60,7 +60,8 @@ export default function MenuBar() {
     role === 'workshop-manager' ||
     role === 'workshop-supervisor' ||
     role === 'recording-officer' ||
-    role === 'workshop-team-leader'
+    role === 'workshop-team-leader' ||
+    role == 'admin'
 
   function logout() {
     localStorage.removeItem('user')
@@ -235,64 +236,93 @@ export default function MenuBar() {
           </div>
         )} */}
 
-        <div
-          className={
-            screen === 'maintenance'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-          }
-          onClick={() => setScreen('maintenance')}
-        >
-          <WrenchIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">Maintenance</div>
-        </div>
-        
-        <div className='w-full'>
+        {isWorkshopUser && (
           <div
             className={
-              ((screen === 'workshop') || (screen === 'items') || (screen === 'mechanics') || (screen === 'mechanical'))
+              screen === 'maintenance'
                 ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
                 : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
             }
-            onClick={() => setScreen('workshop')}
+            onClick={() => setScreen('maintenance')}
           >
-            <WrenchScrewdriverIcon className="h-5 w-5" />
-            <div className="hidden w-1/2 font-semibold md:block">Workshop</div>
+            <WrenchIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">
+              Maintenance
+            </div>
           </div>
-          <div className={`w-full bg-gray-300`} hidden={((screen == 'workshop') || (screen == 'items') || (screen == 'mechanics') || (screen == 'mechanical')) ? false : true}>
-            <div className={
-              (screen == 'workshop' || screen === 'items')
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
-              }
-              onClick={() => setScreen('items')}
-            >
-              <ClipboardDocumentListIcon className="h-4 w-4" />
-              <div className="hidden w-1/2 text-base font-semibold md:block">Items</div>
-            </div>
-            <div className={
-              screen == 'mechanics'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
-              }
-              onClick={() => setScreen('mechanics')}
-            >
-              <UserIcon className="h-4 w-4" />
-              <div className="hidden w-1/2 text-base font-semibold md:block">Mechanics</div>
-            </div>
-            <div className={
-              screen == 'mechanical'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
-              }
-              onClick={() => setScreen('mechanical')}
-            >
-              <AdjustmentsVerticalIcon className="h-4 w-4" />
-              <div className="hidden w-1/2 text-base font-semibold md:block">Mechanical Issues</div>
-            </div>
+        )}
 
+        {isWorkshopUser && (
+          <div className="w-full">
+            <div
+              className={
+                screen === 'workshop' ||
+                screen === 'items' ||
+                screen === 'mechanics' ||
+                screen === 'mechanical'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+              }
+              onClick={() => setScreen('workshop')}
+            >
+              <WrenchScrewdriverIcon className="h-5 w-5" />
+              <div className="hidden w-1/2 font-semibold md:block">
+                Workshop
+              </div>
+            </div>
+            <div
+              className={`w-full bg-gray-300`}
+              hidden={
+                screen == 'workshop' ||
+                screen == 'items' ||
+                screen == 'mechanics' ||
+                screen == 'mechanical'
+                  ? false
+                  : true
+              }
+            >
+              <div
+                className={
+                  screen == 'workshop' || screen === 'items'
+                    ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+                    : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+                }
+                onClick={() => setScreen('items')}
+              >
+                <ClipboardDocumentListIcon className="h-4 w-4" />
+                <div className="hidden w-1/2 text-base font-semibold md:block">
+                  Items
+                </div>
+              </div>
+              <div
+                className={
+                  screen == 'mechanics'
+                    ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+                    : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+                }
+                onClick={() => setScreen('mechanics')}
+              >
+                <UserIcon className="h-4 w-4" />
+                <div className="hidden w-1/2 text-base font-semibold md:block">
+                  Mechanics
+                </div>
+              </div>
+              <div
+                className={
+                  screen == 'mechanical'
+                    ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+                    : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+                }
+                onClick={() => setScreen('mechanical')}
+              >
+                <AdjustmentsVerticalIcon className="h-4 w-4" />
+                <div className="hidden w-1/2 text-base font-semibold md:block">
+                  Mechanical Issues
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {canReverseTransactions && (
           <div
@@ -307,7 +337,6 @@ export default function MenuBar() {
             <div className="hidden w-1/2 font-semibold md:block">Reversals</div>
           </div>
         )}
-        
       </div>
 
       <div className="flex w-full flex-col items-center px-5">
