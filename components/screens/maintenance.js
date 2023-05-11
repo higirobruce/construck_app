@@ -792,13 +792,13 @@ const Maintenance = () => {
         let filtered = jobCards;
         if(search) {
             filtered = jobCards.filter(jobCard => 
-                jobCard.plate.text.toLowerCase().includes(search.toLowerCase()) 
+                jobCard.plate && jobCard.plate.text && jobCard.plate.text.toLowerCase().includes(search.toLowerCase()) 
                 ||
                 jobCard.jobCard_Id.toLowerCase().includes(search.toLowerCase())
                 ||
-                (jobCard.driver) && jobCard.driver.text.toLowerCase().includes(search.toLowerCase())
+                (jobCard.driver && jobCard.driver.text) && jobCard.driver.text.toLowerCase().includes(search.toLowerCase())
                 ||
-                jobCard.plate.eqDescription.toLowerCase().includes(search.toLowerCase())
+                jobCard.plate && jobCard.plate.eqDescription && jobCard.plate.eqDescription.toLowerCase().includes(search.toLowerCase())
             )
         } else if(filterBy !== 'all') {
             filtered = jobCards.filter(jobCard => 
