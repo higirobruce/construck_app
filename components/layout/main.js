@@ -14,7 +14,6 @@ import Costs from '../screens/costs'
 import Maintenance from '../screens/maintenance';
 import MechanicRepair from '../screens/mechanicRepair';
 import WorkshopRequested from '../screens/workshopRequested';
-import Items from '../screens/Items';
 import Mechanics from '../screens/mechanics';
 import Mechanical from '../screens/mechanicals';
 
@@ -35,7 +34,7 @@ export default function Main() {
       {screen === 'vendors' && <Vendors />}
       {screen === 'costs' && <Costs />}
       {screen === 'maintenance' && <Maintenance />}
-      {(screen === 'workshop' || screen === 'items') && <Items />}
+      {/* {(screen === 'workshop' || screen === 'items') && <Items />} */}
       {screen === 'mechanics' && <Mechanics />}
       {screen === 'mechanical' && <Mechanical />}
     </div>
