@@ -16,6 +16,8 @@ import {
   BanknotesIcon,
   WrenchScrewdriverIcon,
   BuildingStorefrontIcon,
+  ClipboardDocumentListIcon,
+  AdjustmentsVerticalIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
@@ -244,18 +246,53 @@ export default function MenuBar() {
           <WrenchIcon className="h-5 w-5" />
           <div className="hidden w-1/2 font-semibold md:block">Maintenance</div>
         </div>
+        
+        <div className='w-full'>
+          <div
+            className={
+              ((screen === 'workshop') || (screen === 'items') || (screen === 'mechanics') || (screen === 'mechanical'))
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('workshop')}
+          >
+            <WrenchScrewdriverIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">Workshop</div>
+          </div>
+          <div className={`w-full bg-gray-300`} hidden={((screen == 'workshop') || (screen == 'items') || (screen == 'mechanics') || (screen == 'mechanical')) ? false : true}>
+            <div className={
+              (screen == 'workshop' || screen === 'items')
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+              }
+              onClick={() => setScreen('items')}
+            >
+              <ClipboardDocumentListIcon className="h-4 w-4" />
+              <div className="hidden w-1/2 text-base font-semibold md:block">Items</div>
+            </div>
+            <div className={
+              screen == 'mechanics'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+              }
+              onClick={() => setScreen('mechanics')}
+            >
+              <UserIcon className="h-4 w-4" />
+              <div className="hidden w-1/2 text-base font-semibold md:block">Mechanics</div>
+            </div>
+            <div className={
+              screen == 'mechanical'
+              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+              }
+              onClick={() => setScreen('mechanical')}
+            >
+              <AdjustmentsVerticalIcon className="h-4 w-4" />
+              <div className="hidden w-1/2 text-base font-semibold md:block">Mechanical Issues</div>
+            </div>
 
-        {/* <div
-          className={
-            screen === 'repair'
-              ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
-              : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
-          }
-          onClick={() => setScreen('repair')}
-        >
-          <WrenchScrewdriverIcon className="h-5 w-5" />
-          <div className="hidden w-1/2 font-semibold md:block">My Repairs</div>
-        </div> */}
+          </div>
+        </div>
 
         {canReverseTransactions && (
           <div

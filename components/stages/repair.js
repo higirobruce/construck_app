@@ -12,7 +12,8 @@ const Repair = (props) => {
         setAssignIssue,
         assignIssue,
         entryDate,
-        row
+        row,
+        role
     } = props;
 
     const range = (start, end) => {
@@ -194,7 +195,7 @@ const Repair = (props) => {
                                 className={"rounded-2xl w-1/3"}
                                 onChange={(value) => handleAssign(issue, value)}
                                 placeholder="Assign Mechanics"
-                                disabled={assignIssue[i] && assignIssue[i].endRepair}
+                                disabled={role != 'workshop-support' && assignIssue[i] && assignIssue[i].endRepair}
                                 defaultValue={assignIssue.length > 0 ? (assignIssue.filter((assign) => assign.issue == issue).length > 0 && assignIssue.filter((assign) => assign.issue == issue)[0].mech) : []}
                                 optionLabelProp='label'
                             >
@@ -250,8 +251,8 @@ const Repair = (props) => {
                                         disabledTime={(value) => disableCustomTime(value, i)}
                                         showTime
                                         value={((assignIssue.length > 0 && assignIssue[i]) && assignIssue[i]['endRepair']) ? moment(assignIssue[i]['endRepair']) : ''}
-                                        disabled
-                                        // onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}
+                                        disabled={role !== 'workshop-support'}
+                                        onChange={(values, dateStrings) => handleEndRepair(dateStrings, issue)}
                                     />
                                 ) : (
                                     <DatePicker
