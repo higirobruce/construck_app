@@ -61,6 +61,7 @@ export default function MenuBar() {
     role === 'workshop-supervisor' ||
     role === 'recording-officer' ||
     role === 'workshop-team-leader' ||
+    role == 'workshop-support' ||
     role == 'admin'
 
   function logout() {

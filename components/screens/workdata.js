@@ -2208,6 +2208,8 @@ export default function Workdata() {
           )}
         </div>
 
+        {console.log('Worklist ', workList)}
+
         {viewPort === 'list' && (
           <>
             {loadingData && <Loader active />}
