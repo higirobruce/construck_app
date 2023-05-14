@@ -91,7 +91,7 @@ const PartsRequisition = (props) => {
 
     const handleTransfers = (value) => {
         for(let i = 0; i <= transferParts.length; i++) {
-            setTransferData([...transferData, {parts: '', from: ''}])
+            setTransferData([...transferData, {parts: '', from: '', qty: ''}])
         }
         setTransferParts(value);
 
@@ -99,6 +99,14 @@ const PartsRequisition = (props) => {
             const validParts = transferData.filter((item) => item.parts == value.map((val) => val));
             setTransferData(validParts);
         }
+    }
+
+    const handleTransferQty = ({target}, i) => {
+        if(target.value < 1)
+            return;
+        const newData = [...transferData];
+        newData[i]['qty'] = target.value;
+        setTransferData(newData);
     }
 
     const handleChange = (value, part, i) => {
@@ -124,6 +132,7 @@ const PartsRequisition = (props) => {
 
         newData[i]['from'] = value;
         newData[i].parts = part;
+        newData[i]['qty'] = 1;
         
         setTransferData(newData);
     }
@@ -231,7 +240,7 @@ const PartsRequisition = (props) => {
                 <div className='w-full'>
                     <div className='flex items-center space-x-5'>
                         <span>{item}</span>
-                        <div className='flex items-center space-x-5 w-1/2'>
+                        <div className='flex items-center space-x-5 w-2/3'>
                             <div className='flex w-full flex-col space-y-1'>
                                 <div className='flex flex-row items-center'>
                                     <MTextView content={'From'} />
@@ -247,7 +256,7 @@ const PartsRequisition = (props) => {
                                 </div>
                                 <Select
                                     showSearch
-                                    style={{ width: '60%' }}
+                                    style={{ width: '100%' }}
                                     placeholder="Parts transfer from"
                                     defaultValue={transferData.length > 0 ? transferData[i]['from'] : []}
                                     onChange={(value) => handleChange(value, item, i)}
@@ -266,6 +275,19 @@ const PartsRequisition = (props) => {
                                         </Option>
                                     ))}
                                 </Select>
+                            </div>
+                            <div className='flex w-1/3 flex-col space-y-1'>
+                                <div className='flex flex-row items-center'>
+                                    <MTextView content={'Quantity'} />
+                                    <div className='text-sm text-red-600'>*</div>
+                                </div>
+                                <input
+                                    className='rounded-sm border-gray-100 py-2.5 px-3 text-sm font-medium shadow-none ring-1 ring-gray-200 transition duration-200 ease-in-out hover:ring-1 hover:ring-gray-400 focus:outline-none focus:ring-blue-300 w-full'
+                                    onChange={(e) => handleTransferQty(e, i)}
+                                    name="qty"
+                                    value={transferData && transferData[i] && transferData[i]['qty']}
+                                    type={'number'}
+                                />
                             </div>
                         </div>
                     </div>

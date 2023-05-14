@@ -117,7 +117,7 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                             <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>S/No</th>
                             <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>ITEMS</th>
                             <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>FROM</th>
-                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>REMARKS</th>
+                            <th style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>QUANTITY</th>
                         </tr>
                         {row.transferData.map((value, i) => (
                             <tr>
@@ -128,7 +128,9 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
                                 <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
                                     {value.from}
                                 </td>
-                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}></td>
+                                <td style={{border: '1px solid #ddd', textAlign: 'left', paddingLeft: '10px'}}>
+                                    {value.qty ? value.qty : 0}
+                                </td>
                             </tr>
                         ))}
                     </table>
