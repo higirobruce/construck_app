@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Checkbox, Select, Space } from 'antd';
 import MTextView from '../common/mTextView';
-import mechanicIssues from '../../public/data/mechanicIssue.json'
 
 const tools = [
     {label: 'Fire extinguisher', value: 'Fire extinguisher'},
@@ -22,15 +21,41 @@ const InspectionDiagnosis = (props) => {
         previousMode
     } = props;
 
+    const [mechanicIssues, setMechanicals] = useState([]);
+
+    const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
+    const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+    const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+
+
     const { Option } = Select;
 
     const handleChange = (value) => {
         setMechanicalInspections(value)
     };
 
+    const populateMechanicals = () => {
+        fetch(`${newUrl}/api/mechanicals`, {
+            headers: {
+              Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            }
+        })
+        .then((res) => res.json())
+        .then(res => {
+          setMechanicals(res.mechanicals);
+        })
+        .catch((err) => {
+          toast.error(err)
+        })
+    }
+
     const onChange = (checkedValues ) => {
         setInspectionTools(checkedValues);
     };
+
+    useEffect(() => {
+        populateMechanicals();
+    }, [])
 
     return (
         <div className='flex flex-col space-y-10'>

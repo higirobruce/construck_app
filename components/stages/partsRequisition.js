@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {Select, Space} from 'antd';
 import MTextView from '../common/mTextView';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import itemsPart from '../../public/data/itemParts.json'
 
 const PartsRequisition = (props) => {
     const {
@@ -26,6 +25,26 @@ const PartsRequisition = (props) => {
     } = props;
 
     const [eqType, setEqType] = useState([]);
+    const [itemsPart, setItems] = useState([])
+
+    const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
+    const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+    const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+
+    const populateItems = () => {
+        fetch(`${newUrl}/api/items`, {
+          headers: {
+            Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+          }
+        })
+        .then((res) => res.json())
+        .then(res => {
+          setItems(res.items);
+        })
+        .catch((err) => {
+          toast.error(err)
+        })
+    }
 
     const handleInventory = (value, i) => {
         let newData = [...inventoryItems];
@@ -143,9 +162,9 @@ const PartsRequisition = (props) => {
         transferData.map((transfer, i) => {
             foundItem = eqList.filter(({text}) => transfer['from'] == text);
             setEqType(prevState => ([...prevState, foundItem[0]]));
-        })
-        
-    }, [])
+        });
+        populateItems();
+    }, []);
 
     const handleSource = (value) => {
         setSourceItem(value)
