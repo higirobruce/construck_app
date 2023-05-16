@@ -61,9 +61,8 @@ export default function MenuBar() {
     role === 'workshop-supervisor' ||
     role === 'recording-officer' ||
     role === 'workshop-team-leader' ||
+    role == 'workshop-support' ||
     role == 'admin'
-  
-  let isWorkshopSupport = role === 'workshop-support'
 
   function logout() {
     localStorage.removeItem('user')
@@ -254,7 +253,7 @@ export default function MenuBar() {
           </div>
         )}
 
-        {isWorkshopSupport && (
+        {isWorkshopUser && (
           <div className="w-full">
             <div
               className={
