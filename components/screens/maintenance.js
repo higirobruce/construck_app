@@ -1217,7 +1217,7 @@ const Maintenance = () => {
                                 <>
                                     {row.transferData && row.transferData.map((item) => (
                                         <div className='bg-gray-100 px-5 mt-2 py-2'>
-                                            <small>{item.from}: <b>{item.parts}</b></small>
+                                            <small><b>{item.qty && item.qty}</b> {item.parts}: <b>{item.from}</b></small>
                                         </div>
                                     ))}
                                 </>

@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {Select, Space} from 'antd';
 import moment from 'moment';
 import { DatePicker } from 'antd';
 import MTextView from '../common/mTextView';
 import dayjs from 'dayjs';
-import mechanics from '../../public/data/mechanics.json';
 
 const Repair = (props) => {
     const {
@@ -15,6 +14,27 @@ const Repair = (props) => {
         row,
         role
     } = props;
+
+    const [mechanics, setMechanics] = useState([]);
+
+    const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
+    const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
+    const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
+    
+    const populateMechanics = () => {
+        fetch(`${newUrl}/api/mechanics`, {
+          headers: {
+            Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+          }
+        })
+        .then((res) => res.json())
+        .then(res => {
+          setMechanics(res.mechanics);
+        })
+        .catch((err) => {
+          toast.error(err)
+        })
+    }
 
     const range = (start, end) => {
         const result = [];
@@ -182,6 +202,10 @@ const Repair = (props) => {
             setAssignIssue([{issue, mech: [''], startRepair: '', endRepair: date}])
         }
     }
+
+    useEffect(() => {
+        populateMechanics()
+    }, [])
 
     return (
         <>

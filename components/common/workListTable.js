@@ -179,6 +179,7 @@ export default function WorkListTable({
 }) {
   const [pageSize, setPageSize] = useState(15)
   const { user, setUser } = useContext(UserContext)
+  console.log('Data ', data)
 
   //Authorization
   let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
