@@ -1,6 +1,7 @@
 import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
+import { UserContext } from '../../contexts/UserContext';
 import MSubmitButton from '../common/mSubmitButton';
 import MTextView from '../common/mTextView';
 import MPagination from '../common/pagination';
@@ -8,7 +9,11 @@ import TextInput from '../common/TextIput';
 import TextInputLogin from '../common/TextIputLogin';
 
 const Mechanicals = () => {
-  let canCreateData = true;
+
+  let { user } = useContext(UserContext)
+
+  let role = user?.userType
+  let canCreateData = role === 'workshop-support';
 
   let [pageNumber, setPageNumber] = useState(1);
   const [mechanicals, setMechanicals] = useState([]);
