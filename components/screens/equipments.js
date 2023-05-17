@@ -118,7 +118,7 @@ export default function Equipments() {
       value: 'PNEUMATIC ASPHALT COMPACTOR',
     },
     {
-      key: 26,
+      key: 27,
       text: 'DOUBLE DRUM ASPHALT COMPACTOR',
       value: 'DOUBLE DRUM ASPHALT COMPACTOR',
     },
@@ -131,6 +131,36 @@ export default function Equipments() {
     { key: 24, text: 'WHEEL LOADER', value: 'WHEEL LOADER' },
     { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
     { key: 26, text: 'PICK UP', value: 'PICK UP' },
+    {
+      key: 28,
+      text: 'MILK TANK TRUCK',
+      value: 'MILK TANK TRUCK',
+    },
+    {
+      key: 29,
+      text: 'MILK MINI-TRUCK',
+      value: 'MILK MINI-TRUCK',
+    },
+    {
+      key: 30,
+      text: 'SMALL TRUCK',
+      value: 'SMALL TRUCK',
+    },
+    {
+      key: 31,
+      text: 'MEDIUM CONTAINER TRUCK',
+      value: 'MEDIUM CONTAINER TRUCK',
+    },
+    {
+      key: 32,
+      text: 'FLATBED',
+      value: 'FLATBED',
+    },
+    {
+      key: 33,
+      text: 'TRAILER',
+      value: 'TRAILER',
+    },
   ]
 
   let assetTypeOptions = [
