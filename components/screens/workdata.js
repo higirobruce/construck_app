@@ -166,7 +166,7 @@ export default function Workdata() {
 
   const disabledDate = (current) => {
     // Can not select days before today and today
-    return current && current < moment('2022-07-01')
+    return current && current < moment().subtract(2,'months').endOf('month') && user.userType!=='admin'
   }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
