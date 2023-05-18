@@ -6,7 +6,7 @@ import Image from 'next/image'
 import itemsPart from '../../public/data/itemParts.json';
 import moment from 'moment';
 
-const PrintableItems = ({row, setPage, jobLogCards, role, setViewPort}) => {
+const PrintableItems = ({row, setPage, jobLogCards, role}) => {
     const componentRef = useRef(null);
     const user = JSON.parse(localStorage.getItem('user'))
 
@@ -43,6 +43,8 @@ const PrintableItems = ({row, setPage, jobLogCards, role, setViewPort}) => {
 
         return {data: diff}
     }
+
+    console.log('Row ', row);
     
     return (
         <div className='flex flex-col items-center space-y-5'>
