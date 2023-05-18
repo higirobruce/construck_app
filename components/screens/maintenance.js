@@ -206,7 +206,7 @@ const Maintenance = () => {
         disabledSeconds: () => [55, 56],
     })
 
-    const setJobCardsToUpdate = (data) => {
+    const setJobCardsToUpdate = (data, shouldPrint) => {
         populateJobLogsCard();
         refreshData();
         setRow(data)
@@ -236,40 +236,47 @@ const Maintenance = () => {
         setOperatorNotApp(data.operatorNotApplicable)
         setRequestParts(data.requestParts)
         setReceivedParts(data.receivedParts)
-        setPage(
-            role != 'workshop-manager' &&
-            role == 'workshop-support' && (data.status != 'pass' && data.status != 'requisition')
-            ? 1
-            : (data && data.status) == 'entry'
-            ? 1 
-            : (data && data.status) == 'diagnosis'
-            ? 2
-            : (role == 'workshop-support' && (data && data.status) == 'requisition' && data.isViewed == 'approved new request')
-            ? 3
-            : (role != 'workshop-support' && (data && data.status) == 'requisition' && data.isViewed == 'approved')
-            ? 3
-            : (role != 'workshop-support' && (data && data.status) == 'requisition' && data.sourceItem == 'Transfer' && data.isViewed == 'approved')
-            ? 3
-            : (data && data.status) == 'requisition'
-            ? 2
-            : ((data && data.status) == 'repair' && (data.finishTime) && data.finishTime.length > 1)
-            ? 6
-            : (data && data.status) == 'repair'
-            ? 5
-            : (data && data.jobCard_status) == 'closed'
-            ? 7
-            : (data && data.status) == 'testing'
-            ? 6
-            : (data && data.status) == 'pass'
-            ? 7
-            : 0
-        )
+        if(shouldPrint && (data.isViewed == 'approved' || data.status == 'approved new request')) {
+            setPage(3)
+        }
+        else if((role == 'recording-officer' && (data && data.status) == 'requisition' && (data.isViewed == 'approved new request' || data.isViewed == 'new request'))) {
+            return
+        } else {
+            setPage(
+                role != 'workshop-manager' &&
+                role == 'workshop-support' && (data.status != 'pass' && data.status != 'requisition')
+                ? 1
+                : (data && data.status) == 'entry'
+                ? 1 
+                : (data && data.status) == 'diagnosis'
+                ? 2
+                : (role == 'workshop-support' && (data && data.status) == 'requisition' && (data.isViewed == 'approved' || data.isViewed == 'approved new request'))
+                ? 3
+                : (role != 'workshop-support' && (data && data.status) == 'requisition' && (data.isViewed == 'approved'))
+                ? 3
+                : (role != 'workshop-support' && (data && data.status) == 'requisition' && data.sourceItem == 'Transfer' && data.isViewed == 'approved')
+                ? 3
+                : (data && data.status) == 'requisition'
+                ? 2
+                : ((data && data.status) == 'repair' && (data.finishTime) && data.finishTime.length > 1)
+                ? 6
+                : (data && data.status) == 'repair'
+                ? 5
+                : (data && data.jobCard_status) == 'closed'
+                ? 7
+                : (data && data.status) == 'testing'
+                ? 6
+                : (data && data.status) == 'pass'
+                ? 7
+                : 0
+            )
+        }
         setMileagesNotApplicable(data.mileagesNotApplicable);
         setNextMileages(data.nextMileages);
         
         if(role == 'workshop-manager' && (data && data.status == 'requisition')) {
             showModal()
-        } else if(((role == 'recording-officer' && data.status == 'testing')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
+        } else if(!shouldPrint && ((role == 'recording-officer' && data.status == 'testing')) || (role == 'workshop-manager' && data.status != 'requisition') || role == 'workshop-team-leader' || (role == 'workshop-supervisor' && data.jobCard_status == 'opened')) {
             setViewPort('operatorView');
         } else {
             setViewPort((data && data.status) && 'change');
@@ -364,8 +371,8 @@ const Maintenance = () => {
                         'jobCard-Id': obj.jobCard_Id,
                         'plate number': obj.plate.text,
                         'mechanical Issue': obj.mechanicalInspections.join(', '),
-                        'parts requested': moment(new Date(+obj.requestParts)).format('DD-MMMM-YYYY LT'),
-                        'parts received': moment(new Date(+obj.receivedParts)).format('DD-MMMM-YYYY LT'),
+                        'parts requested': moment(obj.requestParts).format('DD-MMMM-YYYY LT'),
+                        'parts received': moment(obj.receivedParts).format('DD-MMMM-YYYY LT'),
                     }
                 })
             }
@@ -635,12 +642,13 @@ const Maintenance = () => {
             teamApproval: role === 'workshop-team-leader' ? true : teamApproval,
             supervisorApproval: role === 'workshop-supervisor' ? true : row.supervisorApproval,
             isViewed:
-                (role == 'workshop-support') ? 'new request' :
+                (role == 'workshop-support' && page < 4) ? 'new request' :
+                (role == 'workshop-support' && page >= 4) ? 'approved new request' : 
                 (role === 'workshop-manager' && row.status == 'requisition') ?
                     (isReason && isViewed == 'new request') ? 'denied' :
                     (!isReason && isViewed == 'new request') ? 'approved new request' :
                     (isReason) ? 'denied' : 'approved' : isViewed,
-            status: role != 'workshop-manager' ? page == 1 
+            status: (role == 'workshop-support' && page > 3) ? 'repair' : role != 'workshop-manager' ? page == 1 
             ? 'diagnosis'
             : page == 2 || page == 4
             ? 'requisition'
@@ -864,6 +872,7 @@ const Maintenance = () => {
             jobLogCards={jobLogCards}
             setPage={setPage}
             role={role}
+            setViewPort={setViewPort}
         />,
         <PartsRequisitions 
             sourceItem={sourceItem}
@@ -1039,7 +1048,7 @@ const Maintenance = () => {
                                     }
                                 />
                                 <MainStatusCard
-                                    data={{ title: 'Diagnos', content: nDiagnosis }}
+                                    data={{ title: 'Diagnosis', content: nDiagnosis }}
                                     intent={
                                     filterBy === 'diagnosis' || filterBy === 'all'
                                         ? 'diagnosis'
@@ -1277,8 +1286,8 @@ const Maintenance = () => {
                                     receivedParts: c.receivedParts
                                 }}
                                 role={role}
-                                updateMe={setJobCardsToUpdate}
                                 canCreateData={canCreateData}
+                                updateMe={setJobCardsToUpdate}
                             />
                         )
                     }) : (
