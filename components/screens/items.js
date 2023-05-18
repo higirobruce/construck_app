@@ -1,4 +1,5 @@
 import { ArrowLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Result, Select, Space } from 'antd';
 import React, { useContext, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import { UserContext } from '../../contexts/UserContext';
@@ -13,12 +14,13 @@ const Items = () => {
 
   let role = user?.userType
   let canCreateData = role === 'workshop-support';
-
+  
   let [pageNumber, setPageNumber] = useState(1);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItem] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false)
+  const [row, setRow] = useState('')
 
   const [viewPort, setViewPort] = useState('list');
   const [itemPart, setItemPart] = useState('');
@@ -29,6 +31,31 @@ const Items = () => {
   const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
   
+  const refreshData = () => {
+    setItemPart('');
+    setUOM('');
+    setItemCategory('');
+  }
+
+  const populateItems = () => {
+    setLoading(true);
+    fetch(`${newUrl}/api/items?page=${pageNumber}`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      }
+    })
+    .then((res) => res.json())
+    .then(res => {
+      setItems(res.items);
+      setTotalItem(res.totalItems);
+      setLoading(false);
+    }
+    )
+    .catch((err) => {
+      toast.error(err)
+    })
+  }
+
   const handleSubmit = () => {
     const payload = {
       itemCategory,
@@ -51,25 +78,31 @@ const Items = () => {
       setViewPort('list');
       populateItems();
     })
+    .catch(error => toast.error(error))
   }
 
-  const populateItems = () => {
-    setLoading(true);
-    fetch(`${newUrl}/api/items?page=${pageNumber}`, {
-      headers: {
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      }
-    })
-    .then((res) => res.json())
-    .then(res => {
-      setItems(res.items);
-      setTotalItem(res.totalItems);
-      setLoading(false);
+  const handleChange = () => {
+    const payload = {
+      itemCategory,
+      itemPart,
+      uom,
+      id: row['#']
     }
-    )
-    .catch((err) => {
-      toast.error(err)
+
+    fetch(`${newUrl}/api/items/${row._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+      body: JSON.stringify({payload})
     })
+    .then(res => res.json())
+    .then(result => {
+      setViewPort('list');
+      populateItems();
+    })
+    .catch(error => toast.error(error));
   }
 
   useEffect(() => {
@@ -98,6 +131,14 @@ const Items = () => {
     setPageNumber(data.activePage);
   }
 
+  const handleUpdate = (item) => {
+    setRow(item);
+    setItemCategory(item['ITEM CATEGORY']);
+    setItemPart(item['ITEM & PART']);
+    setUOM(item['UOM'])
+    setViewPort('change')
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">
@@ -108,8 +149,9 @@ const Items = () => {
           <MSubmitButton
             submit={() => {
                 // emptyState();
-                // refreshData();
                 setViewPort('new')
+                setRow('');
+                refreshData()
             }}
             intent="primary"
             icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
@@ -162,7 +204,7 @@ const Items = () => {
             </thead>
             {!loading && <tbody>
               {getData().data.map((item) => (
-                <tr class="bg-white border-b dark:bg-white-800 dark:border-white-700">
+                <tr onClick={() => handleUpdate(item)} class="bg-white border-b dark:bg-white-800 dark:border-white-700 hover:bg-gray-100 hover:cursor-pointer">
                   <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-gray">
                     {item['#']}
                   </th>
@@ -192,7 +234,7 @@ const Items = () => {
           />
       </div>}
       
-      {viewPort == 'new' && (
+      {(viewPort == 'new' || viewPort == 'change') && (
         <div className='mt-5 w-1/2'>
           <div className='flex flex-col space-y-5'>
             <div className='w-2/3'>
@@ -201,33 +243,52 @@ const Items = () => {
                 type="text"
                 placeholder="Item Part"
                 isRequired
+                value={itemPart}
                 setValue={setItemPart}
               />
             </div>
             <div className='w-1/3'>
-              <TextInputLogin
-                label="Unit Of Measurement"
-                type="text"
-                placeholder="UOM"
-                isRequired
-                setValue={setUOM}
-              />
+              <label className='text-sm font-normal text-gray-500'>Choose UOM</label>
+              <Select
+                style={{ width: '100%' }}
+                defaultValue={row && row['UOM']}
+                placeholder="Select the UOM"
+                optionLabelProp="label"
+                onChange={(value) => setUOM(value)}
+              >   
+                {['LTRS', 'PCS', 'KG', 'SET'].map((item, i) => (
+                  <Option key={i} value={item} label={item}>
+                    <Space>
+                      {item}
+                    </Space>
+                  </Option>
+                ))}
+              </Select>
             </div>
-            <div className='w-2/3'>
-              <TextInputLogin
-                label="Item Category"
-                type="text"
-                placeholder="Item Category"
-                isRequired
-                setValue={setItemCategory}
-              />
+            <div className='w-2/4'>
+              <label className='text-sm font-normal text-gray-500'>Choose UOM</label>
+              <Select
+                style={{ width: '100%' }}
+                defaultValue={row && row['ITEM CATEGORY']}
+                placeholder="Select Item Category"
+                optionLabelProp="label"
+                onChange={(value) => setItemCategory(value)}
+              >   
+                {['SPARE PARTS', 'PANEL BEATING AND PAINTING', 'WELDING', 'WIRING'].map((item, i) => (
+                  <Option key={i} value={item} label={item}>
+                    <Space>
+                      {item}
+                    </Space>
+                  </Option>
+                ))}
+              </Select>
             </div>
           </div>
           <button
             className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 mt-5 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'
-            onClick={handleSubmit}
+            onClick={() => {viewPort == 'new' ? handleSubmit() : handleChange()}}
           >
-            <div className='font-bold'>Create Items</div>
+            <div className='font-bold'>{viewPort == 'change' ? `Update Items` : `Create Items`}</div>
           </button>
         </div>
       )}

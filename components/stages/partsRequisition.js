@@ -48,6 +48,10 @@ const PartsRequisition = (props) => {
 
     const handleInventory = (value, i) => {
         let newData = [...inventoryItems];
+        
+        if(newData[i] == undefined) {
+            newData = [...newData, {value: '', index: 0}]
+        }
 
         newData[i]['value'] = value;
         newData[i]['index'] = i;

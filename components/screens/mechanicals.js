@@ -20,6 +20,7 @@ const Mechanicals = () => {
   const [totalMechanicals, setTotalMechanical] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false)
+  const [row, setRow] = useState('')
 
   const [viewPort, setViewPort] = useState('list');
   const [service, setService] = useState('');
@@ -28,6 +29,29 @@ const Mechanicals = () => {
   const apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
   const apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
   
+  const refreshData = () => {
+    setService('');
+  }
+
+  const populateMechanicals = () => {
+    setLoading(true);
+    fetch(`${newUrl}/api/mechanicals?page=${pageNumber}`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      }
+    })
+    .then((res) => res.json())
+    .then(res => {
+      setMechanicals(res.mechanicals);
+      setTotalMechanical(res.totalMechanicals);
+      setLoading(false);
+    }
+    )
+    .catch((err) => {
+      toast.error(err)
+    })
+  }
+
   const handleSubmit = () => {
     const payload = {
       service,
@@ -50,23 +74,25 @@ const Mechanicals = () => {
     })
   }
 
-  const populateMechanicals = () => {
-    setLoading(true);
-    fetch(`${newUrl}/api/mechanicals?page=${pageNumber}`, {
-      headers: {
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      }
-    })
-    .then((res) => res.json())
-    .then(res => {
-      setMechanicals(res.mechanicals);
-      setTotalMechanical(res.totalMechanicals);
-      setLoading(false);
+  const handleChange = () => {
+    const payload = {
+      service
     }
-    )
-    .catch((err) => {
-      toast.error(err)
+
+    fetch(`${newUrl}/api/mechanicals/${row._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+      body: JSON.stringify({payload})
     })
+    .then(res => res.json())
+    .then(result => {
+      setViewPort('list');
+      populateMechanicals();
+    })
+    .catch(error => toast.error(error));
   }
 
   useEffect(() => {
@@ -93,6 +119,12 @@ const Mechanicals = () => {
     setPageNumber(data.activePage);
   }
 
+  const handleUpdate = (item) => {
+    setRow(item);
+    setService(item['SERVICE'])
+    setViewPort('change')
+  }
+
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">
@@ -103,8 +135,9 @@ const Mechanicals = () => {
           <MSubmitButton
             submit={() => {
                 // emptyState();
-                // refreshData();
                 setViewPort('new')
+                setRow('');
+                refreshData()
             }}
             intent="primary"
             icon={<PlusIcon className="h-5 w-5 text-zinc-800" />}
@@ -145,7 +178,7 @@ const Mechanicals = () => {
             </thead>
             {!loading && <tbody>
               {getData().data.map((item) => (
-                <tr class="bg-white border-b dark:bg-white-800 dark:border-white-700">
+                <tr onClick={() => handleUpdate(item)} class="bg-white border-b dark:bg-white-800 dark:border-white-700 hover:bg-gray-100 hover:cursor-pointer">
                   <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-gray">
                     {item['_id']}
                   </th>
@@ -169,7 +202,7 @@ const Mechanicals = () => {
           />
       </div>}
       
-      {viewPort == 'new' && (
+      {(viewPort == 'new' || viewPort == 'change') && (
         <div className='mt-5 w-1/2'>
           <div className='flex flex-col space-y-5'>
             <div className='w-2/3'>
@@ -178,15 +211,16 @@ const Mechanicals = () => {
                 type="text"
                 placeholder="Service"
                 isRequired
+                value={service}
                 setValue={setService}
               />
             </div>
           </div>
           <button
             className='flex items-center justify-center space-x-1 bg-blue-400 rounded  ring-1 mt-5 ring-zinc-300 shadow-sm cursor-pointer px-3 py-2  active:scale-95 hover:bg-blue-500 text-white'
-            onClick={handleSubmit}
+            onClick={() => {viewPort == 'new' ? handleSubmit() : handleChange()}}
           >
-            <div className='font-bold'>Create Service</div>
+            <div className='font-bold'>{viewPort == 'change' ? `Update Service` : `Create Service`}</div>
           </button>
         </div>
       )}
