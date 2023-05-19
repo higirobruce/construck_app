@@ -207,6 +207,8 @@ const Maintenance = () => {
     })
 
     const setJobCardsToUpdate = (data, shouldPrint) => {
+        console.log('Data ', data);
+        console.log('Data Should ', shouldPrint);
         populateJobLogsCard();
         refreshData();
         setRow(data)
@@ -236,7 +238,7 @@ const Maintenance = () => {
         setOperatorNotApp(data.operatorNotApplicable)
         setRequestParts(data.requestParts)
         setReceivedParts(data.receivedParts)
-        if(shouldPrint && (data.isViewed == 'approved' || data.status == 'approved new request')) {
+        if(shouldPrint && (data.isViewed == 'approved' || data.isViewed == 'approved new request')) {
             setPage(3)
         }
         else if((role == 'recording-officer' && (data && data.status) == 'requisition' && (data.isViewed == 'approved new request' || data.isViewed == 'new request'))) {
