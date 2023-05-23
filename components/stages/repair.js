@@ -240,7 +240,7 @@ const Repair = (props) => {
                                 <div className="text-sm text-red-600">*</div>
                             </div>
                             <div className='w-2/3 mt-3 ml-4'>
-                                {assignIssue[i] && assignIssue[i]['startRepair'] ? (
+                                {role !== 'workshop-support' && assignIssue[i] && assignIssue[i]['startRepair'] ? (
                                     <DatePicker
                                         format="YYYY-MM-DD HH:mm:ss"
                                         disabledDate={disableDate}

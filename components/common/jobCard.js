@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  ExclamationTriangleIcon,
+  ExclamationTriangleIcon, EyeIcon, PrinterIcon,
 } from '@heroicons/react/24/outline'
 import moment from 'moment'
 
@@ -23,16 +23,20 @@ intent,
       } else if (intent == 'normal') {
         return 'flex flex-col space-y-5 p-5 rounded bg-green-200  w-full'
       } else {
-        return 'flex flex-col rounded-xl border border-gray-100 px-4 shadow-xl sm:p-6 lg:px-3 lg:pt-4 cursor-pointer'
+        return 'flex flex-col rounded-xl border border-gray-100 px-4 shadow-xl sm:p-6 lg:px-3 lg:pt-4'
       }
     }
   return (
     <div
-        onClick={() => updateMe(data)}
         className={`${getClassFromIntent(intent)} ${(data.startTime && data.jobCard_status == 'opened') ? `bg-orange-200` : (data.jobCard_status == 'closed') ? `bg-green-200` : ``}`}
     >
         <div className='flex items-center justify-between'>
-            <h5 className='font-bold'>{data.plate.text + ' - ' + data.plate.eqDescription}</h5>
+          <div className='flex space-x-4'>
+            <h5 onClick={() => updateMe(data, false)} className='font-bold hover:cursor-pointer'>{data.plate.text + ' - ' + data.plate.eqDescription}</h5>
+            {(data.isViewed == 'approved' || data.isViewed == 'approved new request') && <span className='hover:cursor-pointer' onClick={() => updateMe(data, true)}>
+              <PrinterIcon className='w-5 h-5 text-blue-500' />
+            </span>}
+          </div>
             {!data.finishTime && <span
                 class="rounded-full bg-blue-100 py-1.5 px-3 text-xs font-medium text-blue-600"
             >
