@@ -662,7 +662,7 @@ export default function Dashboard() {
             content: loadingAverageDownTimeTrucks ? (
               <Loader active inline size="mini" />
             ) : (
-              averageDownTimeTrucks + ' hours'
+              averageDownTimeTrucks + ' days'
             ),
           }}
           icon={<TruckIcon className="h-5 w-5 text-red-500" />}
@@ -675,7 +675,7 @@ export default function Dashboard() {
             content: loadingAverageDownTimeMachines ? (
               <Loader active inline size="mini" />
             ) : (
-              averageDownTimeMachines + ' hours'
+              averageDownTimeMachines + ' days'
             ),
           }}
           icon={<WrenchScrewdriverIcon className="h-5 w-5 text-red-500" />}
