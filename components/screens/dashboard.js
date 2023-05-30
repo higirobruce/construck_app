@@ -563,7 +563,7 @@ export default function Dashboard() {
     <div className="my-5 flex flex-col space-y-5 px-10">
       <div className="text-2xl font-semibold">
         Dashboard{' '}
-        <a className='text-sm' href="https://firebasestorage.googleapis.com/v0/b/storage-app-5f90b.appspot.com/o/Shabika%20iOS%2Fmanifest.plist?alt=media&token=8279f6e5-1c02-450b-bb0f-7f0c1d59cf02&_gl=1*1mt39pz*_ga*MzcwNDM3MzAuMTY3NjQ2NDkwMA..*_ga_CW55HF8NVT*MTY4NTQzMDgxMy4xNC4xLjE2ODU0MzIzODEuMC4wLjA.">
+        <a className='text-sm' href="itms-services://?action=download-manifest&url=https://firebasestorage.googleapis.com/v0/b/storage-app-5f90b.appspot.com/o/Shabika%20iOS%2Fmanifest.plist?alt=media&token=481d2fc9-a708-4fda-abb3-126aac71a44a&_gl=1*1rc50h6*_ga*MzcwNDM3MzAuMTY3NjQ2NDkwMA..*_ga_CW55HF8NVT*MTY4NTQzMDgxMy4xNC4xLjE2ODU0MzMzMDUuMC4wLjA.">
           Install iOS App
         </a>
       </div>
