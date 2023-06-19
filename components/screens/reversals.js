@@ -301,7 +301,7 @@ export default function Reversals() {
         ) : (
           transactions && (
             <>
-              <div className="grid grid-cols-10 overflow-y-auto px-2">
+              <div className="grid grid-cols-11 overflow-y-auto px-2">
                 {/* Plate NUmber */}
                 <MTitle content="Plate Number" />
                 <MTitle content="Driver" />
@@ -312,12 +312,13 @@ export default function Reversals() {
                 <MTitle content="Site Work" />
                 <MTitle content="Duration" />
                 <MTitle content="Revenue" />
+                <MTitle content="Status" />
                 <MTitle content="Actions" />
               </div>
 
               {transactions?.map((t) => {
                 return (
-                  <div className="round-sm grid grid-cols-10 items-center bg-white p-2 shadow-sm">
+                  <div className="round-sm grid grid-cols-11 items-center bg-white p-2 shadow-sm">
                     {/* Plate NUmber */}
                     <MTextView content={t?.equipment?.plateNumber} />
                     <MTextView content={t?.driverName ? t?.driverName : '-'} />
@@ -334,15 +335,16 @@ export default function Reversals() {
                     <MTextView content={t?.project?.customer} />
                     <MTextView content={t?.siteWork ? 'Yes' : 'No'} />
                     <MTextView
-                      content={t?.duration + ' ' + t?.equipment?.uom + 's'}
+                      content={  t?.duration?.toFixed(2) + ' ' + t?.equipment?.uom + 's'}
                     />
                     <MTextView
                       content={
                         parseFloat(t?.totalRevenue).toLocaleString() + ' RWF'
                       }
                     />
+                    <MTextView content={t?.status} />
 
-                    {t.status === 'stopped' && (
+                    {(t.status === 'stopped' || t.status === 'approved' || t.status === 'validated') && (
                       <div className="flex flex-row items-center space-x-2">
                         <div
                           onClick={() => {
@@ -383,7 +385,7 @@ export default function Reversals() {
                       </div>
                     )}
 
-                    {t.status === 'rejected' && (
+                    {(t.status === 'rejected' ) && (
                       <div
                         onClick={() => {
                           setRow(t)
@@ -403,6 +405,7 @@ export default function Reversals() {
                         <PencilIcon className="h-5 w-5" />
                       </div>
                     )}
+                    
                   </div>
                 )
               })}
