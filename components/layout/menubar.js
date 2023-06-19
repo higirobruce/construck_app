@@ -54,7 +54,7 @@ export default function MenuBar() {
     role === 'customer-project-manager' ||
     role === 'customer-site-manager'
 
-  let isProjectManager = role === 'customer-project-manager'
+  let isProjectManager = role === 'customer-project-manager' || role ==='customer-site-manager'
 
   let isWorkshopUser =
     role === 'workshop-manager' ||

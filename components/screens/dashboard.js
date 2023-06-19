@@ -268,27 +268,30 @@ export default function Dashboard() {
     //   })
     //   .catch((err) => toast.error('Error Occured!'))
 
-    fetch(`${url}/downtimes`,{
+    fetch(`${url}/downtimes`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
-    }).then(res=>res.json())
-    .then(res=>{
-      let downTimeTrucks = res.filter(r=>r._id=='Truck')
-      let downTimeMachines = res.filter(r=>r._id=='Machine')
-
-      console.log(downTimeTrucks)
-
-
-      setLoadingAverageDownTimeTrucks(false)
-      setLoadingAverageDownTimeMachines(false)
-
-      setAverageDowntimeTrucks( _.round(downTimeTrucks[0]?.fieldN, 2)?.toLocaleString())
-      setAverageDowntimeMachines(_.round(downTimeMachines[0]?.fieldN, 2)?.toLocaleString())
-      
     })
+      .then((res) => res.json())
+      .then((res) => {
+        let downTimeTrucks = res.filter((r) => r._id == 'Truck')
+        let downTimeMachines = res.filter((r) => r._id == 'Machine')
+
+        console.log(downTimeTrucks)
+
+        setLoadingAverageDownTimeTrucks(false)
+        setLoadingAverageDownTimeMachines(false)
+
+        setAverageDowntimeTrucks(
+          _.round(downTimeTrucks[0]?.fieldN, 2)?.toLocaleString()
+        )
+        setAverageDowntimeMachines(
+          _.round(downTimeMachines[0]?.fieldN, 2)?.toLocaleString()
+        )
+      })
   }, [startDate, endDate])
 
   //Customer changed
@@ -558,7 +561,12 @@ export default function Dashboard() {
 
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
-      <div className="text-2xl font-semibold">Dashboard</div>
+      <div className="text-2xl font-semibold">
+        Dashboard{' '}
+        {/* <a className='text-sm' href="itms-services://?action=download-manifest&url=https://shapeherd.rw/shabikaapp/manifest.plist">
+          Install iOS App
+        </a> */}
+      </div>
       <div className="mb-5 flex flex-row space-x-5 py-5">
         <TextInputV placeholder="Customer Name" setValue={setCustomer} />
         <TextInputV placeholder="Project" setValue={setProject} />
