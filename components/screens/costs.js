@@ -16,7 +16,7 @@ export default function Costs() {
   }, [])
 
   function refresh() {
-    let projectName = user?.assignedProject?.prjDescription
+    let projectName = user?.assignedProjects[0]?.prjDescription
     fetch(
       `${url}/works/monthlyRevenuePerProject/${projectName}?status=validated`,
       {
@@ -36,7 +36,7 @@ export default function Costs() {
   }
 
   function releaseMonth(month, year) {
-    let projectName = user?.assignedProject?.prjDescription
+    let projectName = user?.assignedProjects[0]?.prjDescription
     fetch(
       `${url}/works/releaseValidated/${projectName}?month=${month}&year=${year}`,
       {

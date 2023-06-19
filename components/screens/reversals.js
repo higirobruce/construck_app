@@ -346,7 +346,7 @@ export default function Reversals() {
 
                     {(t.status === 'stopped' || t.status === 'approved' || t.status === 'validated') && (
                       <div className="flex flex-row items-center space-x-2">
-                        <div
+                        {(user?.userType==='admin' || (t.status === 'stopped' || t.status === 'approved'))  && <div
                           onClick={() => {
                             setRow(t)
                             _swamend(
@@ -363,9 +363,9 @@ export default function Reversals() {
                           className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
                         >
                           <PencilIcon className="h-5 w-5" />
-                        </div>
+                        </div>}
 
-                        <div
+                        {(user?.userType==='admin' || (t.status === 'stopped' || t.status === 'approved'))  &&<div
                           onClick={() =>
                             _reverse(
                               t?.siteWork,
@@ -381,7 +381,9 @@ export default function Reversals() {
                           className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 active:bg-red-500"
                         >
                           <ArrowPathIcon className="h-5 w-5" />
-                        </div>
+                        </div>}
+
+                        
                       </div>
                     )}
 
