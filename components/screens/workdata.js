@@ -1556,7 +1556,7 @@ export default function Workdata() {
                     ) > 1
                       ? true
                       : false,
-                  workStartDate: new Date(dispatchDates[i][0]),
+                  workStartDate: row?.dispatch?.date || new Date(dispatchDates[i][0]),
                   workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
                     moment(dispatchDates[i][1]).diff(
@@ -1575,9 +1575,9 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: dispatchDates
+                    date: row?.dispatch?.date ||( dispatchDates
                       ? new Date(dispatchDates[i][0])
-                      : new Date().toISOString(),
+                      : new Date().toISOString()),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -1616,12 +1616,12 @@ export default function Workdata() {
                     ? workStartDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : (row?.dispatch?.date || dispatchDate),
                   workEndDate: siteWork
                     ? workEndDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : (row?.dispatch?.date|| dispatchDate),
                   workDurationDays: siteWork
                     ? moment(workEndDate).diff(moment(workStartDate), 'days') +
                       1
@@ -1640,7 +1640,7 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: new Date(dispatchDate),
+                    date: row?.dispatch?.date || new Date(dispatchDate),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
