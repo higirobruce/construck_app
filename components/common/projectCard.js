@@ -131,8 +131,10 @@ export default function ProjectCard({
       .then((res) => res.json())
       .then((res) => {
         let result = res[0]
-        setLoadingApprovedRev(false)
         setApprovedRevenue(result?.totalRevenue ? result?.totalRevenue : 0)
+        
+      }).finally(()=>{
+        setLoadingApprovedRev(false)
       })
   }
 
@@ -149,8 +151,10 @@ export default function ProjectCard({
       .then((res) => res.json())
       .then((res) => {
         let result = res[0]
-        setLoadingRejectedRev(false)
         setRejectedRevenue(result?.totalRevenue ? result?.totalRevenue : 0)
+        
+      }).finally(()=>{
+        setLoadingRejectedRev(false)
       })
   }
 
@@ -166,8 +170,10 @@ export default function ProjectCard({
     )
       .then((res) => res.json())
       .then((res) => {
-        setLoadingReleased(false)
         setReleasedMonthlyWorks(res)
+       
+      }).finally(()=>{
+        setLoadingReleased(false)
       })
   }
 
@@ -186,8 +192,10 @@ export default function ProjectCard({
     )
       .then((res) => res.json())
       .then((res) => {
-        setLoadingDetails(false)
         setWorkDetails(res)
+        
+      }).finally(()=>{
+        setLoadingDetails(false)
       })
   }
 
