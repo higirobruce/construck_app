@@ -31,10 +31,14 @@ export default function Dashboard() {
     Date.today().clearTime().moveToFirstDayOfMonth()
   )
   let [endDate, setEndDate] = useState(Date.today())
-  let [customer, setCustomer] = useState()
-  let [project, setProject] = useState()
-  let [equipment, setEquipment] = useState()
+  let [customer, setCustomer] = useState([])
+  let [project, setProject] = useState([])
+  let [equipment, setEquipment] = useState([])
   let [owner, setOwner] = useState('')
+
+  let [customerOptions, setCustomerOptions] = useState([])
+  let [projectOptions, setProjectOptions] = useState([])
+  let [equipmentOptions, setEquipmentOptions] = useState([])
 
   let [finalRevenues, setFinalRevenues] = useState(0)
   let [provisionalRevenues, setProvisionalRevenues] = useState(0)
@@ -117,6 +121,69 @@ export default function Dashboard() {
         setAssetUtilization(res.assetUtilization)
       })
       .catch((err) => toast.error('Error Occured!'))
+
+    fetch(`${url}/customers`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let customers = res
+        let options = customers.map((c) => {
+          return {
+            key: c._id,
+            text: c.name,
+            value: c.name,
+          }
+        })
+
+        setCustomerOptions(options)
+      })
+
+    fetch(`${url}/projects/v2`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let projects = res
+        let options = projects.map((c) => {
+          return {
+            key: c._id,
+            text: c.prjDescription,
+            value: c.prjDescription,
+          }
+        })
+
+        setProjectOptions(options)
+      })
+
+    fetch(`${url}/equipments/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let equipments = res?.equipments
+        let options = equipments.map((c) => {
+          return {
+            key: c._id,
+            text: c.plateNumber,
+            value: c.plateNumber,
+            // description: c.eqDescription,
+          }
+        })
+
+        setEquipmentOptions(options)
+      })
+      .catch((err) => {})
 
     // fetch(`${url}/downtimes/trucks`, {
     //   method: 'POST',
@@ -356,6 +423,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log('Reeees', res)
         setFinalRevenues(parseFloat(res.totalRevenue))
         setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setTotalDays(res.totalDays)
@@ -567,10 +635,56 @@ export default function Dashboard() {
           Install iOS App
         </a> */}
       </div>
+
       <div className="mb-5 flex flex-row space-x-5 py-5">
-        <TextInputV placeholder="Customer Name" setValue={setCustomer} />
-        <TextInputV placeholder="Project" setValue={setProject} />
-        <TextInputV placeholder="Equipment" setValue={setEquipment} />
+        {/* Customer name list */}
+        {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} /> */}
+        <div className="w-1/5">
+          <Dropdown
+            options={customerOptions}
+            placeholder="Select customer(s)"
+            fluid
+            search
+            multiple
+            selection
+            onChange={(e, data) => {
+              setCustomer(data.value)
+            }}
+          />
+        </div>
+
+        {/* Project list */}
+        {/* <TextInputV placeholder="Project" setValue={setProject} /> */}
+        <div className="w-1/5">
+          <Dropdown
+            options={projectOptions}
+            placeholder="Select project(s)"
+            fluid
+            search
+            multiple
+            selection
+            onChange={(e, data) => {
+              setProject(data.value)
+            }}
+          />
+        </div>
+
+        {/* equipment list */}
+        {/* <TextInputV placeholder="Equipment" setValue={setEquipment} /> */}
+        <div className="w-1/5">
+          <Dropdown
+            options={equipmentOptions}
+            placeholder="Select equipment"
+            fluid
+            search
+            multiple
+            selection
+            onChange={(e, data) => {
+              setEquipment(data.value)
+            }}
+          />
+        </div>
+
         <div className="w-1/5">
           <Dropdown
             options={[
