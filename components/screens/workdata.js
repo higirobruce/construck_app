@@ -774,6 +774,10 @@ export default function Workdata() {
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
+    setDispatchDate(moment()
+    .utcOffset(0)
+    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+    .toDate())
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
