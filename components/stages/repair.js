@@ -233,7 +233,7 @@ const Repair = (props) => {
                             </Select>
                         </div>
                     </div>
-                    <div className='flex space-x-5 w-1/2 my-4 p-4 bg-slate-100'>
+                    <div className='flex space-x-5 my-4 p-4 bg-slate-100'>
                         <div className='flex items-center'>
                             <div className='flex flex-row'>
                                 <MTextView content={"Start Repair:"} />

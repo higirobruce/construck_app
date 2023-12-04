@@ -664,6 +664,8 @@ const Maintenance = () => {
             receivedParts: role == 'recording-officer' && (row.status == 'requisition') && (row.isViewed == 'denied' || row.isViewed == 'approved') ? moment() : receivedParts
         }
 
+        console.log(payload)
+
         fetch(`${newUrl}/api/maintenance/${row._id}`, {
             method: 'PUT',
             headers: {
@@ -868,6 +870,7 @@ const Maintenance = () => {
             reason={reason}
             role={role}
             previousMode={previousMode}
+            setAssignIssue={setAssignIssue}
         />,
         <PrintableItems 
             row={row} 
@@ -896,6 +899,7 @@ const Maintenance = () => {
             reason={reason}
             role={role}
             previousMode={previousMode}
+            setAssignIssue={setAssignIssue}
         />,
         <Repair
             mechanicalInspections={mechanicalInspections}
