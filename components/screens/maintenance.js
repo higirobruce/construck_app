@@ -34,6 +34,8 @@ import PrintableItems from '../stages/printableItems'
 import OperatorCard from '../common/operatorCard'
 import * as XLSX from 'xlsx'
 import * as FileSaver from 'file-saver'
+import { Pagination } from 'semantic-ui-react'
+import MPagination from '../common/pagination'
 
 const Maintenance = () => {
   const canCreateData = true
@@ -68,12 +70,14 @@ const Maintenance = () => {
   const [checkReason, setCheckReason] = useState(false)
   const [updatedAt, setUpdatedAt] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingJobCards, setLoadingJobCards] = useState(false)
 
   // Form States
   const [entryDate, setEntryDate] = useState('')
   const [driver, setDriver] = useState('')
   const [carPlate, setCarPlate] = useState('')
   const [mileages, setMileages] = useState('')
+  const [currentMileages, setCurrentMileages] = useState('')
   const [location, setLocation] = useState('')
   const [startRepair, setStartRepair] = useState('')
   const [endRepair, setEndRepair] = useState('')
@@ -102,6 +106,9 @@ const Maintenance = () => {
   const [nextMileages, setNextMileages] = useState('')
   const [receivedParts, setReceivedParts] = useState('')
   const [requestParts, setRequestParts] = useState('')
+  const [jobCardsPage, setJobCardsPage] = useState(1)
+  const [cardCount, setCardCount] = useState(0)
+  const [jobCardPageCount, setJobCardsPageCount] = useState(0)
 
   const url = process.env.NEXT_PUBLIC_BKEND_URL
   const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
@@ -236,6 +243,7 @@ const Maintenance = () => {
     setOperator(data.operator)
     setEndRepair(data.finishTime)
     setMileages(data.mileages)
+    setCurrentMileages(data.mileages)
     setInspectionTools(data.inspectionTools)
     setMechanicalInspections(data.mechanicalInspections)
     setAssignIssue(data.assignIssue)
@@ -495,13 +503,17 @@ const Maintenance = () => {
   }
 
   const populateJobCards = () => {
-    fetch(`${newUrl}/api/maintenance`, {
+    setLoadingJobCards(true)
+    fetch(`${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}`, {
       headers: {
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
     })
       .then((res) => res.json())
-      .then((res) => {
+      .then((response) => {
+        let res = response?.jobCards
+        setCardCount(response.dataCount)
+        setJobCardsPageCount(Math.round(response.dataCount / 9) + 1)
         let availableCards = res.filter(
           (result) =>
             (result.status == 'requisition' && !result.isViewed) ||
@@ -542,6 +554,9 @@ const Maintenance = () => {
       })
       .catch((err) => {
         toast.error(err)
+      })
+      .finally(() => {
+        setLoadingJobCards(false)
       })
   }
 
@@ -590,6 +605,7 @@ const Maintenance = () => {
             text: p.plateNumber,
             status: p.eqStatus,
             eqDescription: p.eqDescription,
+            mileages: p.millage,
             eqStatus: p.eqStatus,
           }
         })
@@ -644,35 +660,55 @@ const Maintenance = () => {
       status: 'entry',
     }
 
-    fetch(`${newUrl}/api/maintenance`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-      body: JSON.stringify({
-        payload,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setRow(res)
-        setExistingRow(res)
-        fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization:
-              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-          },
-        })
-          .then((res) => res.json())
-          .then((res) => {
-            setPage(1)
-          })
-          .catch((err) => toast.error('Error Occured!'))
+    if (parseInt(mileages) < currentMileages && !startIndexNotApplicable) {
+      // console.log(currentMileages, mileages)
+      alert('Invalid Index')
+    } else {
+      fetch(`${newUrl}/api/maintenance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+        body: JSON.stringify({
+          payload,
+        }),
       })
-      .catch((err) => toast.error('Error Occured!'))
+        .then((res) => res.json())
+        .then((res) => {
+          setRow(res)
+          setExistingRow(res)
+          fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+          })
+            .then((res) => res.json())
+            .then((res) => {
+              setPage(1)
+            })
+            .catch((err) => toast.error('Error Occured!'))
+
+          fetch(`${newUrl}/equipments/${res.plate.key}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+            body: JSON.stringify({
+              millage: mileages,
+            }),
+          })
+            .then((res) => res.json())
+            .then((res) => {})
+        })
+        .catch((err) => toast.error('Error Occured!'))
+    }
   }
 
   const handleLogsSubmit = () => {
@@ -684,36 +720,40 @@ const Maintenance = () => {
       location,
       status: 'entry',
     }
-
-    fetch(`${newUrl}/api/maintenance/logs`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-      body: JSON.stringify({
-        payload,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setLoading(true)
-        fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization:
-              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-          },
-        })
-          .then((res) => res.json())
-          .then((res) => {
-            setPage(1)
-            setLoading(false)
-          })
-          .catch((err) => toast.error('Error Occured!'))
+    if (parseInt(mileages) < currentMileages && !startIndexNotApplicable) {
+      setLoading(false)
+    } else {
+      fetch(`${newUrl}/api/maintenance/logs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+        body: JSON.stringify({
+          payload,
+        }),
       })
-      .catch((err) => toast.error('Error Occured!'))
+        .then((res) => res.json())
+        .then((res) => {
+          setLoading(true)
+          fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization:
+                'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+            },
+          })
+            .then((res) => res.json())
+            .then((res) => {
+              setPage(1)
+              setLoading(false)
+            })
+            .catch((err) => toast.error('Error Occured!'))
+        })
+        .catch((err) => toast.error('Error Occured!'))
+    }
   }
 
   const handleUpdate = () => {
@@ -785,7 +825,6 @@ const Maintenance = () => {
           ? moment()
           : receivedParts,
     }
-
     console.log(payload)
 
     fetch(`${newUrl}/api/maintenance/${row._id}`, {
@@ -803,7 +842,9 @@ const Maintenance = () => {
           result.assignIssue &&
           result.assignIssue.filter(
             (item) =>
-              item.endRepair == '' || item.hasOwnProperty('endRepair') == false
+              item.endRepair == '' ||
+              item.hasOwnProperty('endRepair') == false ||
+              item.endRepair == null
           )
         setLoading(false)
         if (
@@ -1004,6 +1045,7 @@ const Maintenance = () => {
       setCarPlate={setCarPlate}
       mileages={mileages}
       setMileages={setMileages}
+      setCurrentMileages={setCurrentMileages}
       location={location}
       setLocation={setLocation}
       startIndexNotApplicable={startIndexNotApplicable}
@@ -1462,54 +1504,82 @@ const Maintenance = () => {
         )}
       </Modal>
       {/* Displaying Job Cards List */}
-      {viewPort === 'list' && (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {getData().totalCount > 0 ? (
-            getData().data.map((c) => {
-              return (
-                <JobCard
-                  data={{
-                    _id: c._id,
-                    status: c.status,
-                    jobCard_id: c.jobCard_Id,
-                    finishTime: c.endRepair,
-                    startTime: c.startRepair,
-                    plate: c.plate,
-                    driver: c.driver,
-                    operator: c.operator,
-                    location: c.location,
-                    operatorApproval: c.operatorApproval,
-                    teamApproval: c.teamApproval,
-                    supervisorApproval: c.supervisorApproval,
-                    entryDate: c.entryDate,
-                    mileages: c.mileage,
-                    inspectionTools: c.inspectionTools,
-                    mechanicalInspections: c.mechanicalInspections,
-                    assignIssue: c.assignIssue,
-                    inventoryData: c.inventoryData,
-                    inventoryItems: c.inventoryItems,
-                    sourceItem: c.sourceItem,
-                    transferData: c.transferData,
-                    transferParts: c.transferParts,
-                    isViewed: c.isViewed,
-                    reason: c.reason,
-                    jobCard_status: c.jobCard_status,
-                    updated_At: c.updated_At,
-                    operatorNotApplicable: c.operatorNotApplicable,
-                    mileagesNotApplicable: c.mileagesNotApplicable,
-                    nextMileages: c.nextMileages,
-                    requestParts: c.requestParts,
-                    receivedParts: c.receivedParts,
-                  }}
-                  role={role}
-                  canCreateData={canCreateData}
-                  updateMe={setJobCardsToUpdate}
-                />
-              )
-            })
-          ) : (
-            <h5 className="text-center">No Data ...</h5>
-          )}
+      {viewPort === 'list' && !loadingJobCards && (
+        <div className='flex flex-col justify-end'>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {getData().totalCount > 0 && !loadingJobCards ? (
+              getData().data.map((c) => {
+                return (
+                  <JobCard
+                    key={c._id}
+                    data={{
+                      _id: c._id,
+                      status: c.status,
+                      jobCard_id: c.jobCard_Id,
+                      finishTime: c.endRepair,
+                      startTime: c.startRepair,
+                      plate: c.plate,
+                      driver: c.driver,
+                      operator: c.operator,
+                      location: c.location,
+                      operatorApproval: c.operatorApproval,
+                      teamApproval: c.teamApproval,
+                      supervisorApproval: c.supervisorApproval,
+                      entryDate: c.entryDate,
+                      mileages: c.mileage,
+                      inspectionTools: c.inspectionTools,
+                      mechanicalInspections: c.mechanicalInspections,
+                      assignIssue: c.assignIssue,
+                      inventoryData: c.inventoryData,
+                      inventoryItems: c.inventoryItems,
+                      sourceItem: c.sourceItem,
+                      transferData: c.transferData,
+                      transferParts: c.transferParts,
+                      isViewed: c.isViewed,
+                      reason: c.reason,
+                      jobCard_status: c.jobCard_status,
+                      updated_At: c.updated_At,
+                      operatorNotApplicable: c.operatorNotApplicable,
+                      mileagesNotApplicable: c.mileagesNotApplicable,
+                      nextMileages: c.nextMileages,
+                      requestParts: c.requestParts,
+                      receivedParts: c.receivedParts,
+                    }}
+                    role={role}
+                    canCreateData={canCreateData}
+                    updateMe={setJobCardsToUpdate}
+                  />
+                )
+              })
+            ) : loadingJobCards ? (
+              <h5 className="text-center">Loading Data...</h5>
+            ) : (
+              <h5 className="text-center">No Data ...</h5>
+            )}
+          </div>
+          {/* <Pagination
+            activePage={jobCardsPage}
+            boundaryRange={1}
+            onPageChange={(e, data) => {
+              setJobCardsPage(data?.activePage)
+              populateJobCards()
+            }}
+            size="mini"
+            siblingRange={3}
+            totalPages={jobCardPageCount}
+            // Heads up! All items are powered by shorthands, if you want to hide one of them, just pass `null` as value
+          /> */}
+          <div className='mt-5 self-end'>
+          <MPagination
+            activePage={jobCardsPage}
+            count={cardCount}
+            onPageChange={(e, data) => {
+              setJobCardsPage(data?.activePage)
+              populateJobCards()
+            }}
+            pageSize={9}
+          />
+            </div>
         </div>
       )}
 

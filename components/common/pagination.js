@@ -17,10 +17,9 @@ export default function MPagination({
     return (
       <Pagination
         size="mini"
-        defaultActivePage={1}
-        ellipsisItem={true}
-        lastItem={false}
-        firstItem={false}
+        siblingRange={3}
+        boundaryRange={1}
+        
         totalPages={totalPages}
         onPageChange={(e, data) => onPageChange(e, data)}
         activePage={activePage}
