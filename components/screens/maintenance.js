@@ -635,7 +635,7 @@ const Maintenance = () => {
         setNParts(response?.requisitionDataCount)
         // setNRepair(repairCards.length)
         setNRepair(response?.repairDataCount)
-        setNTesting(testingCards.length)
+        setNTesting(response?.testingDataCount)
         // setNClosed(closedCards.length)
         setNClosed(response?.closedDataCount)
         setJobCards(res)
