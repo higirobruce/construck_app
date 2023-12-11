@@ -823,6 +823,7 @@ const Maintenance = () => {
         .catch((err) => toast.error('Error Occured!'))
         .finally(() => {
           setPage(1)
+          setLoading(false)
         })
     }
   }
