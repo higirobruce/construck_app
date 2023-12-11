@@ -829,6 +829,7 @@ const Maintenance = () => {
   }
 
   const handleLogsSubmit = () => {
+    setLoading(true)
     const payload = {
       entryDate,
       carPlate,
@@ -853,7 +854,7 @@ const Maintenance = () => {
       })
         .then((res) => res.json())
         .then((res) => {
-          setLoading(true)
+      
           fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
             method: 'PUT',
             headers: {
@@ -870,6 +871,9 @@ const Maintenance = () => {
             .catch((err) => toast.error('Error Occured!'))
         })
         .catch((err) => toast.error('Error Occured!'))
+        .finally(()=>{
+          setLoading(false)
+        })
     }
   }
 
@@ -1776,7 +1780,7 @@ const Maintenance = () => {
                   label={`Go to Previous`}
                 />
               )}
-              {!loading && (
+              { (
                 <Popconfirm
                   placement="topLeft"
                   title={textConfirm}
