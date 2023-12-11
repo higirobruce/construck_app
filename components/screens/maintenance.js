@@ -16,6 +16,7 @@ import {
   UsersIcon,
   WrenchScrewdriverIcon,
   XCircleIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline'
 import dayjs from 'dayjs'
 import { toast, ToastContainer } from 'react-toastify'
@@ -342,15 +343,11 @@ const Maintenance = () => {
   }
 
   const download = (query) => {
-    fetch(
-      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=all`,
-      {
-        headers: {
-          Authorization:
-            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-        },
-      }
-    )
+    fetch(`${newUrl}/api/maintenance?limit=-1&page=${0}&status=all`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
       .then((res) => res.json())
       .then((response) => {
         let data = []
@@ -497,8 +494,8 @@ const Maintenance = () => {
                         ),
                         'source of parts': obj.sourceItem,
                         'parts requested': anotherSub.item,
-                        'quantity requested': parseInt(anotherSub.qty||'0'),
-                        'quantity received': parseInt(anotherSub.recQty||'0'),
+                        'quantity requested': parseInt(anotherSub.qty || '0'),
+                        'quantity received': parseInt(anotherSub.recQty || '0'),
                         'parts transfered': null,
                         'parts taken from': null,
                       }
@@ -522,26 +519,25 @@ const Maintenance = () => {
                   'quantity received': 0,
                   'parts transfered': subObj.parts,
                   'parts taken from': subObj.from,
-                 
                 }
               })
             } else {
               return {
                 'jobCard-Id': obj.jobCard_Id,
-                  'plate number': obj.plate.text,
-                  'mechanical Issue': obj.mechanicalInspections.join(', '),
-                  'Requisition date': moment(obj.requestParts).format(
-                    'DD-MMMM-YYYY LT'
-                  ),
-                  'Reception date': moment(obj.receivedParts).format(
-                    'DD-MMMM-YYYY LT'
-                  ),
-                  'source of parts': obj.sourceItem,
-                  'parts requested': null,
-                  'quantity requested': null,
-                  'quantity received': null,
-                  'parts transfered': null,
-                  'parts taken from': null,
+                'plate number': obj.plate.text,
+                'mechanical Issue': obj.mechanicalInspections.join(', '),
+                'Requisition date': moment(obj.requestParts).format(
+                  'DD-MMMM-YYYY LT'
+                ),
+                'Reception date': moment(obj.receivedParts).format(
+                  'DD-MMMM-YYYY LT'
+                ),
+                'source of parts': obj.sourceItem,
+                'parts requested': null,
+                'quantity requested': null,
+                'quantity received': null,
+                'parts transfered': null,
+                'parts taken from': null,
               }
             }
           })
@@ -586,7 +582,7 @@ const Maintenance = () => {
   const populateJobCards = () => {
     setLoadingJobCards(true)
     fetch(
-      `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}`,
+      `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}&search=${search}`,
       {
         headers: {
           Authorization:
@@ -752,12 +748,23 @@ const Maintenance = () => {
     populateJobLogsCard()
   }, [status])
 
+  // useEffect(() => {
+  //   if (search?.length > 3) {
+  //     setJobCardsPage(1)
+  //     setLoadingJobCards(true)
+  //     // setJobCardsPage(1)
+  //     populateJobCards()
+  //     populateJobLogsCard()
+  //   }
+  // }, [search])
+
   useEffect(() => {
     setLoadingJobCards(true)
     // setJobCardsPage(1)
     populateJobCards()
     populateJobLogsCard()
   }, [jobCardsPage])
+
   const handleSubmit = () => {
     const payload = {
       entryDate,
@@ -1440,8 +1447,8 @@ const Maintenance = () => {
             <MSubmitButton
               submit={refreshData}
               intent="neutral"
-              icon={<ArrowPathIcon className="h-5 w-5 text-zinc-800" />}
-              label="Refresh"
+              icon={<MagnifyingGlassIcon className="h-5 w-5 text-zinc-800" />}
+              label="Search"
             />
           </div>
         )}
@@ -1605,8 +1612,8 @@ const Maintenance = () => {
       {viewPort === 'list' && (
         <div className="flex flex-col justify-end">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {getData().totalCount > 0 && !loadingJobCards ? (
-              getData().data.map((c) => {
+            {jobCards?.length > 0 && !loadingJobCards ? (
+              jobCards?.map((c) => {
                 return (
                   <JobCard
                     key={c._id}
