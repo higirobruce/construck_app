@@ -36,6 +36,8 @@ import * as XLSX from 'xlsx'
 import * as FileSaver from 'file-saver'
 import { Pagination } from 'semantic-ui-react'
 import MPagination from '../common/pagination'
+import * as _ from 'lodash'
+import { Loader } from 'semantic-ui-react'
 
 const Maintenance = () => {
   const canCreateData = true
@@ -55,6 +57,7 @@ const Maintenance = () => {
   const [nClosed, setNClosed] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [previousMode, setPreviousMode] = useState(false)
+  const [status, setStatus] = useState('open')
 
   const [viewPort, setViewPort] = useState('list')
   const [search, setSearch] = useState('')
@@ -339,15 +342,19 @@ const Maintenance = () => {
   }
 
   const download = (query) => {
-    fetch(`${newUrl}/api/maintenance`, {
-      headers: {
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
+    fetch(
+      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=all`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
+    )
       .then((res) => res.json())
-      .then((res) => {
+      .then((response) => {
         let data = []
-
+        let res = response.jobCards
         if (query == 'general') {
           data = res.flatMap((obj) => {
             if (obj.sourceItem == 'Inventory') {
@@ -452,16 +459,90 @@ const Maintenance = () => {
           })
         } else {
           data = res.flatMap((obj) => {
-            return {
-              'jobCard-Id': obj.jobCard_Id,
-              'plate number': obj.plate.text,
-              'mechanical Issue': obj.mechanicalInspections.join(', '),
-              'parts requested': moment(obj.requestParts).format(
-                'DD-MMMM-YYYY LT'
-              ),
-              'parts received': moment(obj.receivedParts).format(
-                'DD-MMMM-YYYY LT'
-              ),
+            // return {
+            //   'jobCard-Id': obj.jobCard_Id,
+            //   'plate number': obj.plate.text,
+            //   'mechanical Issue': obj.mechanicalInspections.join(', '),
+            //   'Requisition date': moment(obj.requestParts).format(
+            //     'DD-MMMM-YYYY LT'
+            //   ),
+            //   'Reception date': moment(obj.receivedParts).format(
+            //     'DD-MMMM-YYYY LT'
+            //   ),
+            //   'source of parts': obj.sourceItem,
+            //   'parts requested': anotherSub.item,
+            //   'quantity requested': anotherSub.qty,
+            //   'quantity received': anotherSub.recQty,
+            //   'parts transfered': null,
+            //   'parts taken from': null,
+            // }
+
+            if (obj.sourceItem == 'Inventory') {
+              return obj.inventoryData
+                .filter((array) => array.some((obj) => obj.issue !== ''))
+                .map((subObj) => {
+                  return subObj
+                    .filter((value) => value.issue !== '')
+                    .map((anotherSub) => {
+                      return {
+                        'jobCard-Id': obj.jobCard_Id,
+                        'plate number': obj.plate.text,
+                        'mechanical Issue':
+                          obj.mechanicalInspections.join(', '),
+                        'Requisition date': moment(obj.requestParts).format(
+                          'DD-MMMM-YYYY LT'
+                        ),
+                        'Reception date': moment(obj.receivedParts).format(
+                          'DD-MMMM-YYYY LT'
+                        ),
+                        'source of parts': obj.sourceItem,
+                        'parts requested': anotherSub.item,
+                        'quantity requested': parseInt(anotherSub.qty||'0'),
+                        'quantity received': parseInt(anotherSub.recQty||'0'),
+                        'parts transfered': null,
+                        'parts taken from': null,
+                      }
+                    })
+                })
+            } else if (obj.sourceItem == 'Transfer') {
+              return obj.transferData.map((subObj) => {
+                return {
+                  'jobCard-Id': obj.jobCard_Id,
+                  'plate number': obj.plate.text,
+                  'mechanical Issue': obj.mechanicalInspections.join(', '),
+                  'Requisition date': moment(obj.requestParts).format(
+                    'DD-MMMM-YYYY LT'
+                  ),
+                  'Reception date': moment(obj.receivedParts).format(
+                    'DD-MMMM-YYYY LT'
+                  ),
+                  'source of parts': obj.sourceItem,
+                  'parts requested': subObj.item,
+                  'quantity requested': 0,
+                  'quantity received': 0,
+                  'parts transfered': subObj.parts,
+                  'parts taken from': subObj.from,
+                 
+                }
+              })
+            } else {
+              return {
+                'jobCard-Id': obj.jobCard_Id,
+                  'plate number': obj.plate.text,
+                  'mechanical Issue': obj.mechanicalInspections.join(', '),
+                  'Requisition date': moment(obj.requestParts).format(
+                    'DD-MMMM-YYYY LT'
+                  ),
+                  'Reception date': moment(obj.receivedParts).format(
+                    'DD-MMMM-YYYY LT'
+                  ),
+                  'source of parts': obj.sourceItem,
+                  'parts requested': null,
+                  'quantity requested': null,
+                  'quantity received': null,
+                  'parts transfered': null,
+                  'parts taken from': null,
+              }
             }
           })
         }
@@ -504,16 +585,21 @@ const Maintenance = () => {
 
   const populateJobCards = () => {
     setLoadingJobCards(true)
-    fetch(`${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}`, {
-      headers: {
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
+    fetch(
+      `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
+    )
       .then((res) => res.json())
       .then((response) => {
         let res = response?.jobCards
+        console.log(response)
         setCardCount(response.dataCount)
-        setJobCardsPageCount(Math.round(response.dataCount / 9) + 1)
+        setJobCardsPageCount(_.round(response.dataCount / 9, 0) + 1)
         let availableCards = res.filter(
           (result) =>
             (result.status == 'requisition' && !result.isViewed) ||
@@ -540,16 +626,22 @@ const Maintenance = () => {
         )
         let repairCards = res.filter((result) => result.status == 'repair')
         let testingCards = res.filter((result) => result.status == 'testing')
+
         let closedCards = res.filter((result) => result.status == 'pass')
         setNAvailable(availableCards.length)
         setNApproved(approvedCards.length)
         setNCanceled(canceledCards.length)
-        setNEntry(EntryCards.length)
-        setNDiagnosis(diagnosisCards.length)
-        setNParts(requisitionCards.length)
-        setNRepair(repairCards.length)
+        // setNEntry(EntryCards.length)
+        setNEntry(response?.entryDataCount)
+        // setNDiagnosis(diagnosisCards.length)
+        setNDiagnosis(response?.diagnosisDataCount)
+        // setNParts(requisitionCards.length)
+        setNParts(response?.requisitionDataCount)
+        // setNRepair(repairCards.length)
+        setNRepair(response?.repairDataCount)
         setNTesting(testingCards.length)
-        setNClosed(closedCards.length)
+        // setNClosed(closedCards.length)
+        setNClosed(response?.closedDataCount)
         setJobCards(res)
       })
       .catch((err) => {
@@ -598,17 +690,19 @@ const Maintenance = () => {
       .then((res) => res.json())
       .then((res) => {
         let list = res.equipments
-        let eqOptions = list.map((p) => {
-          return {
-            key: p._id,
-            value: p._id,
-            text: p.plateNumber,
-            status: p.eqStatus,
-            eqDescription: p.eqDescription,
-            mileages: p.millage,
-            eqStatus: p.eqStatus,
-          }
-        })
+        let eqOptions = list
+          .filter((l) => l.status !== 'workshop')
+          .map((p) => {
+            return {
+              key: p._id,
+              value: p._id,
+              text: p.plateNumber,
+              status: p.eqStatus,
+              eqDescription: p.eqDescription,
+              mileages: p.millage,
+              eqStatus: p.eqStatus,
+            }
+          })
         setEqList(eqOptions)
       })
       .catch((err) => {
@@ -650,6 +744,20 @@ const Maintenance = () => {
     populateJobLogsCard()
   }, [])
 
+  useEffect(() => {
+    setJobCardsPage(1)
+    setLoadingJobCards(true)
+    // setJobCardsPage(1)
+    populateJobCards()
+    populateJobLogsCard()
+  }, [status])
+
+  useEffect(() => {
+    setLoadingJobCards(true)
+    // setJobCardsPage(1)
+    populateJobCards()
+    populateJobLogsCard()
+  }, [jobCardsPage])
   const handleSubmit = () => {
     const payload = {
       entryDate,
@@ -1255,76 +1363,66 @@ const Maintenance = () => {
             <div className="flex flex-row items-center space-x-5">
               <MainStatusCard
                 data={{ title: 'Entry', content: nEntry }}
-                intent={
-                  filterBy === 'entry' || filterBy === 'all' ? 'entry' : ''
-                }
+                intent={status === 'entry' || status === 'open' ? 'entry' : ''}
                 icon={<FolderPlusIcon className="h-5 w-5" />}
                 onClick={() =>
-                  filterBy === 'entry'
-                    ? setFilterBy('all')
-                    : setFilterBy('entry')
+                  status === 'entry' ? setStatus('open') : setStatus('entry')
                 }
               />
               <MainStatusCard
                 data={{ title: 'Diagnosis', content: nDiagnosis }}
                 intent={
-                  filterBy === 'diagnosis' || filterBy === 'all'
-                    ? 'diagnosis'
-                    : ''
+                  status === 'diagnosis' || status === 'open' ? 'diagnosis' : ''
                 }
                 icon={<CheckIcon className="h-5 w-5" />}
                 onClick={() =>
-                  filterBy === 'diagnosis'
-                    ? setFilterBy('all')
-                    : setFilterBy('diagnosis')
+                  status === 'diagnosis'
+                    ? setStatus('open')
+                    : setStatus('diagnosis')
                 }
               />
               <MainStatusCard
                 data={{ title: 'Requisition', content: nParts }}
                 intent={
-                  filterBy === 'requisition' || filterBy === 'all'
+                  status === 'requisition' || status === 'open'
                     ? 'requisition'
                     : ''
                 }
                 icon={<ArrowPathRoundedSquareIcon className="h-5 w-5" />}
                 onClick={() =>
-                  filterBy === 'requisition'
-                    ? setFilterBy('all')
-                    : setFilterBy('requisition')
+                  status === 'requisition'
+                    ? setStatus('open')
+                    : setStatus('requisition')
                 }
               />
               <MainStatusCard
                 data={{ title: 'Repair', content: nRepair }}
                 intent={
-                  filterBy === 'repair' || filterBy === 'all' ? 'repair' : ''
+                  status === 'repair' || status === 'open' ? 'repair' : ''
                 }
                 icon={<AdjustmentsVerticalIcon className="h-5 w-5" />}
                 onClick={() =>
-                  filterBy === 'repair'
-                    ? setFilterBy('all')
-                    : setFilterBy('repair')
+                  status === 'repair' ? setStatus('open') : setStatus('repair')
                 }
               />
               <MainStatusCard
                 data={{ title: 'Testing', content: nTesting }}
                 intent={
-                  filterBy === 'testing' || filterBy === 'all' ? 'testing' : ''
+                  status === 'testing' || status === 'open' ? 'testing' : ''
                 }
                 icon={<WrenchScrewdriverIcon className="h-5 w-5" />}
                 onClick={() =>
-                  filterBy === 'testing'
-                    ? setFilterBy('all')
-                    : setFilterBy('testing')
+                  status === 'testing'
+                    ? setStatus('open')
+                    : setStatus('testing')
                 }
               />
               <MainStatusCard
                 data={{ title: 'Closed', content: nClosed }}
-                intent={
-                  filterBy === 'pass' || filterBy === 'all' ? 'closed' : ''
-                }
+                intent={status === 'pass' || status === 'open' ? 'closed' : ''}
                 icon={<XCircleIcon className="h-5 w-5" />}
                 onClick={() =>
-                  filterBy === 'pass' ? setFilterBy('all') : setFilterBy('pass')
+                  status === 'pass' ? setStatus('open') : setStatus('pass')
                 }
               />
             </div>
@@ -1504,8 +1602,8 @@ const Maintenance = () => {
         )}
       </Modal>
       {/* Displaying Job Cards List */}
-      {viewPort === 'list' && !loadingJobCards && (
-        <div className='flex flex-col justify-end'>
+      {viewPort === 'list' && (
+        <div className="flex flex-col justify-end">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {getData().totalCount > 0 && !loadingJobCards ? (
               getData().data.map((c) => {
@@ -1552,7 +1650,9 @@ const Maintenance = () => {
                 )
               })
             ) : loadingJobCards ? (
-              <h5 className="text-center">Loading Data...</h5>
+              <div>
+                <Loader active />
+              </div>
             ) : (
               <h5 className="text-center">No Data ...</h5>
             )}
@@ -1569,17 +1669,19 @@ const Maintenance = () => {
             totalPages={jobCardPageCount}
             // Heads up! All items are powered by shorthands, if you want to hide one of them, just pass `null` as value
           /> */}
-          <div className='mt-5 self-end'>
-          <MPagination
-            activePage={jobCardsPage}
-            count={cardCount}
-            onPageChange={(e, data) => {
-              setJobCardsPage(data?.activePage)
-              populateJobCards()
-            }}
-            pageSize={9}
-          />
-            </div>
+          <div className="mt-5 self-end">
+            {!loadingJobCards && (
+              <MPagination
+                activePage={jobCardsPage}
+                count={cardCount}
+                onPageChange={(e, data) => {
+                  console.log(data)
+                  setJobCardsPage(data?.activePage)
+                }}
+                pageSize={9}
+              />
+            )}
+          </div>
         </div>
       )}
 
