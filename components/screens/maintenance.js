@@ -16,7 +16,7 @@ import {
   UsersIcon,
   WrenchScrewdriverIcon,
   XCircleIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline'
 import dayjs from 'dayjs'
 import { toast, ToastContainer } from 'react-toastify'
@@ -803,9 +803,7 @@ const Maintenance = () => {
             },
           })
             .then((res) => res.json())
-            .then((res) => {
-              setPage(1)
-            })
+            .then((res) => {})
             .catch((err) => toast.error('Error Occured!'))
 
           fetch(`${newUrl}/equipments/${res.plate.key}`, {
@@ -823,6 +821,9 @@ const Maintenance = () => {
             .then((res) => {})
         })
         .catch((err) => toast.error('Error Occured!'))
+        .finally(() => {
+          setPage(1)
+        })
     }
   }
 
