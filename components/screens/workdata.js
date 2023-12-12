@@ -1107,6 +1107,7 @@ export default function Workdata() {
     setSiteWork(row?.siteWork)
     setDayShift(row?.dispatch?.shift === 'dayShift')
     setWorkStartDate(moment(row?.workStartDate))
+    setWorkEndDate(moment(row?.workEndDate))
     setDriver(row?.driver?._id)
     setJobType(row?.workDone?._id)
     setDrivers(row?.dispatch?.drivers)
