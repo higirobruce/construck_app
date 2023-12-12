@@ -1534,10 +1534,12 @@ export default function Workdata() {
   }
 
   async function update() {
+    console.log(selEquipments.length, drivers)
     if (eqType === 'Truck' && (targetTrips == 0 || !targetTrips)) {
       toast.error('Target trips are mandatory for this entry!')
     } else {
-      if (selEquipments.length === drivers.length) {
+      if (selEquipments.length <= drivers.length) {
+        console.log('here')
         setSubmitting(true)
         let posted = 0
         let promises = []
@@ -1717,6 +1719,7 @@ export default function Workdata() {
           })
         } else {
           await Promise.all(promises).then(() => {
+            console.log('Doooone')
             setSubmitting(false)
             refresh()
             setViewPort('list')
