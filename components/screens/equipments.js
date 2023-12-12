@@ -117,6 +117,11 @@ export default function Equipments() {
       text: 'PNEUMATIC ASPHALT COMPACTOR',
       value: 'PNEUMATIC ASPHALT COMPACTOR',
     },
+    {
+      key: 27,
+      text: 'DOUBLE DRUM ASPHALT COMPACTOR',
+      value: 'DOUBLE DRUM ASPHALT COMPACTOR',
+    },
     { key: 18, text: 'SOIL COMPACTOR', value: 'SOIL COMPACTOR' },
     { key: 19, text: 'STUMPER', value: 'STUMPER' },
     { key: 20, text: 'TIPPER TRUCK', value: 'TIPPER TRUCK' },
@@ -125,6 +130,37 @@ export default function Equipments() {
     { key: 23, text: 'WATER TANK TRUCK', value: 'WATER TANK TRUCK' },
     { key: 24, text: 'WHEEL LOADER', value: 'WHEEL LOADER' },
     { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
+    { key: 26, text: 'PICK UP', value: 'PICK UP' },
+    {
+      key: 28,
+      text: 'MILK TANK TRUCK',
+      value: 'MILK TANK TRUCK',
+    },
+    {
+      key: 29,
+      text: 'MILK MINI-TRUCK',
+      value: 'MILK MINI-TRUCK',
+    },
+    {
+      key: 30,
+      text: 'SMALL TRUCK',
+      value: 'SMALL TRUCK',
+    },
+    {
+      key: 31,
+      text: 'MEDIUM CONTAINER TRUCK',
+      value: 'MEDIUM CONTAINER TRUCK',
+    },
+    {
+      key: 32,
+      text: 'FLATBED',
+      value: 'FLATBED',
+    },
+    {
+      key: 33,
+      text: 'TRAILER',
+      value: 'TRAILER',
+    },
   ]
 
   let assetTypeOptions = [
@@ -310,93 +346,93 @@ export default function Equipments() {
   }, [filterBy])
 
   function sendToWorkShop() {
-    let _eqs = [...equipments]
-    let indexToUpdate = 0
-    let eqToUpdate = _eqs.find((e, index) => {
-      indexToUpdate = index
-      return e._id == rowId
-    })
-    eqToUpdate.eqStatus = 'updating'
-    _eqs[indexToUpdate] = eqToUpdate
-    setEquipments(_eqs)
+    // let _eqs = [...equipments]
+    // let indexToUpdate = 0
+    // let eqToUpdate = _eqs.find((e, index) => {
+    //   indexToUpdate = index
+    //   return e._id == rowId
+    // })
+    // eqToUpdate.eqStatus = 'updating'
+    // _eqs[indexToUpdate] = eqToUpdate
+    // setEquipments(_eqs)
 
-    fetch(`${url}/equipments/sendToWorkshop/${rowId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let _eqs = [...equipments]
-        let indexToUpdate = 0
-        let eqToUpdate = _eqs.find((e, index) => {
-          indexToUpdate = index
-          return e._id == rowId
-        })
-        eqToUpdate.eqStatus = 'workshop'
-        _eqs[indexToUpdate] = eqToUpdate
-        setEquipments(_eqs)
-        // setOgEquipmentList(_eqs)
+    // fetch(`${url}/equipments/sendToWorkshop/${rowId}`, {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let _eqs = [...equipments]
+    //     let indexToUpdate = 0
+    //     let eqToUpdate = _eqs.find((e, index) => {
+    //       indexToUpdate = index
+    //       return e._id == rowId
+    //     })
+    //     eqToUpdate.eqStatus = 'workshop'
+    //     _eqs[indexToUpdate] = eqToUpdate
+    //     setEquipments(_eqs)
+    //     // setOgEquipmentList(_eqs)
 
-        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
-        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
-        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
+    //     let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+    //     let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+    //     let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
 
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
-        setNDisposed(disposed.length)
-      })
-      .catch((err) => {})
+    //     setNAssigned(assignedEq.length)
+    //     setNAvailable(availableEq.length)
+    //     setNDispatched(dispatchedEq.length)
+    //     setNInWorkshop(inWorkshopEq.length)
+    //     setNDisposed(disposed.length)
+    //   })
+    //   .catch((err) => {})
   }
 
   function makeAvailable() {
-    let _eqs = [...equipments]
-    let indexToUpdate = 0
-    let eqToUpdate = _eqs.find((e, index) => {
-      indexToUpdate = index
-      return e._id == rowId
-    })
-    eqToUpdate.eqStatus = 'updating'
-    _eqs[indexToUpdate] = eqToUpdate
-    setEquipments(_eqs)
+    // let _eqs = [...equipments]
+    // let indexToUpdate = 0
+    // let eqToUpdate = _eqs.find((e, index) => {
+    //   indexToUpdate = index
+    //   return e._id == rowId
+    // })
+    // eqToUpdate.eqStatus = 'updating'
+    // _eqs[indexToUpdate] = eqToUpdate
+    // setEquipments(_eqs)
 
-    fetch(`${url}/equipments/makeAvailable/${rowId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let _eqs = [...equipments]
-        let indexToUpdate = 0
-        let eqToUpdate = _eqs.find((e, index) => {
-          indexToUpdate = index
-          return e._id == rowId
-        })
-        eqToUpdate.eqStatus = 'standby'
-        _eqs[indexToUpdate] = eqToUpdate
-        setEquipments(_eqs)
-        // setOgEquipmentList(_eqs)
-        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
-        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
-        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
+    // fetch(`${url}/equipments/makeAvailable/${rowId}`, {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let _eqs = [...equipments]
+    //     let indexToUpdate = 0
+    //     let eqToUpdate = _eqs.find((e, index) => {
+    //       indexToUpdate = index
+    //       return e._id == rowId
+    //     })
+    //     eqToUpdate.eqStatus = 'standby'
+    //     _eqs[indexToUpdate] = eqToUpdate
+    //     setEquipments(_eqs)
+    //     // setOgEquipmentList(_eqs)
+    //     let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+    //     let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+    //     let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
 
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
-        setNDisposed(disposed.length)
-      })
+    //     setNAssigned(assignedEq.length)
+    //     setNAvailable(availableEq.length)
+    //     setNDispatched(dispatchedEq.length)
+    //     setNInWorkshop(inWorkshopEq.length)
+    //     setNDisposed(disposed.length)
+    //   })
   }
 
   function disposeEquipment() {

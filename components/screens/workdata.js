@@ -166,7 +166,11 @@ export default function Workdata() {
 
   const disabledDate = (current) => {
     // Can not select days before today and today
-    return current && current < moment('2022-07-01')
+    return (
+      current &&
+      current < moment().subtract(2, 'months').endOf('month') &&
+      user.userType !== 'admin'
+    )
   }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -448,9 +452,7 @@ export default function Workdata() {
     setLoadingEquipments(true)
     let dispDate = siteWork === true ? workStartDate : dispatchDate
     fetch(
-      `${url}/employees/${dispDate}/${
-        dayShift ? 'dayShift' : 'nightShift'
-      }`,
+      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -516,7 +518,9 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
+      `${url}/equipments/${dispDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
       {
         headers: {
           Authorization:
@@ -774,11 +778,17 @@ export default function Workdata() {
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
+    setDispatchDate(
+      moment()
+        .utcOffset(0)
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+        .toDate()
+    )
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
       `${url}/works/filtered/${pageNumber}?userProject=${
-        user.assignedProject?.prjDescription
+        user.assignedProjects[0]?.prjDescription
       }&userType=${user.userType}&companyName=${
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
@@ -817,6 +827,7 @@ export default function Workdata() {
         setNJobs(1)
         setNMachinesToMove(1)
         setSelEquipments([])
+        setSelJobTypes([])
         setFromProjects([])
         settoProjects([])
         setTargetTrips(0)
@@ -824,6 +835,8 @@ export default function Workdata() {
         setLoadingData(false)
         setSubmitting(false)
         setComment(null)
+        setPostingDate(moment())
+        setAstDrivers([])
       })
       .catch((err) => {
         toast.error(err)
@@ -1094,6 +1107,7 @@ export default function Workdata() {
     setSiteWork(row?.siteWork)
     setDayShift(row?.dispatch?.shift === 'dayShift')
     setWorkStartDate(moment(row?.workStartDate))
+    setWorkEndDate(moment(row?.workEndDate))
     setDriver(row?.driver?._id)
     setJobType(row?.workDone?._id)
     setDrivers(row?.dispatch?.drivers)
@@ -1514,16 +1528,19 @@ export default function Workdata() {
           })
         }
       } else {
+        refresh()
         setSubmitting(false)
       }
     }
   }
 
   async function update() {
+    console.log(selEquipments.length, drivers)
     if (eqType === 'Truck' && (targetTrips == 0 || !targetTrips)) {
       toast.error('Target trips are mandatory for this entry!')
     } else {
-      if (selEquipments.length === drivers.length) {
+      if (selEquipments.length <= drivers.length) {
+        console.log('here')
         setSubmitting(true)
         let posted = 0
         let promises = []
@@ -1551,7 +1568,8 @@ export default function Workdata() {
                     ) > 1
                       ? true
                       : false,
-                  workStartDate: new Date(dispatchDates[i][0]),
+                  workStartDate:
+                    row?.dispatch?.date || new Date(dispatchDates[i][0]),
                   workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
                     moment(dispatchDates[i][1]).diff(
@@ -1570,9 +1588,11 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: dispatchDates
-                      ? new Date(dispatchDates[i][0])
-                      : new Date().toISOString(),
+                    date:
+                      row?.dispatch?.date ||
+                      (dispatchDates
+                        ? new Date(dispatchDates[i][0])
+                        : new Date().toISOString()),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -1611,12 +1631,12 @@ export default function Workdata() {
                     ? workStartDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : row?.dispatch?.date || dispatchDate,
                   workEndDate: siteWork
                     ? workEndDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : row?.dispatch?.date || dispatchDate,
                   workDurationDays: siteWork
                     ? moment(workEndDate).diff(moment(workStartDate), 'days') +
                       1
@@ -1635,7 +1655,7 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: new Date(dispatchDate),
+                    date: row?.dispatch?.date || new Date(dispatchDate),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -1700,6 +1720,7 @@ export default function Workdata() {
           })
         } else {
           await Promise.all(promises).then(() => {
+            console.log('Doooone')
             setSubmitting(false)
             refresh()
             setViewPort('list')
@@ -2061,6 +2082,7 @@ export default function Workdata() {
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
   }
+
   return (
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
@@ -2201,6 +2223,8 @@ export default function Workdata() {
             </div>
           )}
         </div>
+
+        {console.log('Worklist ', workList)}
 
         {viewPort === 'list' && (
           <>
@@ -3461,6 +3485,8 @@ export default function Workdata() {
                           defaultValue={moment(row?.dispatch?.date)}
                           onChange={(date, dateString) => {
                             setDispatchDate(dateString)
+                            row.dispatch.date = new Date(dateString)
+                            setRow(row)
                           }}
                         />
                       </div>

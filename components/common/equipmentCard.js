@@ -152,7 +152,7 @@ export default function EquipmentType({
                 : 'h-5 w-5 text-zinc-300'
             }
           /> */}
-            {data.eqStatus !== 'workshop' &&
+            {/* {data.eqStatus !== 'workshop' &&
               data.eqStatus !== 'disposed' &&
               data.eqStatus !== 'assigned to job' &&
               data.eqStatus !== 'dispatched' &&
@@ -176,11 +176,11 @@ export default function EquipmentType({
                     handleSendToWorkshop(data.id)
                   }}
                 />
-              )}
+              )} */}
 
             {data.eqStatus === 'workshop' && canMoveAssets && (
               <div className="flex flex-col justify-between">
-                <ArrowsRightLeftIcon
+                {/* <ArrowsRightLeftIcon
                   onClick={() => {
                     handleMakeAvailable(data.id)
                   }}
@@ -189,7 +189,7 @@ export default function EquipmentType({
                       ? 'h-5 w-5 cursor-pointer text-teal-400'
                       : 'h-5 w-5 text-teal-300'
                   }
-                />
+                /> */}
 
                 <TrashIcon
                   onClick={() => {

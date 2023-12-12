@@ -31,10 +31,14 @@ export default function Dashboard() {
     Date.today().clearTime().moveToFirstDayOfMonth()
   )
   let [endDate, setEndDate] = useState(Date.today())
-  let [customer, setCustomer] = useState()
-  let [project, setProject] = useState()
-  let [equipment, setEquipment] = useState()
+  let [customer, setCustomer] = useState([])
+  let [project, setProject] = useState([])
+  let [equipment, setEquipment] = useState([])
   let [owner, setOwner] = useState('')
+
+  let [customerOptions, setCustomerOptions] = useState([])
+  let [projectOptions, setProjectOptions] = useState([])
+  let [equipmentOptions, setEquipmentOptions] = useState([])
 
   let [finalRevenues, setFinalRevenues] = useState(0)
   let [provisionalRevenues, setProvisionalRevenues] = useState(0)
@@ -118,47 +122,110 @@ export default function Dashboard() {
       })
       .catch((err) => toast.error('Error Occured!'))
 
-    fetch(`${url}/downtimes/trucks`, {
-      method: 'POST',
+    fetch(`${url}/customers`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
-      body: JSON.stringify({
-        startDate: startDate
-          ? startDate
-          : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate ? endDate : Date.today(),
-      }),
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
-        setLoadingAverageDownTimeTrucks(false)
-        setAverageDowntimeTrucks(_.round(res[0].downtime, 2).toLocaleString())
-      })
-      .catch((err) => toast.error('Error Occured!'))
+        let customers = res
+        let options = customers.map((c) => {
+          return {
+            key: c._id,
+            text: c.name,
+            value: c.name,
+          }
+        })
 
-    fetch(`${url}/downtimes/machines`, {
-      method: 'POST',
+        setCustomerOptions(options)
+      })
+
+    fetch(`${url}/projects/v2`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
-      body: JSON.stringify({
-        startDate: startDate
-          ? startDate
-          : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate ? endDate : Date.today(),
-      }),
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
-        setLoadingAverageDownTimeMachines(false)
-        setAverageDowntimeMachines(_.round(res[0].downtime, 2).toLocaleString())
+        let projects = res
+        let options = projects.map((c) => {
+          return {
+            key: c._id,
+            text: c.prjDescription,
+            value: c.prjDescription,
+          }
+        })
+
+        setProjectOptions(options)
       })
-      .catch((err) => toast.error('Error Occured!'))
+
+    fetch(`${url}/equipments/`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        let equipments = res?.equipments
+        let options = equipments.map((c) => {
+          return {
+            key: c._id,
+            text: c.plateNumber,
+            value: c.plateNumber,
+            // description: c.eqDescription,
+          }
+        })
+
+        setEquipmentOptions(options)
+      })
+      .catch((err) => {})
+
+    // fetch(`${url}/downtimes/trucks`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    //   body: JSON.stringify({
+    //     startDate: startDate
+    //       ? startDate
+    //       : Date.today().clearTime().moveToFirstDayOfMonth(),
+    //     endDate: endDate ? endDate : Date.today(),
+    //   }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     console.log(res)
+    //     setLoadingAverageDownTimeTrucks(false)
+    //     setAverageDowntimeTrucks(_.round(res[0].downtime, 2).toLocaleString())
+    //   })
+    //   .catch((err) => toast.error('Error Occured!'))
+
+    // fetch(`${url}/downtimes/machines`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    //   body: JSON.stringify({
+    //     startDate: startDate
+    //       ? startDate
+    //       : Date.today().clearTime().moveToFirstDayOfMonth(),
+    //     endDate: endDate ? endDate : Date.today(),
+    //   }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     console.log(res)
+    //     setLoadingAverageDownTimeMachines(false)
+    //     setAverageDowntimeMachines(_.round(res[0].downtime, 2).toLocaleString())
+    //   })
+    //   .catch((err) => toast.error('Error Occured!'))
   }, [])
 
   //Date range changed
@@ -226,47 +293,72 @@ export default function Dashboard() {
       })
       .catch((err) => toast.error('Error Occured!'))
 
-    fetch(`${url}/downtimes/trucks`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-      body: JSON.stringify({
-        startDate: startDate
-          ? startDate
-          : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate ? endDate : Date.today(),
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res)
-        setLoadingAverageDownTimeTrucks(false)
-        setAverageDowntimeTrucks(_.round(res[0].downtime, 2).toLocaleString())
-      })
-      .catch((err) => toast.error('Error Occured!'))
+    // fetch(`${url}/downtimes/trucks`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    //   body: JSON.stringify({
+    //     startDate: startDate
+    //       ? startDate
+    //       : Date.today().clearTime().moveToFirstDayOfMonth(),
+    //     endDate: endDate ? endDate : Date.today(),
+    //   }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     console.log(res)
+    //     setLoadingAverageDownTimeTrucks(false)
+    //     setAverageDowntimeTrucks(_.round(res[0].downtime, 2).toLocaleString())
+    //   })
+    //   .catch((err) => toast.error('Error Occured!'))
 
-    fetch(`${url}/downtimes/machines`, {
-      method: 'POST',
+    // fetch(`${url}/downtimes/machines`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    //   body: JSON.stringify({
+    //     startDate: startDate
+    //       ? startDate
+    //       : Date.today().clearTime().moveToFirstDayOfMonth(),
+    //     endDate: endDate ? endDate : Date.today(),
+    //   }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     console.log(res)
+    //     setLoadingAverageDownTimeMachines(false)
+    //     setAverageDowntimeMachines(_.round(res[0].downtime, 2).toLocaleString())
+    //   })
+    //   .catch((err) => toast.error('Error Occured!'))
+
+    fetch(`${url}/downtimes`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
       },
-      body: JSON.stringify({
-        startDate: startDate
-          ? startDate
-          : Date.today().clearTime().moveToFirstDayOfMonth(),
-        endDate: endDate ? endDate : Date.today(),
-      }),
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
+        let downTimeTrucks = res.filter((r) => r._id == 'Truck')
+        let downTimeMachines = res.filter((r) => r._id == 'Machine')
+
+        console.log(downTimeTrucks)
+
+        setLoadingAverageDownTimeTrucks(false)
         setLoadingAverageDownTimeMachines(false)
-        setAverageDowntimeMachines(_.round(res[0].downtime, 2).toLocaleString())
+
+        setAverageDowntimeTrucks(
+          _.round(downTimeTrucks[0]?.fieldN, 2)?.toLocaleString()
+        )
+        setAverageDowntimeMachines(
+          _.round(downTimeMachines[0]?.fieldN, 2)?.toLocaleString()
+        )
       })
-      .catch((err) => toast.error('Error Occured!'))
   }, [startDate, endDate])
 
   //Customer changed
@@ -331,6 +423,7 @@ export default function Dashboard() {
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log('Reeees', res)
         setFinalRevenues(parseFloat(res.totalRevenue))
         setProvisionalRevenues(parseFloat(res.projectedRevenue))
         setTotalDays(res.totalDays)
@@ -536,11 +629,62 @@ export default function Dashboard() {
 
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
-      <div className="text-2xl font-semibold">Dashboard</div>
+      <div className="text-2xl font-semibold">
+        Dashboard{' '}
+        {/* <a className='text-sm' href="itms-services://?action=download-manifest&url=https://shapeherd.rw/shabikaapp/manifest.plist">
+          Install iOS App
+        </a> */}
+      </div>
+
       <div className="mb-5 flex flex-row space-x-5 py-5">
-        <TextInputV placeholder="Customer Name" setValue={setCustomer} />
-        <TextInputV placeholder="Project" setValue={setProject} />
-        <TextInputV placeholder="Equipment" setValue={setEquipment} />
+        {/* Customer name list */}
+        {/* <TextInputV placeholder="Customer Name" setValue={setCustomer} /> */}
+        <div className="w-1/5">
+          <Dropdown
+            options={customerOptions}
+            placeholder="Select customer(s)"
+            fluid
+            search
+            multiple
+            selection
+            onChange={(e, data) => {
+              setCustomer(data.value)
+            }}
+          />
+        </div>
+
+        {/* Project list */}
+        {/* <TextInputV placeholder="Project" setValue={setProject} /> */}
+        <div className="w-1/5">
+          <Dropdown
+            options={projectOptions}
+            placeholder="Select project(s)"
+            fluid
+            search
+            multiple
+            selection
+            onChange={(e, data) => {
+              setProject(data.value)
+            }}
+          />
+        </div>
+
+        {/* equipment list */}
+        {/* <TextInputV placeholder="Equipment" setValue={setEquipment} /> */}
+        <div className="w-1/5">
+          <Dropdown
+            options={equipmentOptions}
+            placeholder="Select equipment"
+            fluid
+            search
+            multiple
+            selection
+            onChange={(e, data) => {
+              setEquipment(data.value)
+            }}
+          />
+        </div>
+
         <div className="w-1/5">
           <Dropdown
             options={[
@@ -640,7 +784,7 @@ export default function Dashboard() {
             content: loadingAverageDownTimeTrucks ? (
               <Loader active inline size="mini" />
             ) : (
-              averageDownTimeTrucks + ' hours'
+              averageDownTimeTrucks + ' days'
             ),
           }}
           icon={<TruckIcon className="h-5 w-5 text-red-500" />}
@@ -653,7 +797,7 @@ export default function Dashboard() {
             content: loadingAverageDownTimeMachines ? (
               <Loader active inline size="mini" />
             ) : (
-              averageDownTimeMachines + ' hours'
+              averageDownTimeMachines + ' days'
             ),
           }}
           icon={<WrenchScrewdriverIcon className="h-5 w-5 text-red-500" />}

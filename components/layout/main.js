@@ -11,6 +11,10 @@ import Reversals from '../screens/reversals'
 import Drivers from '../screens/drivers'
 import Vendors from '../screens/vendors'
 import Costs from '../screens/costs'
+import Maintenance from '../screens/maintenance';
+import Items from '../screens/items';
+import Mechanics from '../screens/mechanics';
+import Mechanical from '../screens/mechanicals';
 
 export default function Main() {
   let { screen, setScreen } = useContext(ScreenContext)
@@ -28,6 +32,10 @@ export default function Main() {
       {screen === 'drivers' && <Drivers />}
       {screen === 'vendors' && <Vendors />}
       {screen === 'costs' && <Costs />}
+      {screen === 'maintenance' && <Maintenance />}
+      {(screen === 'workshop' || screen === 'items') && <Items />}
+      {screen === 'mechanics' && <Mechanics />}
+      {screen === 'mechanical' && <Mechanical />}
     </div>
   )
 }

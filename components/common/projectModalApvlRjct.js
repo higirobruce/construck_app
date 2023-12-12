@@ -3,6 +3,7 @@ import moment from 'moment'
 import React, { useContext, useEffect, useState } from 'react'
 import { Dropdown, Loader } from 'semantic-ui-react'
 import MTextView from './mTextView'
+import MLable from './mLabel'
 import TextInput from './TextIput'
 import TextInputLogin from './TextIputLogin'
 import TextInputV from './TextIputV'
@@ -133,7 +134,7 @@ export default function ModalApprovalRejections({
     let _siteWorkDetails = [...workDetails]
 
     if (isSiteWork) {
-      let _dailyWork = _work.dailyWork[dailyWorkIndex]
+      let _dailyWork = _work.dailyWorkNew[dailyWorkIndex]
       _dailyWork.toConfirm = true
 
       _siteWorkDetails[workIndex] = _work
@@ -173,7 +174,7 @@ export default function ModalApprovalRejections({
     // console.log(ogWorkDetails)
 
     if (isSiteWork) {
-      let _dailyWork = _work.dailyWork[dailyWorkIndex]
+      let _dailyWork = _work.dailyWorkNew[dailyWorkIndex]
       _dailyWork.toConfirm = false
       _dailyWork.confirming = false
 
@@ -201,7 +202,7 @@ export default function ModalApprovalRejections({
       let id = _work._id
 
       if (isSiteWork) {
-        let _dailyWork = _work.dailyWork[dailyWorkIndex]
+        let _dailyWork = _work.dailyWorkNew[dailyWorkIndex]
         _dailyWork.confirming = true
         _siteWorkDetails[workIndex] = _work
         setWorkDetails(_siteWorkDetails)
@@ -219,7 +220,7 @@ export default function ModalApprovalRejections({
           .then((res) => {
             let _work2 = workDetails[workIndex]
             let _siteWorkDetails2 = [...workDetails]
-            let _dailyWork2 = _work2.dailyWork[dailyWorkIndex]
+            let _dailyWork2 = _work2.dailyWorkNew[dailyWorkIndex]
             _dailyWork2.confirming = false
             _dailyWork2.toConfirm = false
             _dailyWork2.status = 'validated'
@@ -289,7 +290,7 @@ export default function ModalApprovalRejections({
             x-transitionLeave="transition ease-in duration-200 transform"
             x-transitionLeave-start="opacity-100 trangray-y-0 sm:scale-100"
             x-transitionLeave-end="opacity-0 trangray-y-4 sm:trangray-y-0 sm:scale-95"
-            className="my-20 inline-block w-full max-w-xl transform overflow-auto rounded-lg bg-white p-8 text-left shadow-xl transition-all 2xl:max-w-5xl"
+            className="my-20 inline-block w-full transform overflow-auto rounded-lg bg-white p-8 px-10 text-left shadow-xl transition-all 2xl:max-w-7xl"
           >
             <div className="mb-5 flex items-center justify-between space-x-4">
               <div className="text-2xl font-semibold">{title}</div>
@@ -318,20 +319,38 @@ export default function ModalApprovalRejections({
             {workDetails && workDetails.length > 0 && (
               <div className="flex flex-col rounded-lg ring-1 ring-gray-100">
                 {workDetails.map((detail, workIndex) => {
-                  if (detail.siteWork)
+                  if (detail?.siteWork)
                     return (
-                      detail.siteWork &&
-                      detail.dailyWork.map((d, index) => {
+                      detail?.siteWork &&
+                      detail?.dailyWorkNew.map((d, index) => {
                         return (
                           d.status &&
                           // d.status !== 'validated' &&
                           d.status !== 'released' && (
                             <div
                               key={d.date}
-                              className="grid grid-cols-5 rounded p-3 shadow-sm"
+                              className="grid grid-cols-7 rounded p-3 shadow-sm"
                             >
                               {/* <div>{d.date}</div> */}
-                              <MTextView content={d.date} />
+                              <MTextView
+                                content={
+                                  moment(d.date).format('DD-MMM-YYYY') +
+                                  '-' +
+                                  detail?.dispatch?.shift
+                                    ?.substring(0, 1)
+                                    .toUpperCase()
+                                }
+                              />
+                              <div className="flex flex-col">
+                                <MTextView
+                                  content={detail?.equipment?.plateNumber}
+                                />
+
+                                <div className="text-xs text-gray-400">
+                                  {detail?.equipment?.eqDescription}
+                                </div>
+                              </div>
+
                               <MTextView
                                 content={
                                   (d.uom === 'day'
@@ -350,13 +369,29 @@ export default function ModalApprovalRejections({
                                   : _.round(d.duration / (1000 * 60 * 60), 2)}
                                 {' ' + d.uom + 's'}
                               </div> */}
+                              <div className="flex flex-col">
+                                <MTextView
+                                  content={
+                                    detail?.driver?.firstName 
+                                  }
+                                />
+                                <div className="font-mono text-xs">
+                                  {detail?.driver?.phone}
+                                </div>
+                              </div>
                               <MTextView
                                 content={
                                   'RWF ' + d.totalRevenue?.toLocaleString()
                                 }
                               />
-                              <MTextView content={d.status} />
-
+                              <div className="flex flex-col">
+                                <MTextView content={d.status} />
+                                <div className="font-mono text-xs">
+                                  {d.rejectedReason
+                                    ? 'Reason: ' + d.rejectedReason
+                                    : ''}
+                                </div>
+                              </div>
                               {!d.toConfirm && d.status !== 'validated' && (
                                 <div className="flex flex-row items-center space-x-3">
                                   {d.status === 'approved' && (
@@ -420,33 +455,83 @@ export default function ModalApprovalRejections({
                       detail.status && (
                         <div
                           key={detail._id}
-                          className="grid grid-cols-5 rounded p-3 shadow-sm"
+                          className="grid grid-cols-7 rounded p-3 shadow-sm"
                         >
                           <MTextView
-                            content={moment(detail?.dispatch?.date).format(
-                              'DD-MMM-YYYY'
-                            )}
-                          />
-
-                          <MTextView
                             content={
-                              (detail.equipment.uom === 'day'
-                                ? detail.approvedDuration
-                                : _.round(
-                                    detail.approvedDuration / (1000 * 60 * 60),
-                                    2
-                                  )) +
-                              detail.equipment.uom +
-                              's'
+                              moment(detail?.dispatch?.date).format(
+                                'DD-MMM-YYYY'
+                              ) +
+                              '-' +
+                              detail?.dispatch?.shift
+                                ?.substring(0, 1)
+                                .toUpperCase()
                             }
                           />
 
+                          <div className="flex flex-col">
+                            <MTextView
+                              content={detail?.equipment?.plateNumber}
+                            />
+
+                            <div className="text-xs text-gray-400">
+                              {detail?.equipment?.eqDescription}
+                            </div>
+                          </div>
+
                           <MTextView
                             content={
-                              'RWF ' + detail.approvedRevenue?.toLocaleString()
+                              detail.status === 'rejected'
+                                ? (detail.equipment.uom === 'day'
+                                    ? detail.rejectedDuration
+                                    : _.round(
+                                        detail.rejectedDuration /
+                                          (1000 * 60 * 60),
+                                        2
+                                      )) +
+                                  detail.equipment.uom +
+                                  's'
+                                : (detail.equipment.uom === 'day'
+                                    ? detail.approvedDuration
+                                    : _.round(
+                                        detail.approvedDuration /
+                                          (1000 * 60 * 60),
+                                        2
+                                      )) +
+                                  detail.equipment.uom +
+                                  's'
                             }
                           />
-                          <MTextView content={detail.status} />
+
+                          <div className="flex flex-col">
+                            <MTextView
+                              content={
+                                detail?.driver?.firstName
+                              }
+                            />
+                            <div className="font-mono text-xs">
+                              {detail?.driver?.phone}
+                            </div>
+                          </div>
+
+                          <MTextView
+                            content={
+                              'RWF ' +
+                              (detail.status === 'rejected'
+                                ? detail.rejectedRevenue?.toLocaleString()
+                                : detail.approvedRevenue?.toLocaleString())
+                            }
+                          />
+
+                          <div className="flex flex-col">
+                            <MTextView content={detail.status} />
+                            <div className="font-mono text-xs">
+                              {detail.reasonForRejection
+                                ? 'Reason: ' + detail.reasonForRejection
+                                : ''}
+                            </div>
+                          </div>
+
                           {!detail.toConfirm && detail.status !== 'validated' && (
                             <div className="flex flex-row items-center space-x-3">
                               {detail.status === 'approved' && (

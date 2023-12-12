@@ -7,6 +7,7 @@ export default function MSubmitButton({
   icon,
   intent = '',
   disabled = false,
+  intentColor
 }) {
   function getClassByIntent(intent) {
     if (intent === 'primary') {
@@ -31,7 +32,7 @@ export default function MSubmitButton({
       className={getClassByIntent(intent)}
     >
       {icon}
-      <div className="font-bold">{label}</div>
+      <div className={`font-bold ${(intentColor) && intentColor == 'danger' ? 'text-red-400' : intentColor == 'success' ? 'text-green-400' :'' }`}>{label}</div>
     </button>
   )
 }
