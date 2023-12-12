@@ -486,12 +486,12 @@ const Maintenance = () => {
                         'plate number': obj.plate.text,
                         'mechanical Issue':
                           obj.mechanicalInspections.join(', '),
-                        'Requisition date': moment(obj.requestParts).format(
-                          'DD-MMMM-YYYY LT'
-                        ),
-                        'Reception date': moment(obj.receivedParts).format(
-                          'DD-MMMM-YYYY LT'
-                        ),
+                        'Requisition date':
+                          obj.requestParts &&
+                          moment(obj.requestParts).format('DD-MMMM-YYYY LT'),
+                        'Reception date':
+                          obj.receivedParts &&
+                          moment(obj.receivedParts).format('DD-MMMM-YYYY LT'),
                         'source of parts': obj.sourceItem,
                         'parts requested': anotherSub.item,
                         'quantity requested': parseInt(anotherSub.qty || '0'),
@@ -507,12 +507,12 @@ const Maintenance = () => {
                   'jobCard-Id': obj.jobCard_Id,
                   'plate number': obj.plate.text,
                   'mechanical Issue': obj.mechanicalInspections.join(', '),
-                  'Requisition date': moment(obj.requestParts).format(
-                    'DD-MMMM-YYYY LT'
-                  ),
-                  'Reception date': moment(obj.receivedParts).format(
-                    'DD-MMMM-YYYY LT'
-                  ),
+                  'Requisition date':
+                    obj.requestParts &&
+                    moment(obj.requestParts).format('DD-MMMM-YYYY LT'),
+                  'Reception date':
+                    obj.receivedParts &&
+                    moment(obj.receivedParts).format('DD-MMMM-YYYY LT'),
                   'source of parts': obj.sourceItem,
                   'parts requested': subObj.item,
                   'quantity requested': 0,
@@ -526,12 +526,12 @@ const Maintenance = () => {
                 'jobCard-Id': obj.jobCard_Id,
                 'plate number': obj.plate.text,
                 'mechanical Issue': obj.mechanicalInspections.join(', '),
-                'Requisition date': moment(obj.requestParts).format(
-                  'DD-MMMM-YYYY LT'
-                ),
-                'Reception date': moment(obj.receivedParts).format(
-                  'DD-MMMM-YYYY LT'
-                ),
+                'Requisition date':
+                  obj.requestParts &&
+                  moment(obj.requestParts).format('DD-MMMM-YYYY LT'),
+                'Reception date':
+                  obj.receivedParts &&
+                  moment(obj.receivedParts).format('DD-MMMM-YYYY LT'),
                 'source of parts': obj.sourceItem,
                 'parts requested': null,
                 'quantity requested': null,
@@ -854,7 +854,6 @@ const Maintenance = () => {
       })
         .then((res) => res.json())
         .then((res) => {
-      
           fetch(`${url}/equipments/sendToWorkshop/${res.plate.key}`, {
             method: 'PUT',
             headers: {
@@ -871,7 +870,7 @@ const Maintenance = () => {
             .catch((err) => toast.error('Error Occured!'))
         })
         .catch((err) => toast.error('Error Occured!'))
-        .finally(()=>{
+        .finally(() => {
           setLoading(false)
         })
     }
@@ -1780,7 +1779,7 @@ const Maintenance = () => {
                   label={`Go to Previous`}
                 />
               )}
-              { (
+              {
                 <Popconfirm
                   placement="topLeft"
                   title={textConfirm}
@@ -1805,7 +1804,7 @@ const Maintenance = () => {
                     }`}</div>
                   </button>
                 </Popconfirm>
-              )}
+              }
             </div>
           )}
         </div>
