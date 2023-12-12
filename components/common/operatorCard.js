@@ -108,6 +108,7 @@ const OperatorCard = (props) => {
                             disabled={row.teamApproval == true}
                             isRequired
                             setNextMileages={setNextMileages}
+                            setValue={setNextMileages}
                         />
                     </div>)} 
                 </div>}

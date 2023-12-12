@@ -166,7 +166,11 @@ export default function Workdata() {
 
   const disabledDate = (current) => {
     // Can not select days before today and today
-    return current && current < moment().subtract(2,'months').endOf('month') && user.userType!=='admin'
+    return (
+      current &&
+      current < moment().subtract(2, 'months').endOf('month') &&
+      user.userType !== 'admin'
+    )
   }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -448,9 +452,7 @@ export default function Workdata() {
     setLoadingEquipments(true)
     let dispDate = siteWork === true ? workStartDate : dispatchDate
     fetch(
-      `${url}/employees/${dispDate}/${
-        dayShift ? 'dayShift' : 'nightShift'
-      }`,
+      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -516,7 +518,9 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
+      `${url}/equipments/${dispDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
       {
         headers: {
           Authorization:
@@ -774,6 +778,12 @@ export default function Workdata() {
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
+    setDispatchDate(
+      moment()
+        .utcOffset(0)
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+        .toDate()
+    )
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
@@ -817,7 +827,7 @@ export default function Workdata() {
         setNJobs(1)
         setNMachinesToMove(1)
         setSelEquipments([])
-        setSelJobTypes([]);
+        setSelJobTypes([])
         setFromProjects([])
         settoProjects([])
         setTargetTrips(0)
@@ -827,7 +837,6 @@ export default function Workdata() {
         setComment(null)
         setPostingDate(moment())
         setAstDrivers([])
-
       })
       .catch((err) => {
         toast.error(err)
@@ -1556,7 +1565,8 @@ export default function Workdata() {
                     ) > 1
                       ? true
                       : false,
-                  workStartDate: new Date(dispatchDates[i][0]),
+                  workStartDate:
+                    row?.dispatch?.date || new Date(dispatchDates[i][0]),
                   workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
                     moment(dispatchDates[i][1]).diff(
@@ -1575,9 +1585,11 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: dispatchDates
-                      ? new Date(dispatchDates[i][0])
-                      : new Date().toISOString(),
+                    date:
+                      row?.dispatch?.date ||
+                      (dispatchDates
+                        ? new Date(dispatchDates[i][0])
+                        : new Date().toISOString()),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -1616,12 +1628,12 @@ export default function Workdata() {
                     ? workStartDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : row?.dispatch?.date || dispatchDate,
                   workEndDate: siteWork
                     ? workEndDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : row?.dispatch?.date || dispatchDate,
                   workDurationDays: siteWork
                     ? moment(workEndDate).diff(moment(workStartDate), 'days') +
                       1
@@ -1640,7 +1652,7 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: new Date(dispatchDate),
+                    date: row?.dispatch?.date || new Date(dispatchDate),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -3469,6 +3481,8 @@ export default function Workdata() {
                           defaultValue={moment(row?.dispatch?.date)}
                           onChange={(date, dateString) => {
                             setDispatchDate(dateString)
+                            row.dispatch.date = new Date(dateString)
+                            setRow(row)
                           }}
                         />
                       </div>

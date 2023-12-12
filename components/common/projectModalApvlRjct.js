@@ -334,7 +334,7 @@ export default function ModalApprovalRejections({
                               {/* <div>{d.date}</div> */}
                               <MTextView
                                 content={
-                                  d.date +
+                                  moment(d.date).format('DD-MMM-YYYY') +
                                   '-' +
                                   detail?.dispatch?.shift
                                     ?.substring(0, 1)

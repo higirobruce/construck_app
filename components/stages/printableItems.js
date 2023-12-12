@@ -23,13 +23,13 @@ const PrintableItems = ({row, setPage, jobLogCards, role}) => {
         let existingCard = jobLogCards.filter((item) => item.jobCard_Id == row.jobCard_id)[0];
         let diff = [];
         
-        if(existingCard.sourceItem == 'Transfer') {
+        if(existingCard?.sourceItem == 'Transfer') {
             diff = row.transferData.filter((obj1) => !existingCard.transferData.some((obj2) => (obj1.from == obj2.from) || ((obj1.from == obj2.from) && obj1.qty == obj2.qty)))
         } else {
             for (let i = 0; i < row.inventoryData.length; i++) {
                 for (let j = 0; j < row.inventoryData[i].length; j++) {
                     const string1 = JSON.stringify(row.inventoryData[i][j]);
-                    const string2 = JSON.stringify(existingCard.inventoryData && existingCard.inventoryData[i] && existingCard.inventoryData[i][j]);
+                    const string2 = JSON.stringify(existingCard?.inventoryData && existingCard?.inventoryData[i] && existingCard?.inventoryData[i][j]);
                     if (string1 !== string2) {
                         // if the object doesn't exist in array2, add it to the diffArray
                         if (!diff[i]) {
