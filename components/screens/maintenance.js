@@ -741,6 +741,7 @@ const Maintenance = () => {
   }, [])
 
   useEffect(() => {
+    setSearch(null)
     setJobCardsPage(1)
     setLoadingJobCards(true)
     // setJobCardsPage(1)
