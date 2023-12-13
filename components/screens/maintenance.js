@@ -577,11 +577,27 @@ const Maintenance = () => {
     })
       .then((res) => res.json())
       .then((res) => setJobLogCards(res))
-      .catch((err)=>{})
+      .catch((err) => {})
   }
 
   const populateJobCards = () => {
     setLoadingJobCards(true)
+    setJobCards([])
+    // setNAvailable(0)
+    // setNApproved(0)
+    // setNCanceled(0)
+    // // setNEntry(EntryCards.length)
+    // setNEntry(0)
+    // // setNDiagnosis(diagnosisCards.length)
+    // setNDiagnosis(0)
+    // // setNParts(requisitionCards.length)
+    // setNParts(0)
+    // // setNRepair(repairCards.length)
+    // setNRepair(0)
+    // setNTesting(0)
+    // // setNClosed(closedCards.length)
+    // setNClosed(0)
+    
     fetch(
       `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}&search=${search}`,
       {
