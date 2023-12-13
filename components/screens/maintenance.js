@@ -577,6 +577,7 @@ const Maintenance = () => {
     })
       .then((res) => res.json())
       .then((res) => setJobLogCards(res))
+      .catch((err)=>{})
   }
 
   const populateJobCards = () => {
