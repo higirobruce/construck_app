@@ -141,6 +141,7 @@ export default function Modal({
   let { user, setUser } = useContext(UserContext)
 
   useEffect(() => {
+    console.log('dailyWorks', dailyWorks)
     let _siteWorkPosted = _.find(dailyWorks, {
       date: pDate,
       pending: false,
@@ -437,13 +438,17 @@ export default function Modal({
                               moment().subtract(2, 'months').endOf('month')
                           )
                         else {
-                          return (
-                            current.isAfter(moment())
-                          )
+                          return current.isAfter(moment())
                         }
                       }}
                       onChange={(d, dateString) => {
-                        setPDate(moment(dateString).format('DD-MMM-YYYY'))
+                        let day = moment(dateString)
+                        day.set('hours',0)
+                        day.set('minutes',0)
+                        day.set('seconds',0)
+                        day.set('milliseconds',0)
+                        
+                        setPDate(day.toISOString())
                         handleSetPostingDate(dateString)
                       }}
                     />
