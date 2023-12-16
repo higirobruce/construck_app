@@ -18,7 +18,8 @@ const InspectionDiagnosis = (props) => {
         setInspectionTools,
         setMechanicalInspections,
         role,
-        previousMode
+        previousMode,
+        row
     } = props;
 
     const [mechanicIssues, setMechanicals] = useState([]);
@@ -31,7 +32,15 @@ const InspectionDiagnosis = (props) => {
     const { Option } = Select;
 
     const handleChange = (value) => {
-        setMechanicalInspections(value)
+        let oldInspections = row?.mechanicalInspections;
+
+        for (let i = 0; i < value.length; i++) {
+            if (!oldInspections.includes(value[i])) {
+                oldInspections.push(value[i]);
+            }
+          }
+
+        setMechanicalInspections(oldInspections)
     };
 
     const populateMechanicals = () => {

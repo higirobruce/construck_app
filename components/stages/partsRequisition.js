@@ -22,7 +22,8 @@ const PartsRequisition = (props) => {
     reason,
     role,
     previousMode,
-    setAssignIssue,
+    // setAssignIssue,
+    row,
   } = props
 
   const [eqType, setEqType] = useState([])
@@ -168,6 +169,7 @@ const PartsRequisition = (props) => {
   }
 
   useEffect(() => {
+    let oldAssignedIssues = row?.assignedIssue
     let foundItem
 
     transferData.map((transfer, i) => {
@@ -179,16 +181,20 @@ const PartsRequisition = (props) => {
 
     mechanicalInspections.map((issue) => {
       let assignedIssue = {
-        endRepair: null,
+        endRepair: oldAssignedIssues?.find((a) => a.issue === issue)[0][
+          'endRepair'
+        ],
         issue,
-        mech: [],
-        startRepair: null,
+        mech: oldAssignedIssues?.find((a) => a.issue === issue)[0]['mech'],
+        startRepair: oldAssignedIssues?.find((a) => a.issue === issue)[0][
+          'startRepair'
+        ],
       }
 
       aIssues.push(assignedIssue)
     })
 
-    setAssignIssue(aIssues)
+    // setAssignIssue(aIssues)
     populateItems()
   }, [])
 
