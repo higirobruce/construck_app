@@ -141,9 +141,13 @@ export default function Modal({
   let { user, setUser } = useContext(UserContext)
 
   useEffect(() => {
-    console.log('dailyWorks', dailyWorks)
-    let _siteWorkPosted = _.find(dailyWorks, {
-      date: pDate,
+    let _d = dailyWorks?.map((d) => {
+      d.date = moment(d?.date).format('DD-MMM-YYYY')
+      return d
+    })
+    let _siteWorkPosted = _.find(_d, {
+      date: moment(pDate)
+      .format('DD-MMM-YYYY'),
       pending: false,
     })
 
@@ -443,11 +447,11 @@ export default function Modal({
                       }}
                       onChange={(d, dateString) => {
                         let day = moment(dateString)
-                        day.set('hours',0)
-                        day.set('minutes',0)
-                        day.set('seconds',0)
-                        day.set('milliseconds',0)
-                        
+                        day.set('hours', 0)
+                        day.set('minutes', 0)
+                        day.set('seconds', 0)
+                        day.set('milliseconds', 0)
+
                         setPDate(day.toISOString())
                         handleSetPostingDate(dateString)
                       }}
