@@ -895,7 +895,6 @@ const Maintenance = () => {
 
   const handleUpdate = () => {
     setLoading(true)
-
     const payload = {
       entryDate,
       carPlate,
@@ -1193,6 +1192,7 @@ const Maintenance = () => {
       eqList={eqList}
       projectList={projectList}
       viewPort={viewPort}
+      
     />,
     <InspectionDiagnosis
       inspectionTools={inspectionTools}
@@ -1201,6 +1201,7 @@ const Maintenance = () => {
       setMechanicalInspections={setMechanicalInspections}
       role={role}
       previousMode={previousMode}
+      row={row}
     />,
     <PartsRequisitions
       sourceItem={sourceItem}
@@ -1223,6 +1224,7 @@ const Maintenance = () => {
       role={role}
       previousMode={previousMode}
       setAssignIssue={setAssignIssue}
+      row={row}
     />,
     <PrintableItems
       row={row}
@@ -1252,6 +1254,7 @@ const Maintenance = () => {
       role={role}
       previousMode={previousMode}
       setAssignIssue={setAssignIssue}
+      row={row}
     />,
     <Repair
       mechanicalInspections={mechanicalInspections}
@@ -1261,6 +1264,7 @@ const Maintenance = () => {
       entryDate={entryDate}
       role={role}
       previousMode={previousMode}
+      
     />,
     <Testing
       userList={usersList}
@@ -1270,6 +1274,7 @@ const Maintenance = () => {
       setOperatorNotApp={setOperatorNotApp}
       role={role}
       previousMode={previousMode}
+      row={row}
     />,
     <GatePass row={row} />,
   ]
