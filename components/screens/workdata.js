@@ -2679,7 +2679,7 @@ export default function Workdata() {
                                     return d === data.value
                                   })
 
-                                  if (!selectedDr) {
+                                  if (!selectedDr || viewPort=='edit') {
                                     let _dr = drivers ? [...drivers] : []
                                     _dr[i] = data.value
 
