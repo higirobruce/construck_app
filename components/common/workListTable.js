@@ -169,6 +169,17 @@ const getTotalRevenue = (dailyWork) => {
     : '...'
 }
 
+const getTotalDuration = (dailyWork, uom) => {
+  let duration = 0
+  dailyWork?.map((s) => {
+    duration += s?.duration
+  })
+
+  return uom === 'hour'
+    ? _.round(duration / (1000 * 60 * 60), 2) + 'h'
+    : Math.round(duration * 100) / 100 + 'd'
+}
+
 export default function WorkListTable({
   data,
   handelApprove,
@@ -431,10 +442,15 @@ export default function WorkListTable({
                           row.status === 'on going' ||
                           row.status === 'approved' ||
                           row.status === 'rejected'
-                            ? row?.equipment?.uom === 'hour'
-                              ? _.round(row?.duration / (1000 * 60 * 60), 2) +
-                                'h'
-                              : Math.round(row?.duration * 100) / 100 + 'd'
+                            ? !row?.siteWork
+                              ? row?.equipment?.uom === 'hour'
+                                ? _.round(row?.duration / (1000 * 60 * 60), 2) +
+                                  'h'
+                                : Math.round(row?.duration * 100) / 100 + 'd'
+                              : getTotalDuration(
+                                  row?.dailyWork,
+                                  row?.equipment?.uom
+                                )
                             : '...'
                         }
                       />
