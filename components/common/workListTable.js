@@ -175,8 +175,13 @@ const getTotalDuration = (dailyWork, uom) => {
     duration += s?.duration
   })
 
-  return Math.round(duration * 100) + ' ' + uom
+  return uom === 'hour'
+  ? _.round(duration / (1000 * 60 * 60), 2) +
+    'h'
+  : Math.round(duration * 100) / 100 + 'd'
 }
+
+
 
 export default function WorkListTable({
   data,
@@ -445,10 +450,7 @@ export default function WorkListTable({
                                 ? _.round(row?.duration / (1000 * 60 * 60), 2) +
                                   'h'
                                 : Math.round(row?.duration * 100) / 100 + 'd'
-                              : getTotalDuration(
-                                  row?.dailyWork,
-                                  row?.equipment?.uom
-                                )
+                              : getTotalDuration(row?.dailyWork, row?.equipment?.uom)
                             : '...'
                         }
                       />
