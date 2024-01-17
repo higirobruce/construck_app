@@ -158,6 +158,17 @@ const getShiftLabel = (shift) => {
   else return ''
 }
 
+const getTotalRevenue = (dailyWork) => {
+  let totalRevenue = 0
+  dailyWork?.map((s) => {
+    totalRevenue += s?.totalRevenue
+  })
+
+  return totalRevenue && totalRevenue !== 0
+    ? 'RWF ' + _.round(totalRevenue, 2).toLocaleString()
+    : '...'
+}
+
 export default function WorkListTable({
   data,
   handelApprove,
@@ -441,13 +452,15 @@ export default function WorkListTable({
                             <MTextView
                               selected={row?.selected}
                               content={
-                                row.totalRevenue
-                                  ? 'RWF ' +
-                                    _.round(
-                                      row?.totalRevenue,
-                                      2
-                                    ).toLocaleString()
-                                  : '...'
+                                !row?.siteWork
+                                  ? row.totalRevenue
+                                    ? 'RWF ' +
+                                      _.round(
+                                        row?.totalRevenue,
+                                        2
+                                      ).toLocaleString()
+                                    : '...'
+                                  : getTotalRevenue(row?.dailyWork)
                               }
                             />
                           </div>
