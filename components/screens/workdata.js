@@ -271,12 +271,12 @@ export default function Workdata() {
         //   value: 'NA',
         //   text: 'Not applicable',
         // })
-        if (viewPort === 'edit')
-          userOptions?.push({
-            key: row?.driver?._id,
-            value: row?.driver?._id,
-            text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
-          })
+        // if (viewPort === 'edit')
+          // userOptions?.push({
+          //   key: row?.driver?._id,
+          //   value: row?.driver?._id,
+          //   text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
+          // })
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
@@ -2679,7 +2679,7 @@ export default function Workdata() {
                                     return d === data.value
                                   })
 
-                                  if (!selectedDr) {
+                                  if (!selectedDr || viewPort=='edit') {
                                     let _dr = drivers ? [...drivers] : []
                                     _dr[i] = data.value
 
