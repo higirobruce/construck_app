@@ -161,7 +161,7 @@ const getShiftLabel = (shift) => {
 const getTotalRevenue = (dailyWork) => {
   let totalRevenue = 0
   dailyWork?.map((s) => {
-    totalRevenue += s?.totalRevenue
+    totalRevenue += s?.totalRevenue || 0
   })
 
   return totalRevenue && totalRevenue !== 0
@@ -172,16 +172,16 @@ const getTotalRevenue = (dailyWork) => {
 const getTotalDuration = (dailyWork, uom) => {
   let duration = 0
   dailyWork?.map((s) => {
-    duration += s?.duration
+    duration += s?.duration || 0
   })
 
-  return uom === 'hour'
-  ? _.round(duration / (1000 * 60 * 60), 2) +
-    'h'
-  : Math.round(duration * 100) / 100 + 'd'
+  if (!duration) return '...'
+
+  if (duration)
+    return uom === 'hour'
+      ? _.round(duration / (1000 * 60 * 60), 2) + 'h'
+      : Math.round(duration * 100) / 100 + 'd'
 }
-
-
 
 export default function WorkListTable({
   data,
@@ -450,7 +450,10 @@ export default function WorkListTable({
                                 ? _.round(row?.duration / (1000 * 60 * 60), 2) +
                                   'h'
                                 : Math.round(row?.duration * 100) / 100 + 'd'
-                              : getTotalDuration(row?.dailyWork, row?.equipment?.uom)
+                              : getTotalDuration(
+                                  row?.dailyWork,
+                                  row?.equipment?.uom
+                                )
                             : '...'
                         }
                       />
