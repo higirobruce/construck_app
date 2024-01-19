@@ -272,11 +272,11 @@ export default function Workdata() {
         //   text: 'Not applicable',
         // })
         // if (viewPort === 'edit')
-          // userOptions?.push({
-          //   key: row?.driver?._id,
-          //   value: row?.driver?._id,
-          //   text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
-          // })
+        // userOptions?.push({
+        //   key: row?.driver?._id,
+        //   value: row?.driver?._id,
+        //   text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
+        // })
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
@@ -1622,7 +1622,7 @@ export default function Workdata() {
                   project,
                   equipment: selEquipments[i],
                   workDone: selJobTypes[i],
-                  driver: drivers[i],
+                  driver: drivers[i] !== 'N/A' ? drivers[i] : driver,
                   startTime: Date.now(),
                   status: 'created',
                   createdOn: Date.now(),
@@ -3614,7 +3614,7 @@ export default function Workdata() {
                                     return d === data.value
                                   })
 
-                                  if (!selectedDr || viewPort ==='edit') {
+                                  if (!selectedDr || viewPort === 'edit') {
                                     let _dr = drivers ? [...drivers] : []
                                     _dr[i] = data.value
 
