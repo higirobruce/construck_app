@@ -49,8 +49,8 @@ export default function StatisticCard({
           {canBeApproved && (
             <NoSymbolIcon className="h-4 w-4 cursor-pointer text-red-500" />
           )}
-          <ListBulletIcon className="h-4 w-4 cursor-pointer text-blue-300" />
-          <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer text-blue-300" />
+          {/* <ListBulletIcon className="h-4 w-4 cursor-pointer text-blue-300" /> */}
+          {/* <ArrowDownTrayIcon className="h-4 w-4 cursor-pointer text-blue-300" /> */}
           {data.title === 'Final Revenues' && (
             <ReceiptRefundIcon className="h-4 w-4 cursor-pointer text-green-500" />
           )}

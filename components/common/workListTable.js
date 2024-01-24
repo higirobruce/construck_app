@@ -206,6 +206,8 @@ export default function WorkListTable({
   dataCount,
   pageNumber,
   handleEdit,
+  handleOpenDrawer,
+  handleViewRow,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const { user, setUser } = useContext(UserContext)
@@ -364,7 +366,13 @@ export default function WorkListTable({
                 // })
 
                 return (
-                  <Table.Row key={row._id}>
+                  <Table.Row
+                    key={row._id}
+                    onClick={() => {
+                      handleOpenDrawer(true)
+                      handleViewRow(row._id)
+                    }}
+                  >
                     <Table.Cell singleLine>
                       <div className="flex flex-row space-x-1">
                         <MTextView

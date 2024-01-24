@@ -39,7 +39,9 @@ import { Pagination } from 'semantic-ui-react'
 import MPagination from '../common/pagination'
 import * as _ from 'lodash'
 import { Loader } from 'semantic-ui-react'
+import { DatePicker, Descriptions } from 'antd'
 
+const { RangePicker } = DatePicker
 const Maintenance = () => {
   const canCreateData = true
   const role = JSON.parse(localStorage.getItem('user')).userType
@@ -113,6 +115,9 @@ const Maintenance = () => {
   const [jobCardsPage, setJobCardsPage] = useState(1)
   const [cardCount, setCardCount] = useState(0)
   const [jobCardPageCount, setJobCardsPageCount] = useState(0)
+
+  let [startDate, setStartDate] = useState(null)
+  let [endDate, setEndDate] = useState(null)
 
   const url = process.env.NEXT_PUBLIC_BKEND_URL
   const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
@@ -344,7 +349,7 @@ const Maintenance = () => {
 
   const download = (query) => {
     fetch(
-      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=${status}&search=${search}&download=1`,
+      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=${status}&search=${search}&download=1&startDate=${startDate}&endDate=${endDate}`,
       {
         headers: {
           Authorization:
@@ -603,7 +608,7 @@ const Maintenance = () => {
     // setNClosed(0)
 
     fetch(
-      `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}&search=${search}`,
+      `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}&search=${search}&startDate=${startDate}&endDate=${endDate}`,
       {
         headers: {
           Authorization:
@@ -1312,7 +1317,7 @@ const Maintenance = () => {
   ]
 
   return (
-    <div className="my-5 flex flex-col space-y-5 px-10">
+    <div className="m-5 flex flex-col space-y-5 pl-10">
       <div className="text-2xl font-semibold">
         {viewPort == 'list'
           ? 'Maintenance Centre'
@@ -1344,9 +1349,20 @@ const Maintenance = () => {
           />
         )}
         {viewPort === 'list' && (
-          <div className="mx-auto flex-1 px-10">
-            <TextInput placeholder="Search..." setValue={setSearch} />
-          </div>
+          <>
+            <div className="mx-auto flex-1">
+              <TextInput placeholder="Search..." setValue={setSearch} />
+            </div>
+
+            <div className="mx-auto flex-1">
+              <RangePicker
+                onChange={(values, dateStrings) => {
+                  setStartDate(dateStrings[0])
+                  setEndDate(dateStrings[1])
+                }}
+              />
+            </div>
+          </>
         )}
         {viewPort === 'list' && (
           <>
