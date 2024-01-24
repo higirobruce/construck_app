@@ -161,7 +161,9 @@ const getShiftLabel = (shift) => {
 const getTotalRevenue = (dailyWork) => {
   let totalRevenue = 0
   dailyWork?.map((s) => {
-    totalRevenue += s?.totalRevenue || 0
+    s?.uom === 'hour' || s?.duration > 16
+      ? (totalRevenue += _.round(s?.totalRevenue / (1000 * 60 * 60), 2) || 0)
+      : (totalRevenue += s?.totalRevenue || 0)
   })
 
   return totalRevenue && totalRevenue !== 0
@@ -172,7 +174,9 @@ const getTotalRevenue = (dailyWork) => {
 const getTotalDuration = (dailyWork, uom) => {
   let duration = 0
   dailyWork?.map((s) => {
-    duration += s?.duration || 0
+    uom === 'hour' || s?.duration > 16
+      ? (duration += _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
+      : (duration += s?.duration || 0)
   })
 
   if (!duration) return '...'
@@ -375,7 +379,12 @@ export default function WorkListTable({
                               <>
                                 <div>Date(s) posted</div>
                                 {row?.dailyWork.map((d, index) => {
-                                  if (index <= 31) return <div>{d.date}</div>
+                                  if (index <= 31)
+                                    return (
+                                      <div>
+                                        {moment(d.date).format('DD-MMM-YYYY')}
+                                      </div>
+                                    )
                                 })}
                                 {row?.dailyWork?.length > 31 && <div>...</div>}
                               </>
