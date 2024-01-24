@@ -162,7 +162,8 @@ const getTotalRevenue = (dailyWork) => {
   let totalRevenue = 0
   dailyWork?.map((s) => {
     s?.uom === 'hour' || s?.duration > 16
-      ? (totalRevenue += _.round(s?.totalRevenue / (1000 * 60 * 60), 2) || 0)
+      ? (totalRevenue +=
+          s?.rate * _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
       : (totalRevenue += s?.totalRevenue || 0)
   })
 
@@ -174,7 +175,7 @@ const getTotalRevenue = (dailyWork) => {
 const getTotalDuration = (dailyWork, uom) => {
   let duration = 0
   dailyWork?.map((s) => {
-    uom === 'hour' || s?.duration > 16
+    uom === 'hour'
       ? (duration += _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
       : (duration += s?.duration || 0)
   })
@@ -183,7 +184,7 @@ const getTotalDuration = (dailyWork, uom) => {
 
   if (duration)
     return uom === 'hour'
-      ? _.round(duration / (1000 * 60 * 60), 2) + 'h'
+      ? _.round(duration) + 'h'
       : Math.round(duration * 100) / 100 + 'd'
 }
 
