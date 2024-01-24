@@ -343,11 +343,15 @@ const Maintenance = () => {
   }
 
   const download = (query) => {
-    fetch(`${newUrl}/api/maintenance?limit=-1&page=${0}&status=all`, {
-      headers: {
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
+    fetch(
+      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=${status}&search=${search}&download=1`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
+    )
       .then((res) => res.json())
       .then((response) => {
         let data = []
@@ -597,7 +601,7 @@ const Maintenance = () => {
     // setNTesting(0)
     // // setNClosed(closedCards.length)
     // setNClosed(0)
-    
+
     fetch(
       `${newUrl}/api/maintenance?limit=9&page=${jobCardsPage}&status=${status}&search=${search}`,
       {
@@ -1192,7 +1196,6 @@ const Maintenance = () => {
       eqList={eqList}
       projectList={projectList}
       viewPort={viewPort}
-      
     />,
     <InspectionDiagnosis
       inspectionTools={inspectionTools}
@@ -1264,7 +1267,6 @@ const Maintenance = () => {
       entryDate={entryDate}
       role={role}
       previousMode={previousMode}
-      
     />,
     <Testing
       userList={usersList}

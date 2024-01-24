@@ -178,7 +178,7 @@ export default function Workdata() {
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   useEffect(() => {
-    console.log(dispatchDate)
+    // refresh()
   }, [])
 
   useEffect(() => {
@@ -786,63 +786,66 @@ export default function Workdata() {
     )
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
-    fetch(
-      `${url}/works/filtered/${pageNumber}?userProject=${
-        user.assignedProjects[0]?.prjDescription
-      }&userType=${user.userType}&companyName=${
-        user.company?.name
-      }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
-        searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
-      {
-        headers: {
-          Authorization:
-            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-        },
-      }
-    )
-      .then((resp) => resp.json())
-      .then((resp) => {
-        let dataList = resp.workList
-        setDataCount(resp.dataCount)
-        let data = !isVendor
-          ? dataList
-          : dataList.filter((p) => p.equipment?.eqOwner === user.firstName)
+    // !isVendor &&
+      fetch(
+        `${url}/works/filtered/${pageNumber}?userProject=${
+          user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
+        }&userType=${user.userType}&companyName=${
+          user?.company?.name
+        }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
+          searchProject
+        )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+          user?.firstName
+        )}`,
+        {
+          headers: {
+            Authorization:
+              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+          },
+        }
+      )
+        .then((resp) => resp.json())
+        .then((resp) => {
+          let dataList = resp.workList
+          setDataCount(resp.dataCount)
+          let data = !isVendor
+            ? dataList
+            : dataList.filter((p) => p.equipment?.eqOwner === user.firstName)
 
-        let _workList = data
+          let _workList = data
 
-        // ?.filter((w) => {
-        //   return (
-        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
-        //       Date.parse(w?.dispatch?.date)
-        //   )
-        // })
-        setWorkList(_workList)
-        setOgWorkList(data)
+          // ?.filter((w) => {
+          //   return (
+          //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+          //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+          //       Date.parse(w?.dispatch?.date)
+          //   )
+          // })
+          setWorkList(_workList)
+          setOgWorkList(data)
 
-        setEquipments([])
-        setEquipmentList([])
-        setDrivers([])
-        setNJobs(1)
-        setNMachinesToMove(1)
-        setSelEquipments([])
-        setSelJobTypes([])
-        setFromProjects([])
-        settoProjects([])
-        setTargetTrips(0)
-        setEqType('')
-        setLoadingData(false)
-        setSubmitting(false)
-        setComment(null)
-        setPostingDate(moment())
-        setAstDrivers([])
-      })
-      .catch((err) => {
-        toast.error(err)
-        setLoadingData(false)
-        setSubmitting(false)
-      })
+          setEquipments([])
+          setEquipmentList([])
+          setDrivers([])
+          setNJobs(1)
+          setNMachinesToMove(1)
+          setSelEquipments([])
+          setSelJobTypes([])
+          setFromProjects([])
+          settoProjects([])
+          setTargetTrips(0)
+          setEqType('')
+          setLoadingData(false)
+          setSubmitting(false)
+          setComment(null)
+          setPostingDate(moment())
+          setAstDrivers([])
+        })
+        .catch((err) => {
+          toast.error(err)
+          setLoadingData(false)
+          setSubmitting(false)
+        })
   }
 
   function approve() {
@@ -2016,8 +2019,9 @@ export default function Workdata() {
     // )
   }
 
-  function getData(reset = true) {
+  function getData(reset = false) {
     if (reset) setPageNumber(1)
+    // refresh()
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
@@ -2025,7 +2029,7 @@ export default function Workdata() {
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
       `${url}/works/filtered/${pageNumber}?userProject=${
-        user.assignedProject?.prjDescription
+        user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
       }&userType=${user.userType}&companyName=${
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(

@@ -146,8 +146,7 @@ export default function Modal({
       return d
     })
     let _siteWorkPosted = _.find(_d, {
-      date: moment(pDate)
-      .format('DD-MMM-YYYY'),
+      date: moment(pDate).format('DD-MMM-YYYY'),
       pending: false,
     })
 
@@ -509,7 +508,9 @@ export default function Modal({
                         className="flex flex-row items-center space-x-3"
                         key={index}
                       >
-                        <MTextView content={d?.date} />
+                        <MTextView
+                          content={moment(d?.date).format('DD-MMM-YYYY')}
+                        />
                         <MTextView
                           content={
                             d?.uom === 'hour'
@@ -517,7 +518,7 @@ export default function Modal({
                                 ' ' +
                                 d?.uom +
                                 's'
-                              : d?.duration + ' ' + d?.uom + 's'
+                              : _.round(d?.duration, 1) + ' ' + d?.uom + 's'
                           }
                         />
                         {!d.toConfirm && !d.status && (
