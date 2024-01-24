@@ -61,6 +61,36 @@ export default function Reversals() {
       })
   }, [])
 
+  const getTotalRevenue = (duration, rate) => {
+    // let totalRevenue = 0
+    // dailyWork?.map((s) => {
+    //   s?.uom === 'hour'
+    //     ? (totalRevenue +=
+    //         s?.rate * _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
+    //     : (totalRevenue += s?.totalRevenue || 0)
+    // })
+
+    return duration && duration !== 0
+      ? 'RWF ' + _.round(duration * rate, 2).toLocaleString()
+      : '...'
+  }
+
+  const getTotalDuration = (dailyWork, uom) => {
+    let duration = 0
+    dailyWork?.map((s) => {
+      uom === 'hour'
+        ? (duration += _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
+        : (duration += s?.duration || 0)
+    })
+
+    if (!duration) return '...'
+
+    if (duration)
+      return uom === 'hour'
+        ? _.round(duration) + 'h'
+        : Math.round(duration * 100) / 100 + 'd'
+  }
+
   function getTransactions() {
     setLoading(true)
     fetch(
@@ -77,6 +107,8 @@ export default function Reversals() {
         if (!res.error) {
           setTransactions(res)
           setLoading(false)
+
+          console.log(res[0])
         }
       })
       .catch((err) => setLoading(false))
@@ -335,59 +367,78 @@ export default function Reversals() {
                     <MTextView content={t?.project?.customer} />
                     <MTextView content={t?.siteWork ? 'Yes' : 'No'} />
                     <MTextView
-                      content={  t?.duration?.toFixed(2) + ' ' + t?.equipment?.uom + 's'}
+                      content={
+                        t?.duration?.toFixed(2) + ' ' + t?.equipment?.uom + 's'
+                      }
                     />
                     <MTextView
+                      // content={
+                      //   parseFloat(t?.totalRevenue).toLocaleString() + ' RWF'
+                      // }
+
                       content={
-                        parseFloat(t?.totalRevenue).toLocaleString() + ' RWF'
+                        !t?.siteWork
+                          ? t?.totalRevenue
+                            ? 'RWF ' +
+                              _.round(t?.totalRevenue, 2).toLocaleString()
+                            : '...'
+                          : getTotalRevenue(t?.duration, t?.equipment?.rate)
                       }
                     />
                     <MTextView content={t?.status} />
 
-                    {(t.status === 'stopped' || t.status === 'approved' || t.status === 'validated') && (
+                    {(t.status === 'stopped' ||
+                      t.status === 'approved' ||
+                      t.status === 'validated') && (
                       <div className="flex flex-row items-center space-x-2">
-                        {(user?.userType==='admin' || (t.status === 'stopped' || t.status === 'approved'))  && <div
-                          onClick={() => {
-                            setRow(t)
-                            _swamend(
-                              t?.siteWork,
-                              t?._id,
-                              t?.dispatchDate,
-                              t?.equipment?.uom === 'day'
-                                ? t?.duration
-                                : t?.duration * (1000 * 60 * 60),
-                              t?.totalRevenue,
-                              t?.totalExpenditure
-                            )
-                          }}
-                          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
-                        >
-                          <PencilIcon className="h-5 w-5" />
-                        </div>}
+                        {(user?.userType === 'admin' ||
+                          t.status === 'stopped' ||
+                          t.status === 'approved') && (
+                          <div
+                            onClick={() => {
+                              setRow(t)
+                              _swamend(
+                                t?.siteWork,
+                                t?._id,
+                                t?.dispatchDate,
+                                t?.equipment?.uom === 'day'
+                                  ? t?.duration
+                                  : t?.duration * (1000 * 60 * 60),
+                                t?.totalRevenue,
+                                t?.totalExpenditure
+                              )
+                            }}
+                            className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
+                          >
+                            <PencilIcon className="h-5 w-5" />
+                          </div>
+                        )}
 
-                        {(user?.userType==='admin' || (t.status === 'stopped' || t.status === 'approved'))  &&<div
-                          onClick={() =>
-                            _reverse(
-                              t?.siteWork,
-                              t?._id,
-                              t?.dispatchDate,
-                              t?.equipment?.uom === 'day'
-                                ? t?.duration
-                                : t?.duration * (1000 * 60 * 60),
-                              t?.totalRevenue,
-                              t?.totalExpenditure
-                            )
-                          }
-                          className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 active:bg-red-500"
-                        >
-                          <ArrowPathIcon className="h-5 w-5" />
-                        </div>}
-
-                        
+                        {(user?.userType === 'admin' ||
+                          t.status === 'stopped' ||
+                          t.status === 'approved') && (
+                          <div
+                            onClick={() =>
+                              _reverse(
+                                t?.siteWork,
+                                t?._id,
+                                t?.dispatchDate,
+                                t?.equipment?.uom === 'day'
+                                  ? t?.duration
+                                  : t?.duration * (1000 * 60 * 60),
+                                t?.totalRevenue,
+                                t?.totalExpenditure
+                              )
+                            }
+                            className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 active:bg-red-500"
+                          >
+                            <ArrowPathIcon className="h-5 w-5" />
+                          </div>
+                        )}
                       </div>
                     )}
 
-                    {(t.status === 'rejected' ) && (
+                    {t.status === 'rejected' && (
                       <div
                         onClick={() => {
                           setRow(t)
@@ -407,7 +458,6 @@ export default function Reversals() {
                         <PencilIcon className="h-5 w-5" />
                       </div>
                     )}
-                    
                   </div>
                 )
               })}
