@@ -45,7 +45,9 @@ export default function Workdata() {
     user.userType === 'revenue' ||
     user.userType === 'admin' ||
     user.userType === 'revenue-admin' ||
-    user.userType === 'dispatch'
+    user.userType === 'dispatch' ||
+    user.userType === 'customer-site-manager' ||
+    user.userType === 'customer-project-manager'
   let isVendor = user.userType === 'vendor'
 
   let [dataSize, setDataSize] = useState(0)
@@ -819,7 +821,7 @@ export default function Workdata() {
         searchProject
       )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
         user?.firstName
-      )}`,
+      )}&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -1996,7 +1998,11 @@ export default function Workdata() {
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user.firstName
+      )}&userProject=${
+        user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
+      }&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -2057,7 +2063,9 @@ export default function Workdata() {
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user.firstName
+      )}&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -4354,7 +4362,7 @@ export default function Workdata() {
           <>
             {activityLog?.map((activity) => {
               return (
-                <div className="my-5 text-xs border-2 p-2 rounded">
+                <div className="my-5 rounded border-2 p-2 text-xs">
                   <div>Action: {activity?._id?.action?.toLowerCase()}</div>
                   <div>
                     Done On:{' '}
@@ -4362,7 +4370,12 @@ export default function Workdata() {
                       'DD-MMM-YYYY hh:mm:ss a'
                     )}
                   </div>
-                  <div>Done By: {activity?._id?.doneBy?.lastName + ' ' +activity?._id?.doneBy?.firstName}</div>
+                  <div>
+                    Done By:{' '}
+                    {activity?._id?.doneBy?.lastName +
+                      ' ' +
+                      activity?._id?.doneBy?.firstName}
+                  </div>
                 </div>
               )
             })}
