@@ -4355,14 +4355,14 @@ export default function Workdata() {
             {activityLog?.map((activity) => {
               return (
                 <div className="my-5 text-xs border-2 p-2 rounded">
-                  <div>Action: {activity.action?.toLowerCase()}</div>
+                  <div>Action: {activity?._id?.action?.toLowerCase()}</div>
                   <div>
                     Done On:{' '}
-                    {moment(activity.createdOn).format(
+                    {moment(activity?._id?.createdOn).format(
                       'DD-MMM-YYYY hh:mm:ss a'
                     )}
                   </div>
-                  <div>Done By: {activity.doneBy?.lastName + ' ' +activity.doneBy?.firstName}</div>
+                  <div>Done By: {activity?._id?.doneBy?.lastName + ' ' +activity?._id?.doneBy?.firstName}</div>
                 </div>
               )
             })}

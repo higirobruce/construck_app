@@ -5,6 +5,8 @@ import {
   ArchiveBoxXMarkIcon,
   EllipsisHorizontalIcon,
   TrashIcon,
+  FolderOpenIcon,
+  ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline'
 import {
   ExclamationTriangleIcon,
@@ -83,6 +85,8 @@ export default function EquipmentType({
   canMoveAssets,
   handleChange,
   canCreateData,
+  handleOpenDrawer,
+  handleViewRow,
 }) {
   function getClassFromStatus(intent) {
     if (intent == 'available') {
@@ -105,12 +109,12 @@ export default function EquipmentType({
   }
   return (
     <div className={getClassFromStatus(intent)}>
-      <div className="grid grid-cols-3 py-1">
-        <div className="col-span-2 flex flex-col">
-          <div className="flex flex-row items-center">
+      <div className="flex justify-between py-1">
+        <div className="flex flex-col">
+          <div className="flex flex-row items-center justify-between">
             {canCreateData && (
               <div
-                className="cursor-pointer text-md font-semibold text-gray-700"
+                className="text-md cursor-pointer font-semibold text-gray-700"
                 onClick={() => handleChange(data)}
               >
                 {data.plateNumber}
@@ -210,6 +214,16 @@ export default function EquipmentType({
             <EllipsisHorizontalIcon className="h-5 w-5 text-gray-300" />
           </div>
         )}
+
+        <div>
+          <ClipboardDocumentListIcon
+            onClick={() => {
+              handleViewRow(data?.plateNumber)
+              handleOpenDrawer(true)
+            }}
+            className={'h-5 w-5 cursor-pointer text-blue-500'}
+          />
+        </div>
       </div>
     </div>
   )
