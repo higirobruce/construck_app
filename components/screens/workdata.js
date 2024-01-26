@@ -8,7 +8,7 @@ import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import _ from 'lodash'
 import { UserContext } from '../../contexts/UserContext'
-import { DatePicker, Descriptions } from 'antd'
+import { DatePicker, Descriptions, Drawer, Skeleton } from 'antd'
 import Modal from '../common/modal'
 // import XlsExport from 'xlsexport'
 import * as FileSaver from 'file-saver'
@@ -45,7 +45,9 @@ export default function Workdata() {
     user.userType === 'revenue' ||
     user.userType === 'admin' ||
     user.userType === 'revenue-admin' ||
-    user.userType === 'dispatch'
+    user.userType === 'dispatch' ||
+    user.userType === 'customer-site-manager' ||
+    user.userType === 'customer-project-manager'
   let isVendor = user.userType === 'vendor'
 
   let [dataSize, setDataSize] = useState(0)
@@ -84,6 +86,11 @@ export default function Workdata() {
   let [loadingEquipments, setLoadingEquipments] = useState(false)
   let [downloadingData, setDownloadingData] = useState(false)
   let [dailyWork, setDailyWork] = useState([])
+
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const [viewRow, setViewRow] = useState(null)
+  const [loadingActivity, setLoadingActivity] = useState(false)
+  const [activityLog, setActivityLog] = useState(null)
 
   let [projects, setProjects] = useState(null)
 
@@ -773,6 +780,24 @@ export default function Workdata() {
     getData(false)
   }, [pageNumber])
 
+  useEffect(() => {
+    setLoadingActivity(true)
+    if (viewRow?.length > 12)
+      fetch(`${url}/logs/filtered?workId=${viewRow}`, {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          setActivityLog(res)
+        })
+        .finally(() => {
+          setLoadingActivity(false)
+        })
+  }, [viewRow])
+
   function refresh() {
     setSearch('')
     setSiteWork(false)
@@ -787,65 +812,65 @@ export default function Workdata() {
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     // !isVendor &&
-      fetch(
-        `${url}/works/filtered/${pageNumber}?userProject=${
-          user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
-        }&userType=${user.userType}&companyName=${
-          user?.company?.name
-        }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
-          searchProject
-        )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
-          user?.firstName
-        )}`,
-        {
-          headers: {
-            Authorization:
-              'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-          },
-        }
-      )
-        .then((resp) => resp.json())
-        .then((resp) => {
-          let dataList = resp.workList
-          setDataCount(resp.dataCount)
-          let data = !isVendor
-            ? dataList
-            : dataList.filter((p) => p.equipment?.eqOwner === user.firstName)
+    fetch(
+      `${url}/works/filtered/${pageNumber}?userProject=${
+        user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
+      }&userType=${user.userType}&companyName=${
+        user?.company?.name
+      }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
+        searchProject
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user?.firstName
+      )}&userProjects=${JSON.stringify(user?.assignedProjects)}`,
+      {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      }
+    )
+      .then((resp) => resp.json())
+      .then((resp) => {
+        let dataList = resp.workList
+        setDataCount(resp.dataCount)
+        let data = !isVendor
+          ? dataList
+          : dataList.filter((p) => p.equipment?.eqOwner === user.firstName)
 
-          let _workList = data
+        let _workList = data
 
-          // ?.filter((w) => {
-          //   return (
-          //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
-          //     Date.parse(endDate).addHours(23).addMinutes(59) >=
-          //       Date.parse(w?.dispatch?.date)
-          //   )
-          // })
-          setWorkList(_workList)
-          setOgWorkList(data)
+        // ?.filter((w) => {
+        //   return (
+        //     Date.parse(startDate) <= Date.parse(w?.dispatch?.date) &&
+        //     Date.parse(endDate).addHours(23).addMinutes(59) >=
+        //       Date.parse(w?.dispatch?.date)
+        //   )
+        // })
+        setWorkList(_workList)
+        setOgWorkList(data)
 
-          setEquipments([])
-          setEquipmentList([])
-          setDrivers([])
-          setNJobs(1)
-          setNMachinesToMove(1)
-          setSelEquipments([])
-          setSelJobTypes([])
-          setFromProjects([])
-          settoProjects([])
-          setTargetTrips(0)
-          setEqType('')
-          setLoadingData(false)
-          setSubmitting(false)
-          setComment(null)
-          setPostingDate(moment())
-          setAstDrivers([])
-        })
-        .catch((err) => {
-          toast.error(err)
-          setLoadingData(false)
-          setSubmitting(false)
-        })
+        setEquipments([])
+        setEquipmentList([])
+        setDrivers([])
+        setNJobs(1)
+        setNMachinesToMove(1)
+        setSelEquipments([])
+        setSelJobTypes([])
+        setFromProjects([])
+        settoProjects([])
+        setTargetTrips(0)
+        setEqType('')
+        setLoadingData(false)
+        setSubmitting(false)
+        setComment(null)
+        setPostingDate(moment())
+        setAstDrivers([])
+      })
+      .catch((err) => {
+        toast.error(err)
+        setLoadingData(false)
+        setSubmitting(false)
+      })
   }
 
   function approve() {
@@ -1973,7 +1998,11 @@ export default function Workdata() {
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user.firstName
+      )}&userProject=${
+        user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
+      }&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -2034,7 +2063,9 @@ export default function Workdata() {
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user.firstName
+      )}&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -2085,6 +2116,11 @@ export default function Workdata() {
 
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
+  }
+
+  function onCloseDrawer() {
+    setOpenDrawer(false)
+    setViewRow(null)
   }
 
   return (
@@ -2258,6 +2294,8 @@ export default function Workdata() {
                   loading
                   pageNumber={pageNumber}
                   handleEdit={_setEditRow}
+                  handleOpenDrawer={setOpenDrawer}
+                  handleViewRow={setViewRow}
                 />
               ))}
           </>
@@ -4318,6 +4356,33 @@ export default function Workdata() {
           endIndexInvalid={false}
         />
       )}
+
+      <Drawer title={`Activity log`} onClose={onCloseDrawer} open={openDrawer}>
+        {activityLog && !loadingActivity && (
+          <>
+            {activityLog?.map((activity) => {
+              return (
+                <div className="my-5 rounded border-2 p-2 text-xs">
+                  <div>Action: {activity?._id?.action?.toLowerCase()}</div>
+                  <div>
+                    Done On:{' '}
+                    {moment(activity?._id?.createdOn).format(
+                      'DD-MMM-YYYY hh:mm:ss a'
+                    )}
+                  </div>
+                  <div>
+                    Done By:{' '}
+                    {activity?._id?.doneBy?.lastName +
+                      ' ' +
+                      activity?._id?.doneBy?.firstName}
+                  </div>
+                </div>
+              )
+            })}
+          </>
+        )}
+        {loadingActivity && <Skeleton active />}
+      </Drawer>
     </>
   )
 }
