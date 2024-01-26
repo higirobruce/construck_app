@@ -116,8 +116,8 @@ const Maintenance = () => {
   const [cardCount, setCardCount] = useState(0)
   const [jobCardPageCount, setJobCardsPageCount] = useState(0)
 
-  let [startDate, setStartDate] = useState(null)
-  let [endDate, setEndDate] = useState(null)
+  let [startDate, setStartDate] = useState(moment().format('YYYY-MM-01'))
+  let [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'))
 
   const url = process.env.NEXT_PUBLIC_BKEND_URL
   const newUrl = process.env.NEXT_PUBLIC_BKEND_URL
@@ -349,7 +349,7 @@ const Maintenance = () => {
 
   const download = (query) => {
     fetch(
-      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=${status}&search=${search}&download=1&startDate=${startDate}&endDate=${endDate}`,
+      `${newUrl}/api/maintenance?limit=-1&page=${0}&status=${'all'}&search=${search}&download=1&startDate=${startDate}&endDate=${endDate}`,
       {
         headers: {
           Authorization:
@@ -1351,7 +1351,7 @@ const Maintenance = () => {
         {viewPort === 'list' && (
           <>
             <div className="mx-auto flex-1">
-              <TextInput placeholder="Search..." setValue={setSearch} />
+              <TextInput placeholder="Search by Plate number, Equipment type" setValue={setSearch} />
             </div>
 
             <div className="mx-auto flex-1">
