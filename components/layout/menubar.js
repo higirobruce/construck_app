@@ -1,4 +1,5 @@
 import {
+  WrenchIcon,
   ArrowLeftOnRectangleIcon,
   ArrowPathIcon,
   BellIcon,
@@ -13,6 +14,10 @@ import {
   UsersIcon,
   QueueListIcon,
   BanknotesIcon,
+  WrenchScrewdriverIcon,
+  BuildingStorefrontIcon,
+  ClipboardDocumentListIcon,
+  AdjustmentsVerticalIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext } from 'react'
 import { ScreenContext } from '../../contexts/ScreenContext'
@@ -49,14 +54,22 @@ export default function MenuBar() {
     role === 'customer-project-manager' ||
     role === 'customer-site-manager'
 
-  let isProjectManager = role === 'customer-project-manager'
+  let isProjectManager = role === 'customer-project-manager' || role ==='customer-site-manager'
+
+  let isWorkshopUser =
+    role === 'workshop-manager' ||
+    role === 'workshop-supervisor' ||
+    role === 'recording-officer' ||
+    role === 'workshop-team-leader' ||
+    role == 'workshop-support' ||
+    role == 'admin'
 
   function logout() {
     localStorage.removeItem('user')
     setUser({})
   }
   return (
-    <div className="flex min-h-screen w-30 flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
+    <div className="w-30 flex min-h-screen flex-col items-center justify-between overflow-y-auto bg-neutral-200 md:w-72">
       {/* Menu items */}
 
       <div className="flex w-full flex-col items-center">
@@ -134,7 +147,7 @@ export default function MenuBar() {
             >
               <TruckIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">
-                Equipments
+                Equipment
               </div>
             </div>
 
@@ -152,7 +165,7 @@ export default function MenuBar() {
               </div>
             </div>
 
-            <div
+            {/* <div
               className={
                 screen === 'profile'
                   ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-gray-50 py-5 text-sky-700'
@@ -162,7 +175,7 @@ export default function MenuBar() {
             >
               <UserIcon className="h-5 w-5" />
               <div className="hidden w-1/2 font-semibold md:block">Profile</div>
-            </div>
+            </div> */}
           </>
         )}
 
@@ -210,7 +223,7 @@ export default function MenuBar() {
           </div>
         )}
 
-        {canSeeSettings && (
+        {/* {canSeeSettings && (
           <div
             className={
               screen === 'settings'
@@ -221,6 +234,94 @@ export default function MenuBar() {
           >
             <CogIcon className="h-5 w-5" />
             <div className="hidden w-1/2 font-semibold md:block">Settings</div>
+          </div>
+        )} */}
+
+        {isWorkshopUser && (
+          <div
+            className={
+              screen === 'maintenance'
+                ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+            }
+            onClick={() => setScreen('maintenance')}
+          >
+            <WrenchIcon className="h-5 w-5" />
+            <div className="hidden w-1/2 font-semibold md:block">
+              Maintenance
+            </div>
+          </div>
+        )}
+
+        {isWorkshopUser && (
+          <div className="w-full">
+            <div
+              className={
+                screen === 'workshop' ||
+                screen === 'items' ||
+                screen === 'mechanics' ||
+                screen === 'mechanical'
+                  ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-50 py-5 text-sky-700'
+                  : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-5 text-black'
+              }
+              onClick={() => setScreen('workshop')}
+            >
+              <WrenchScrewdriverIcon className="h-5 w-5" />
+              <div className="hidden w-1/2 font-semibold md:block">
+                Workshop
+              </div>
+            </div>
+            <div
+              className={`w-full bg-gray-300`}
+              hidden={
+                screen == 'workshop' ||
+                screen == 'items' ||
+                screen == 'mechanics' ||
+                screen == 'mechanical'
+                  ? false
+                  : true
+              }
+            >
+              <div
+                className={
+                  screen == 'workshop' || screen === 'items'
+                    ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+                    : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+                }
+                onClick={() => setScreen('items')}
+              >
+                <ClipboardDocumentListIcon className="h-4 w-4" />
+                <div className="hidden w-1/2 text-base font-semibold md:block">
+                  Items
+                </div>
+              </div>
+              <div
+                className={
+                  screen == 'mechanics'
+                    ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+                    : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+                }
+                onClick={() => setScreen('mechanics')}
+              >
+                <UserIcon className="h-4 w-4" />
+                <div className="hidden w-1/2 text-base font-semibold md:block">
+                  Mechanics
+                </div>
+              </div>
+              <div
+                className={
+                  screen == 'mechanical'
+                    ? 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 bg-slate-200 py-3 text-sky-700'
+                    : 'flex w-full cursor-pointer flex-row items-center justify-center space-x-3 py-3 text-black'
+                }
+                onClick={() => setScreen('mechanical')}
+              >
+                <AdjustmentsVerticalIcon className="h-4 w-4" />
+                <div className="hidden w-1/2 text-base font-semibold md:block">
+                  Mechanical Issues
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

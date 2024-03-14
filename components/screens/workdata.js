@@ -8,7 +8,7 @@ import MTextView from '../common/mTextView'
 import { toast, ToastContainer } from 'react-toastify'
 import _ from 'lodash'
 import { UserContext } from '../../contexts/UserContext'
-import { DatePicker, Descriptions } from 'antd'
+import { DatePicker, Descriptions, Drawer, Skeleton } from 'antd'
 import Modal from '../common/modal'
 // import XlsExport from 'xlsexport'
 import * as FileSaver from 'file-saver'
@@ -45,7 +45,9 @@ export default function Workdata() {
     user.userType === 'revenue' ||
     user.userType === 'admin' ||
     user.userType === 'revenue-admin' ||
-    user.userType === 'dispatch'
+    user.userType === 'dispatch' ||
+    user.userType === 'customer-site-manager' ||
+    user.userType === 'customer-project-manager'
   let isVendor = user.userType === 'vendor'
 
   let [dataSize, setDataSize] = useState(0)
@@ -84,6 +86,11 @@ export default function Workdata() {
   let [loadingEquipments, setLoadingEquipments] = useState(false)
   let [downloadingData, setDownloadingData] = useState(false)
   let [dailyWork, setDailyWork] = useState([])
+
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const [viewRow, setViewRow] = useState(null)
+  const [loadingActivity, setLoadingActivity] = useState(false)
+  const [activityLog, setActivityLog] = useState(null)
 
   let [projects, setProjects] = useState(null)
 
@@ -166,7 +173,11 @@ export default function Workdata() {
 
   const disabledDate = (current) => {
     // Can not select days before today and today
-    return current && current < moment('2022-07-01')
+    return (
+      current &&
+      current < moment().subtract(2, 'months').endOf('month') &&
+      user.userType !== 'admin'
+    )
   }
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
@@ -174,7 +185,7 @@ export default function Workdata() {
   let apiPassword = process.env.NEXT_PUBLIC_API_PASSWORD
 
   useEffect(() => {
-    console.log(dispatchDate)
+    // refresh()
   }, [])
 
   useEffect(() => {
@@ -267,12 +278,12 @@ export default function Workdata() {
         //   value: 'NA',
         //   text: 'Not applicable',
         // })
-        if (viewPort === 'edit')
-          userOptions?.push({
-            key: row?.driver?._id,
-            value: row?.driver?._id,
-            text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
-          })
+        // if (viewPort === 'edit')
+        // userOptions?.push({
+        //   key: row?.driver?._id,
+        //   value: row?.driver?._id,
+        //   text: row?.driver?.firstName + ' ' + row?.driver?.lastName,
+        // })
         setDriverList(userOptions)
         seLowBedDriverList(userOptions)
         let _drLists = [userOptions]
@@ -448,9 +459,7 @@ export default function Workdata() {
     setLoadingEquipments(true)
     let dispDate = siteWork === true ? workStartDate : dispatchDate
     fetch(
-      `${url}/employees/${dispDate}/${
-        dayShift ? 'dayShift' : 'nightShift'
-      }`,
+      `${url}/employees/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -516,7 +525,9 @@ export default function Workdata() {
       .catch((err) => {})
 
     fetch(
-      `${url}/equipments/${dispDate}/${dayShift ? 'dayShift' : 'nightShift'}?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
+      `${url}/equipments/${dispDate}/${
+        dayShift ? 'dayShift' : 'nightShift'
+      }?workStartDate=${workStartDate}&workEndDate=${workEndDate}&siteWork=${siteWork}`,
       {
         headers: {
           Authorization:
@@ -769,21 +780,48 @@ export default function Workdata() {
     getData(false)
   }, [pageNumber])
 
+  useEffect(() => {
+    setLoadingActivity(true)
+    if (viewRow?.length > 12)
+      fetch(`${url}/logs/filtered?workId=${viewRow}`, {
+        headers: {
+          Authorization:
+            'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          setActivityLog(res)
+        })
+        .finally(() => {
+          setLoadingActivity(false)
+        })
+  }, [viewRow])
+
   function refresh() {
     setSearch('')
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
+    setDispatchDate(
+      moment()
+        .utcOffset(0)
+        .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+        .toDate()
+    )
     setWorkStartDate(Date.today().clearTime().moveToFirstDayOfMonth())
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
+    // !isVendor &&
     fetch(
       `${url}/works/filtered/${pageNumber}?userProject=${
-        user.assignedProject?.prjDescription
+        user?.assignedProjects[0] && user?.assignedProjects[0]?.prjDescription
       }&userType=${user.userType}&companyName=${
-        user.company?.name
+        user?.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user?.firstName
+      )}&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -817,6 +855,7 @@ export default function Workdata() {
         setNJobs(1)
         setNMachinesToMove(1)
         setSelEquipments([])
+        setSelJobTypes([])
         setFromProjects([])
         settoProjects([])
         setTargetTrips(0)
@@ -824,6 +863,8 @@ export default function Workdata() {
         setLoadingData(false)
         setSubmitting(false)
         setComment(null)
+        setPostingDate(moment())
+        setAstDrivers([])
       })
       .catch((err) => {
         toast.error(err)
@@ -1094,6 +1135,7 @@ export default function Workdata() {
     setSiteWork(row?.siteWork)
     setDayShift(row?.dispatch?.shift === 'dayShift')
     setWorkStartDate(moment(row?.workStartDate))
+    setWorkEndDate(moment(row?.workEndDate))
     setDriver(row?.driver?._id)
     setJobType(row?.workDone?._id)
     setDrivers(row?.dispatch?.drivers)
@@ -1514,16 +1556,19 @@ export default function Workdata() {
           })
         }
       } else {
+        refresh()
         setSubmitting(false)
       }
     }
   }
 
   async function update() {
+    console.log(selEquipments.length, drivers)
     if (eqType === 'Truck' && (targetTrips == 0 || !targetTrips)) {
       toast.error('Target trips are mandatory for this entry!')
     } else {
-      if (selEquipments.length === drivers.length) {
+      if (selEquipments.length <= drivers.length) {
+        console.log('here')
         setSubmitting(true)
         let posted = 0
         let promises = []
@@ -1551,7 +1596,8 @@ export default function Workdata() {
                     ) > 1
                       ? true
                       : false,
-                  workStartDate: new Date(dispatchDates[i][0]),
+                  workStartDate:
+                    row?.dispatch?.date || new Date(dispatchDates[i][0]),
                   workEndDate: new Date(dispatchDates[i][1]),
                   workDurationDays:
                     moment(dispatchDates[i][1]).diff(
@@ -1570,9 +1616,11 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: dispatchDates
-                      ? new Date(dispatchDates[i][0])
-                      : new Date().toISOString(),
+                    date:
+                      row?.dispatch?.date ||
+                      (dispatchDates
+                        ? new Date(dispatchDates[i][0])
+                        : new Date().toISOString()),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -1602,7 +1650,7 @@ export default function Workdata() {
                   project,
                   equipment: selEquipments[i],
                   workDone: selJobTypes[i],
-                  driver: drivers[i],
+                  driver: drivers[i] !== 'N/A' ? drivers[i] : driver,
                   startTime: Date.now(),
                   status: 'created',
                   createdOn: Date.now(),
@@ -1611,12 +1659,12 @@ export default function Workdata() {
                     ? workStartDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : row?.dispatch?.date || dispatchDate,
                   workEndDate: siteWork
                     ? workEndDate
                     : dispatchDates
                     ? new Date(dispatchDates[i][0])
-                    : dispatchDate,
+                    : row?.dispatch?.date || dispatchDate,
                   workDurationDays: siteWork
                     ? moment(workEndDate).diff(moment(workStartDate), 'days') +
                       1
@@ -1635,7 +1683,7 @@ export default function Workdata() {
                     jobType: selJobTypes[i],
                     shift: dayShift ? 'dayShift' : 'nightShift',
                     createdOn: new Date().toISOString(),
-                    date: new Date(dispatchDate),
+                    date: row?.dispatch?.date || new Date(dispatchDate),
                   },
                   createdBy: user._id,
                   duration: row?.duration,
@@ -1700,6 +1748,7 @@ export default function Workdata() {
           })
         } else {
           await Promise.all(promises).then(() => {
+            console.log('Doooone')
             setSubmitting(false)
             refresh()
             setViewPort('list')
@@ -1949,7 +1998,12 @@ export default function Workdata() {
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user.firstName
+      )}&userProject=${
+        user?.assignedProjects?.length > 1 &&
+        user?.assignedProjects[0]?.prjDescription
+      }&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -1995,8 +2049,9 @@ export default function Workdata() {
     // )
   }
 
-  function getData(reset = true) {
+  function getData(reset = false) {
     if (reset) setPageNumber(1)
+    // refresh()
     setSiteWork(false)
     setLowbedWork(false)
     setLoadingData(true)
@@ -2004,12 +2059,14 @@ export default function Workdata() {
     setWorkEndDate(Date.today().clearTime().moveToLastDayOfMonth())
     fetch(
       `${url}/works/filtered/${pageNumber}?userProject=${
-        user.assignedProject?.prjDescription
+        user?.assignedProjects?.length>=1 && user?.assignedProjects[0]?.prjDescription
       }&userType=${user.userType}&companyName=${
         user.company?.name
       }&&startDate=${startDate}&endDate=${endDate}&searchText=${search}&project=${encodeURIComponent(
         searchProject
-      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(user.firstName)}`,
+      )}&isVendor=${isVendor}&vendorName=${encodeURIComponent(
+        user.firstName
+      )}&userProjects=${JSON.stringify(user?.assignedProjects)}`,
       {
         headers: {
           Authorization:
@@ -2061,6 +2118,12 @@ export default function Workdata() {
   function handlePageChange(e, data) {
     setPageNumber(data.activePage)
   }
+
+  function onCloseDrawer() {
+    setOpenDrawer(false)
+    setViewRow(null)
+  }
+
   return (
     <>
       <div className="my-5 flex flex-col space-y-3 px-10">
@@ -2202,6 +2265,8 @@ export default function Workdata() {
           )}
         </div>
 
+        {console.log('Worklist ', workList)}
+
         {viewPort === 'list' && (
           <>
             {loadingData && <Loader active />}
@@ -2230,6 +2295,8 @@ export default function Workdata() {
                   loading
                   pageNumber={pageNumber}
                   handleEdit={_setEditRow}
+                  handleOpenDrawer={setOpenDrawer}
+                  handleViewRow={setViewRow}
                 />
               ))}
           </>
@@ -3461,6 +3528,8 @@ export default function Workdata() {
                           defaultValue={moment(row?.dispatch?.date)}
                           onChange={(date, dateString) => {
                             setDispatchDate(dateString)
+                            row.dispatch.date = new Date(dateString)
+                            setRow(row)
                           }}
                         />
                       </div>
@@ -3588,7 +3657,7 @@ export default function Workdata() {
                                     return d === data.value
                                   })
 
-                                  if (!selectedDr) {
+                                  if (!selectedDr || viewPort === 'edit') {
                                     let _dr = drivers ? [...drivers] : []
                                     _dr[i] = data.value
 
@@ -4288,6 +4357,33 @@ export default function Workdata() {
           endIndexInvalid={false}
         />
       )}
+
+      <Drawer title={`Activity log`} onClose={onCloseDrawer} open={openDrawer}>
+        {activityLog && !loadingActivity && (
+          <>
+            {activityLog?.map((activity) => {
+              return (
+                <div className="my-5 rounded border-2 p-2 text-xs">
+                  <div>Action: {activity?._id?.action?.toLowerCase()}</div>
+                  <div>
+                    Done On:{' '}
+                    {moment(activity?._id?.createdOn).format(
+                      'DD-MMM-YYYY hh:mm:ss a'
+                    )}
+                  </div>
+                  <div>
+                    Done By:{' '}
+                    {activity?._id?.doneBy?.lastName +
+                      ' ' +
+                      activity?._id?.doneBy?.firstName}
+                  </div>
+                </div>
+              )
+            })}
+          </>
+        )}
+        {loadingActivity && <Skeleton active />}
+      </Drawer>
     </>
   )
 }

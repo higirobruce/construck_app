@@ -17,7 +17,7 @@ import MSubmitButton from '../common/mSubmitButton'
 import TextInput from '../common/TextIput'
 import readXlsxFile from 'read-excel-file'
 import { Dropdown, Loader } from 'semantic-ui-react'
-import { DatePicker, Tooltip } from 'antd'
+import { DatePicker, Tooltip, Drawer, Skeleton } from 'antd'
 import Modal from '../common/modal'
 import { UserContext } from '../../contexts/UserContext'
 import EqStatusCard from '../common/eqStatusCard'
@@ -64,7 +64,7 @@ export default function Equipments() {
   let [rate, setRate] = useState(0)
   let [supplierRate, setSupplierRate] = useState(0)
   let [uom, setUom] = useState('')
-  let [effectiveDate,setEffectiveDate] = useState(null)
+  let [effectiveDate, setEffectiveDate] = useState(null)
 
   let [downloadingData, setDownloadingData] = useState(false)
 
@@ -79,6 +79,11 @@ export default function Equipments() {
   let [disposeModalIsShown, setDisposeModalIsShown] = useState(false)
 
   let [vendorOptions, setVendorOptions] = useState([])
+
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const [viewRow, setViewRow] = useState(null)
+  const [loadingActivity, setLoadingActivity] = useState(false)
+  const [activityLog, setActivityLog] = useState(null)
 
   let url = process.env.NEXT_PUBLIC_BKEND_URL
   let apiUsername = process.env.NEXT_PUBLIC_API_USERNAME
@@ -117,6 +122,11 @@ export default function Equipments() {
       text: 'PNEUMATIC ASPHALT COMPACTOR',
       value: 'PNEUMATIC ASPHALT COMPACTOR',
     },
+    {
+      key: 27,
+      text: 'DOUBLE DRUM ASPHALT COMPACTOR',
+      value: 'DOUBLE DRUM ASPHALT COMPACTOR',
+    },
     { key: 18, text: 'SOIL COMPACTOR', value: 'SOIL COMPACTOR' },
     { key: 19, text: 'STUMPER', value: 'STUMPER' },
     { key: 20, text: 'TIPPER TRUCK', value: 'TIPPER TRUCK' },
@@ -125,6 +135,37 @@ export default function Equipments() {
     { key: 23, text: 'WATER TANK TRUCK', value: 'WATER TANK TRUCK' },
     { key: 24, text: 'WHEEL LOADER', value: 'WHEEL LOADER' },
     { key: 25, text: 'CONCRETE PUMP', value: 'CONCRETE PUMP' },
+    { key: 26, text: 'PICK UP', value: 'PICK UP' },
+    {
+      key: 28,
+      text: 'MILK TANK TRUCK',
+      value: 'MILK TANK TRUCK',
+    },
+    {
+      key: 29,
+      text: 'MILK MINI-TRUCK',
+      value: 'MILK MINI-TRUCK',
+    },
+    {
+      key: 30,
+      text: 'SMALL TRUCK',
+      value: 'SMALL TRUCK',
+    },
+    {
+      key: 31,
+      text: 'MEDIUM CONTAINER TRUCK',
+      value: 'MEDIUM CONTAINER TRUCK',
+    },
+    {
+      key: 32,
+      text: 'FLATBED',
+      value: 'FLATBED',
+    },
+    {
+      key: 33,
+      text: 'TRAILER',
+      value: 'TRAILER',
+    },
   ]
 
   let assetTypeOptions = [
@@ -171,6 +212,23 @@ export default function Equipments() {
     }
   }, [viewPort])
 
+  useEffect(() => {
+    setLoadingActivity(true)
+    // if (viewRow?.length > 12)
+    fetch(`${url}/logs/filtered?plateNumber=${viewRow}`, {
+      headers: {
+        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setActivityLog(res)
+      })
+      .finally(() => {
+        setLoadingActivity(false)
+      })
+  }, [viewRow])
+
   function getListOfOwners() {
     let construckEntry = [
       {
@@ -197,6 +255,11 @@ export default function Equipments() {
         setVendorOptions(construckEntry.concat(_vOptions))
       })
       .catch((err) => {})
+  }
+
+  function onCloseDrawer() {
+    setOpenDrawer(false)
+    setViewRow(null)
   }
 
   function refresh() {
@@ -310,93 +373,88 @@ export default function Equipments() {
   }, [filterBy])
 
   function sendToWorkShop() {
-    let _eqs = [...equipments]
-    let indexToUpdate = 0
-    let eqToUpdate = _eqs.find((e, index) => {
-      indexToUpdate = index
-      return e._id == rowId
-    })
-    eqToUpdate.eqStatus = 'updating'
-    _eqs[indexToUpdate] = eqToUpdate
-    setEquipments(_eqs)
-
-    fetch(`${url}/equipments/sendToWorkshop/${rowId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let _eqs = [...equipments]
-        let indexToUpdate = 0
-        let eqToUpdate = _eqs.find((e, index) => {
-          indexToUpdate = index
-          return e._id == rowId
-        })
-        eqToUpdate.eqStatus = 'workshop'
-        _eqs[indexToUpdate] = eqToUpdate
-        setEquipments(_eqs)
-        // setOgEquipmentList(_eqs)
-
-        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
-        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
-        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
-
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
-        setNDisposed(disposed.length)
-      })
-      .catch((err) => {})
+    // let _eqs = [...equipments]
+    // let indexToUpdate = 0
+    // let eqToUpdate = _eqs.find((e, index) => {
+    //   indexToUpdate = index
+    //   return e._id == rowId
+    // })
+    // eqToUpdate.eqStatus = 'updating'
+    // _eqs[indexToUpdate] = eqToUpdate
+    // setEquipments(_eqs)
+    // fetch(`${url}/equipments/sendToWorkshop/${rowId}`, {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let _eqs = [...equipments]
+    //     let indexToUpdate = 0
+    //     let eqToUpdate = _eqs.find((e, index) => {
+    //       indexToUpdate = index
+    //       return e._id == rowId
+    //     })
+    //     eqToUpdate.eqStatus = 'workshop'
+    //     _eqs[indexToUpdate] = eqToUpdate
+    //     setEquipments(_eqs)
+    //     // setOgEquipmentList(_eqs)
+    //     let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+    //     let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+    //     let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
+    //     setNAssigned(assignedEq.length)
+    //     setNAvailable(availableEq.length)
+    //     setNDispatched(dispatchedEq.length)
+    //     setNInWorkshop(inWorkshopEq.length)
+    //     setNDisposed(disposed.length)
+    //   })
+    //   .catch((err) => {})
   }
 
   function makeAvailable() {
-    let _eqs = [...equipments]
-    let indexToUpdate = 0
-    let eqToUpdate = _eqs.find((e, index) => {
-      indexToUpdate = index
-      return e._id == rowId
-    })
-    eqToUpdate.eqStatus = 'updating'
-    _eqs[indexToUpdate] = eqToUpdate
-    setEquipments(_eqs)
-
-    fetch(`${url}/equipments/makeAvailable/${rowId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        let _eqs = [...equipments]
-        let indexToUpdate = 0
-        let eqToUpdate = _eqs.find((e, index) => {
-          indexToUpdate = index
-          return e._id == rowId
-        })
-        eqToUpdate.eqStatus = 'standby'
-        _eqs[indexToUpdate] = eqToUpdate
-        setEquipments(_eqs)
-        // setOgEquipmentList(_eqs)
-        let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
-        let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
-        let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
-        let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
-
-        setNAssigned(assignedEq.length)
-        setNAvailable(availableEq.length)
-        setNDispatched(dispatchedEq.length)
-        setNInWorkshop(inWorkshopEq.length)
-        setNDisposed(disposed.length)
-      })
+    // let _eqs = [...equipments]
+    // let indexToUpdate = 0
+    // let eqToUpdate = _eqs.find((e, index) => {
+    //   indexToUpdate = index
+    //   return e._id == rowId
+    // })
+    // eqToUpdate.eqStatus = 'updating'
+    // _eqs[indexToUpdate] = eqToUpdate
+    // setEquipments(_eqs)
+    // fetch(`${url}/equipments/makeAvailable/${rowId}`, {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: 'Basic ' + window.btoa(`${apiUsername}:${apiPassword}`),
+    //   },
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     let _eqs = [...equipments]
+    //     let indexToUpdate = 0
+    //     let eqToUpdate = _eqs.find((e, index) => {
+    //       indexToUpdate = index
+    //       return e._id == rowId
+    //     })
+    //     eqToUpdate.eqStatus = 'standby'
+    //     _eqs[indexToUpdate] = eqToUpdate
+    //     setEquipments(_eqs)
+    //     // setOgEquipmentList(_eqs)
+    //     let availableEq = equipments.filter((e) => e.eqStatus === 'standby')
+    //     let assignedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let dispatchedEq = equipments.filter((e) => e.eqStatus === 'dispatched')
+    //     let inWorkshopEq = equipments.filter((e) => e.eqStatus === 'workshop')
+    //     let disposed = equipments.filter((e) => e.eqStatus === 'disposed')
+    //     setNAssigned(assignedEq.length)
+    //     setNAvailable(availableEq.length)
+    //     setNDispatched(dispatchedEq.length)
+    //     setNInWorkshop(inWorkshopEq.length)
+    //     setNDisposed(disposed.length)
+    //   })
   }
 
   function disposeEquipment() {
@@ -523,7 +581,7 @@ export default function Equipments() {
         rate,
         supplierRate,
         uom,
-        effectiveDate
+        effectiveDate,
       }),
     })
       .then((res) => res.json())
@@ -925,6 +983,8 @@ export default function Equipments() {
                       handleChange={_setToChange}
                       canMoveAssets={canMoveAssets}
                       canCreateData={canCreateData}
+                      handleOpenDrawer={setOpenDrawer}
+                      handleViewRow={setViewRow}
                     />
                   )
                 })}
@@ -1237,7 +1297,7 @@ export default function Equipments() {
                 eqDescription.length > 1 &&
                 eqOwner.length > 1 &&
                 rate >= 1 &&
-                effectiveDate&&
+                effectiveDate &&
                 uom.length > 1 && (
                   <div>
                     {submitting ? (
@@ -1252,6 +1312,42 @@ export default function Equipments() {
         )}
       </div>
       <ToastContainer />
+
+      <Drawer title={`Activity log`} onClose={onCloseDrawer} open={openDrawer}>
+        {activityLog && !loadingActivity && (
+          <>
+            {activityLog?.map((activity) => {
+              return (
+                <div className="my-5 rounded border-2 p-2 text-xs">
+                  <div>Action: {activity?._id?.action?.toLowerCase()}</div>
+                  <div>
+                    Project: {activity?._id?.payload?.project?.prjDescription}
+                  </div>
+                  <div>
+                    Dispatch Date:{' '}
+                    {moment(activity?._id?.payload?.dispatch?.date).format(
+                      'DD-MMM-YYYY'
+                    )}
+                  </div>
+                  <div>
+                    Done On:{' '}
+                    {moment(activity?._id?.createdOn).format(
+                      'DD-MMM-YYYY hh:mm:ss a'
+                    )}
+                  </div>
+                  <div>
+                    Done By:{' '}
+                    {activity?._id?.doneBy?.lastName +
+                      ' ' +
+                      activity?._id?.doneBy?.firstName}
+                  </div>
+                </div>
+              )
+            })}
+          </>
+        )}
+        {loadingActivity && <Skeleton active />}
+      </Drawer>
     </>
   )
 }

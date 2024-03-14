@@ -158,6 +158,36 @@ const getShiftLabel = (shift) => {
   else return ''
 }
 
+const getTotalRevenue = (dailyWork) => {
+  let totalRevenue = 0
+  dailyWork?.map((s) => {
+    s?.uom === 'hour' || s?.duration > 16
+      ? (totalRevenue +=
+          s?.rate * _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
+      : (totalRevenue += s?.totalRevenue || 0)
+  })
+
+  return totalRevenue && totalRevenue !== 0
+    ? 'RWF ' + _.round(totalRevenue, 2).toLocaleString()
+    : '...'
+}
+
+const getTotalDuration = (dailyWork, uom) => {
+  let duration = 0
+  dailyWork?.map((s) => {
+    uom === 'hour'
+      ? (duration += _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
+      : (duration += s?.duration || 0)
+  })
+
+  if (!duration) return '...'
+
+  if (duration)
+    return uom === 'hour'
+      ? _.round(duration) + 'h'
+      : Math.round(duration * 100) / 100 + 'd'
+}
+
 export default function WorkListTable({
   data,
   handelApprove,
@@ -175,10 +205,13 @@ export default function WorkListTable({
   handlePageChange,
   dataCount,
   pageNumber,
-  handleEdit
+  handleEdit,
+  handleOpenDrawer,
+  handleViewRow,
 }) {
   const [pageSize, setPageSize] = useState(15)
   const { user, setUser } = useContext(UserContext)
+  console.log('Data ', data)
 
   //Authorization
   let canDispatch = user.userType === 'dispatch' || user.userType === 'admin'
@@ -335,7 +368,13 @@ export default function WorkListTable({
                 return (
                   <Table.Row key={row._id}>
                     <Table.Cell singleLine>
-                      <div className="flex flex-row space-x-1">
+                      <div
+                        className="flex flex-row space-x-1 cursor-pointer hover:underline"
+                        onClick={() => {
+                          handleOpenDrawer(true)
+                          handleViewRow(row._id)
+                        }}
+                      >
                         <MTextView
                           content={
                             new Date(row?.dispatch?.date).toLocaleDateString() +
@@ -349,7 +388,12 @@ export default function WorkListTable({
                               <>
                                 <div>Date(s) posted</div>
                                 {row?.dailyWork.map((d, index) => {
-                                  if (index <= 31) return <div>{d.date}</div>
+                                  if (index <= 31)
+                                    return (
+                                      <div>
+                                        {moment(d.date).format('DD-MMM-YYYY')}
+                                      </div>
+                                    )
                                 })}
                                 {row?.dailyWork?.length > 31 && <div>...</div>}
                               </>
@@ -419,10 +463,15 @@ export default function WorkListTable({
                           row.status === 'on going' ||
                           row.status === 'approved' ||
                           row.status === 'rejected'
-                            ? row?.equipment?.uom === 'hour'
-                              ? _.round(row?.duration / (1000 * 60 * 60), 2) +
-                                'h'
-                              : Math.round(row?.duration * 100) / 100 + 'd'
+                            ? !row?.siteWork
+                              ? row?.equipment?.uom === 'hour'
+                                ? _.round(row?.duration / (1000 * 60 * 60), 2) +
+                                  'h'
+                                : Math.round(row?.duration * 100) / 100 + 'd'
+                              : getTotalDuration(
+                                  row?.dailyWork,
+                                  row?.equipment?.uom
+                                )
                             : '...'
                         }
                       />
@@ -440,13 +489,15 @@ export default function WorkListTable({
                             <MTextView
                               selected={row?.selected}
                               content={
-                                row.totalRevenue
-                                  ? 'RWF ' +
-                                    _.round(
-                                      row?.totalRevenue,
-                                      2
-                                    ).toLocaleString()
-                                  : '...'
+                                !row?.siteWork
+                                  ? row.totalRevenue
+                                    ? 'RWF ' +
+                                      _.round(
+                                        row?.totalRevenue,
+                                        2
+                                      ).toLocaleString()
+                                    : '...'
+                                  : getTotalRevenue(row?.dailyWork)
                               }
                             />
                           </div>
@@ -588,12 +639,16 @@ export default function WorkListTable({
                             </div>
                           )}
 
-                        <div
-                          onClick={() => handleEdit(row, index, pageStartIndex)}
-                          className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
-                        >
-                          <PencilSquareIcon className="h-5 w-5 text-blue-500" />
-                        </div>
+                        {canViewRenues && (
+                          <div
+                            onClick={() =>
+                              handleEdit(row, index, pageStartIndex)
+                            }
+                            className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                          >
+                            <PencilSquareIcon className="h-5 w-5 text-blue-500" />
+                          </div>
+                        )}
                       </div>
                     </Table.Cell>
                     <Table.Cell singleLine>

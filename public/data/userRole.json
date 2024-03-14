@@ -1,0 +1,50 @@
+﻿[
+    {
+        "#": "1",
+        " FIRST NAME ": " ASSIA ",
+        " LAST NAME ": " MUSHIMIYIMANA ",
+        " TITLE ": "MAINTENANCE MANAGER",
+        "CONTACT NUMBER": "0784187646",
+        "ROLE IN SHABIKA": "WORKSHOP MANAGER"
+    },
+    {
+        "#": "2",
+        " FIRST NAME ": " ISRAEL ",
+        " LAST NAME ": " KAMANZI ",
+        " TITLE ": "WORKSHOP SUPERVISOR",
+        "CONTACT NUMBER": "0788757903",
+        "ROLE IN SHABIKA": "WORKSHOP SUPERVISOR"
+    },
+    {
+        "#": "3",
+        " FIRST NAME ": " JEAN MICHEAL ",
+        " LAST NAME ": " NDAGIJIMANA ",
+        " TITLE ": "MAINTENANCE RECORD & REPORTING ENGINEER",
+        "CONTACT NUMBER": "0784371878",
+        "ROLE IN SHABIKA": "RECORDING OFFICER"
+    },
+    {
+        "#": "4",
+        " FIRST NAME ": " VALENS MUVARA ",
+        " LAST NAME ": " TWAGIRIMANA ",
+        " TITLE ": "VEHICLE DIAGINOSIS & ORDER ENGINEER",
+        "CONTACT NUMBER": "0784274787",
+        "ROLE IN SHABIKA": "RECORDING OFFICER"
+    },
+    {
+        "#": "5",
+        " FIRST NAME ": " EUGENE ",
+        " LAST NAME ": " NDIZEYE ",
+        " TITLE ": "MAINTENANCE TEAM LEADER-MACHINES",
+        "CONTACT NUMBER": "0788564906",
+        "ROLE IN SHABIKA": "WORKSHOP TEAM LEADER"
+    },
+    {
+        "#": "6",
+        " FIRST NAME ": " EGIDE ",
+        " LAST NAME ": " HABIMANA ",
+        " TITLE ": "MAINTENANCE TEAM LEADER-TRUCKS",
+        "CONTACT NUMBER": "0788492175",
+        "ROLE IN SHABIKA": "WORKSHOP TEAM LEADER"
+    }
+]
