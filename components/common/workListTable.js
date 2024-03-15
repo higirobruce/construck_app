@@ -476,6 +476,7 @@ export default function WorkListTable({
                         }
                       />
                     </Table.Cell>
+                    
 
                     {canViewRenues && (
                       <Table.Cell>
