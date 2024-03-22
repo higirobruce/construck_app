@@ -4,14 +4,16 @@ import {
   PencilIcon,
 } from '@heroicons/react/24/outline'
 import React, { useContext, useEffect, useState } from 'react'
-import TextInput from '../common/TextIput'
+import TextInput from '../../common/TextIput'
 import { DatePicker, Descriptions } from 'antd'
 import moment from 'moment'
-import MTextView from '../common/mTextView'
-import MTitle from '../common/mTitle'
-import { UserContext } from '../../contexts/UserContext'
+import MTextView from '../../common/mTextView'
+import MTitle from '../../common/mTitle'
+import { UserContext } from '../../../contexts/UserContext'
 import { Loader } from 'semantic-ui-react'
-import Modal from '../common/modal'
+import Modal from '../../common/modal'
+import Menu from './menu'
+import Image from 'next/image'
 
 const { RangePicker } = DatePicker
 
@@ -62,14 +64,6 @@ export default function Reversals() {
   }, [])
 
   const getTotalRevenue = (duration, rate) => {
-    // let totalRevenue = 0
-    // dailyWork?.map((s) => {
-    //   s?.uom === 'hour'
-    //     ? (totalRevenue +=
-    //         s?.rate * _.round(s?.duration / (1000 * 60 * 60), 2) || 0)
-    //     : (totalRevenue += s?.totalRevenue || 0)
-    // })
-
     return duration && duration !== 0
       ? 'RWF ' + _.round(duration * rate, 2).toLocaleString()
       : '...'
@@ -295,32 +289,55 @@ export default function Reversals() {
 
   return (
     <div className="my-5 flex flex-col space-y-5 px-10">
-      <div className="text-2xl font-semibold">Reversals</div>
+      {/* <div className="text-2xl font-semibold">Reversals</div> */}
+      <div className="flex h-12 items-start justify-end">
+        <h2 className="flex-1">
+          <span>Dispatches</span>
+        </h2>
+      </div>
+      <Menu current="reversals" />
 
-      {/* Platenumber search */}
-      <div className="flex w-full flex-row items-center justify-around space-x-5 px-40">
-        <TextInput
-          placeholder="Search Plate number..."
-          setValue={setPlateNumber}
-          isRequired
-        />
+      {/* Plate number search */}
+      <div className="flex items-center gap-x-2">
+        <div className="w-3/12">
+          <TextInput
+            placeholder="Search Plate number..."
+            setValue={setPlateNumber}
+            isRequired
+          />
+        </div>
 
-        <div className="">
+        <div className="w-auto">
           <RangePicker
             onChange={(values, dateStrings) => {
               setStartDate(dateStrings[0])
               setEndDate(dateStrings[1])
             }}
+            style={{
+              border: '1px solid #d9d9d9',
+              borderRadius: '0px',
+              cursor: 'pointer',
+              fontSize: '17px',
+              margin: '0px',
+              padding: '8px 12px',
+            }}
           />
         </div>
 
         {plateNumber.length >= 3 && startDate && endDate && (
-          <div
+          <button
+            type="button"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-400 p-0 text-gray-400 hover:text-gray-500 focus:relative md:hover:bg-gray-50"
             onClick={() => getTransactions()}
-            className="flex cursor-pointer items-center justify-center rounded-full bg-white p-2 text-red-500 shadow-lg active:shadow-none"
           >
-            <ArrowRightIcon className="h-5 w-5" />
-          </div>
+            <ArrowRightIcon className="h-4 w-4" />
+          </button>
+          // <div
+          //   onClick={() => getTransactions()}
+          //   className="w-cursor-pointer flex items-center justify-center rounded-full bg-white p-2 text-red-500 shadow-lg active:shadow-none"
+          // >
+          //   <ArrowRightIcon className="h-5 w-5" />
+          // </div>
         )}
       </div>
 
@@ -408,7 +425,7 @@ export default function Reversals() {
                                 t?.totalExpenditure
                               )
                             }}
-                            className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
+                            className="bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-500 flex h-6 w-6 cursor-pointer items-center justify-center rounded p-1 text-white shadow-sm"
                           >
                             <PencilIcon className="h-5 w-5" />
                           </div>
@@ -453,7 +470,7 @@ export default function Reversals() {
                             t?.totalExpenditure
                           )
                         }}
-                        className="flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-yellow-500 p-1 text-white shadow-sm hover:bg-yellow-600 active:bg-yellow-500"
+                        className="bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-500 flex h-6 w-6 cursor-pointer items-center justify-center rounded p-1 text-white shadow-sm"
                       >
                         <PencilIcon className="h-5 w-5" />
                       </div>

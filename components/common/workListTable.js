@@ -3,13 +3,11 @@ import { useContext, useState } from 'react'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 import MTextView from './mTextView'
-import MLable from './mLabel'
 import MPagination from './pagination'
 import { paginate } from '../../utils/paginate'
 import { UserContext } from '../../contexts/UserContext'
 import _ from 'lodash'
 
-import { ResponsiveWrapper } from '@nivo/core'
 import { Tooltip } from 'antd'
 import moment from 'moment'
 import {
@@ -20,7 +18,6 @@ import {
   EllipsisHorizontalIcon,
   FolderOpenIcon,
   PrinterIcon,
-  ReceiptPercentIcon,
   TrashIcon,
   XMarkIcon,
   HandThumbUpIcon,
@@ -57,7 +54,7 @@ const MStatusIndicator = ({ status }) => {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
-          <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />
+          <ExclamationTriangleIcon className="h-5 w-5 text-orange-400" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
@@ -75,7 +72,7 @@ const MStatusIndicator = ({ status }) => {
     return (
       <Tooltip title={status}>
         <div className="flex flex-row items-center justify-center">
-          <PlayIcon className="h-5 w-5 text-teal-500" />
+          <PlayIcon className="h-5 w-5 text-green-500" />
           {/* <MTextView content={status} /> */}
         </div>
       </Tooltip>
@@ -184,7 +181,7 @@ const getTotalDuration = (dailyWork, uom) => {
 
   if (duration)
     return uom === 'hour'
-      ? _.round(duration,12) + 'h'
+      ? _.round(duration, 2) + 'h'
       : Math.round(duration * 100) / 100 + 'd'
 }
 
@@ -211,7 +208,6 @@ export default function WorkListTable({
 }) {
   const [pageSize, setPageSize] = useState(15)
   const { user, setUser } = useContext(UserContext)
-  console.log('Data ', data)
 
   //Authorization
   let canDispatch = user?.permissions?.canDispatch
@@ -232,37 +228,24 @@ export default function WorkListTable({
       return p.project?.customer === user.company?.name
     })
     data = _pData
-    // pData = data
-    // pData = paginate(_pData, pageNumber, pageSize).pagedData
-    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (
     user.userType === 'customer-site-manager' ||
     user.userType === 'customer-project-manager'
   ) {
     let _pData = data.filter((p) => {
-      // console.log(p.project, user.assignedProject?._id)
       return p.project?.prjDescription === user.assignedProject?.prjDescription
     })
     data = _pData
-    // pData = data
-    // pData = paginate(_pData, pageNumber, pageSize).pagedData
-    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'driver') {
     let _pData = data.filter((p) => {
       return p.driver?._id === user._id
     })
     data = _pData
-    // pData = data
-    // pData = paginate(_pData, pageNumber, pageSize).pagedData
-    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   } else if (user.userType === 'vendor') {
     let _pData = data.filter((p) => {
       return p.equipment?.eqOwner === user.firstName
     })
     data = _pData
-    // pData = data
-    // pData = paginate(_pData, pageNumber, pageSize).pagedData
-    // pageStartIndex = paginate(_pData, pageNumber, pageSize).startIndex
   }
 
   handleSetDataSize(dataCount)
@@ -290,7 +273,7 @@ export default function WorkListTable({
                 <Table.HeaderCell>
                   <div>End Date</div>
                 </Table.HeaderCell>
-                <Table.HeaderCell>
+                <Table.HeaderCell width={4}>
                   <div
                     className="flex cursor-pointer flex-row items-center space-x-1"
                     onClick={() => handleOrder('by project')}
@@ -302,8 +285,8 @@ export default function WorkListTable({
                 <Table.HeaderCell>
                   <div className="w-30 truncate">Plate number</div>
                 </Table.HeaderCell>
-                <Table.HeaderCell singleLine>
-                  <div className="">Equipment type</div>
+                <Table.HeaderCell  width={4}>
+                  <div>Equipment type</div>
                 </Table.HeaderCell>
 
                 <Table.HeaderCell>Duration</Table.HeaderCell>
@@ -346,10 +329,6 @@ export default function WorkListTable({
                 </Table.HeaderCell>
                 <Table.HeaderCell>Customer</Table.HeaderCell>
 
-                {/* <Table.HeaderCell>Created on</Table.HeaderCell>
-            <Table.HeaderCell>Created by</Table.HeaderCell>
-            <Table.HeaderCell>Permit</Table.HeaderCell>
-            <Table.HeaderCell>Duration</Table.HeaderCell> */}
               </Table.Row>
             </Table.Header>
 
@@ -357,10 +336,6 @@ export default function WorkListTable({
               {pData.map((row, index) => {
                 let dailWorks = row.siteWork ? row.dailyWork : []
                 let siteWorkPostedToday = false
-
-                // let siteWorkPostedToday = _.find(dailWorks, {
-                //   date: moment().format('DD-MMM-YYYY'),
-                // })
 
                 return (
                   <Table.Row key={row._id}>
@@ -396,7 +371,7 @@ export default function WorkListTable({
                               </>
                             }
                           >
-                            <div className="rounded text-xs font-bold text-red-600">
+                            <div className="rounded text-xs font-bold text-red-500">
                               sw
                             </div>
                           </Tooltip>
@@ -426,7 +401,7 @@ export default function WorkListTable({
                       )}
                     </Table.Cell>
                     <Table.Cell singleLine>
-                      <MTextView content={row.project?.prjDescription} />
+                      <div className='w-56 truncate'> {row.project?.prjDescription}</div>
                     </Table.Cell>
 
                     <Table.Cell singleLine>
@@ -515,7 +490,7 @@ export default function WorkListTable({
                                 onClick={() =>
                                   handelApprove(row, index, pageStartIndex)
                                 }
-                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <CheckIcon className="h-5 w-5 text-green-400" />
                               </div>
@@ -523,7 +498,7 @@ export default function WorkListTable({
                                 onClick={() =>
                                   handelReject(row, index, pageStartIndex)
                                 }
-                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <XMarkIcon className="h-5 w-5 text-red-400" />
                               </div>
@@ -531,7 +506,7 @@ export default function WorkListTable({
                               {row.selected && (
                                 <div
                                   onClick={() => handleDeselect(row)}
-                                  className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                  className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                                 >
                                   <ClipboardIcon className="h-5 w-5 text-gray-600" />
                                 </div>
@@ -539,7 +514,7 @@ export default function WorkListTable({
                               {!row.selected && (
                                 <div
                                   onClick={() => handleSelect(row)}
-                                  className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                  className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                                 >
                                   <ClipboardDocumentCheckIcon className="h-5 w-5 text-blue-400" />
                                 </div>
@@ -555,7 +530,7 @@ export default function WorkListTable({
                                 onClick={() =>
                                   handelExpandSw(row, index, pageStartIndex)
                                 }
-                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <FolderOpenIcon className="h-5 w-5 text-blue-400" />
                               </div>
@@ -567,13 +542,13 @@ export default function WorkListTable({
                             <>
                               <div
                                 // onClick={() => handelApprove(row)}
-                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <ReceiptRefundIcon className="h-5 w-5 text-green-400" />
                               </div>
                               <div
                                 // onClick={() => handelReject(row)}
-                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                                className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                               >
                                 <PrinterIcon className="h-5 w-5 text-blue-400" />
                               </div>
@@ -586,7 +561,7 @@ export default function WorkListTable({
                               onClick={() =>
                                 handelStop(row, index, pageStartIndex)
                               }
-                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <StopIcon className="h-5 w-5 text-red-500" />
                             </div>
@@ -599,7 +574,7 @@ export default function WorkListTable({
                               onClick={() =>
                                 handelRecall(row, index, pageStartIndex)
                               }
-                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <ReceiptRefundIcon className="h-5 w-5 text-zinc-700" />
                             </div>
@@ -614,7 +589,7 @@ export default function WorkListTable({
                               onClick={() =>
                                 handelStart(row, index, pageStartIndex)
                               }
-                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <PlayIcon className="h-5 w-5 text-green-600" />
                             </div>
@@ -630,7 +605,7 @@ export default function WorkListTable({
                               onClick={() =>
                                 handelEnd(row, index, pageStartIndex)
                               }
-                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                              className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                             >
                               <TrashIcon className="h-5 w-5 text-red-600" />
                             </div>
@@ -641,7 +616,7 @@ export default function WorkListTable({
                             onClick={() =>
                               handleEdit(row, index, pageStartIndex)
                             }
-                            className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 shadow-md hover:scale-105 active:scale-95 active:shadow-sm"
+                            className="mr-4 flex h-8 w-11 cursor-pointer items-center justify-evenly rounded-full bg-white p-2 border border-gray-100 hover:scale-105 active:scale-95 active:shadow-sm"
                           >
                             <PencilSquareIcon className="h-5 w-5 text-blue-500" />
                           </div>
